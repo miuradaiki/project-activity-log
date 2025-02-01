@@ -1,0 +1,51 @@
+{
+  "name": "project-activity-log",
+  "version": "1.0.0",
+  "description": "Project activity tracking and management application",
+  "main": "main.js",
+  "scripts": {
+    "dev": "vite",
+    "start": "cross-env NODE_ENV=development ELECTRON=true electron .",
+    "build": "vite build",
+    "preview": "vite preview",
+    "electron:dev": "cross-env NODE_ENV=development ELECTRON=true concurrently \"npm run dev\" \"npm run start\"",
+    "electron:build": "cross-env NODE_ENV=production ELECTRON=true npm run build && electron-builder"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@types/uuid": "^9.0.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
+    "electron": "^29.0.0",
+    "electron-builder": "^24.13.3",
+    "typescript": "^5.0.0",
+    "vite": "^5.0.0"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.11.0",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.11.0",
+    "@mui/material": "^5.11.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "recharts": "^2.15.1",
+    "uuid": "^9.0.0"
+  },
+  "build": {
+    "appId": "com.project-activity-log.app",
+    "productName": "Project Activity Log",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "main.js",
+      "preload.js",
+      "storageUtils.js"
+    ]
+  }
+}
