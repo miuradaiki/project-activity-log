@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -48,12 +48,21 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
     setWarning(null);
   }, [project, open]);
 
-  const calculateTotalCapacity = (): number => {
+  const calculateTotalCapacity = useCallback((capacity: number): number => {
     const otherProjectsCapacity = projects
       .filter(p => p.id !== project?.id)
       .reduce((sum, p) => sum + p.monthlyCapacity, 0);
-    return otherProjectsCapacity + monthlyCapacity;
-  };
+    return otherProjectsCapacity + capacity;
+  }, [projects, project]);
+
+  useEffect(() => {
+    const totalCapacity = calculateTotalCapacity(monthlyCapacity);
+    if (totalCapacity > 1) {
+      setWarning(`全プロジェクトの合計稼働率が${(totalCapacity * 100).toFixed(1)}%になります。`);
+    } else {
+      setWarning(null);
+    }
+  }, [monthlyCapacity, calculateTotalCapacity]);
 
   const handleSave = () => {
     if (!name.trim()) {
@@ -81,13 +90,6 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
 
   const handleCapacityChange = (_: Event, newValue: number | number[]) => {
     setMonthlyCapacity(newValue as number);
-    // 合計稼働率のチェック（警告のみ）
-    const totalCapacity = calculateTotalCapacity();
-    if (totalCapacity > 1) {
-      setWarning(`全プロジェクトの合計稼働率が${(totalCapacity * 100).toFixed(1)}%になります。`);
-    } else {
-      setWarning(null);
-    }
   };
 
   return (

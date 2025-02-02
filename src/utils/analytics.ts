@@ -2,7 +2,10 @@ import { TimeEntry, Project } from '../types';
 
 // 日付の範囲内かどうかをチェック
 const isWithinDateRange = (date: Date, startDate: Date, endDate: Date): boolean => {
-  return date >= startDate && date <= endDate;
+  const normalizedDate = new Date(date.setHours(0, 0, 0, 0));
+  const normalizedStart = new Date(startDate.setHours(0, 0, 0, 0));
+  const normalizedEnd = new Date(endDate.setHours(23, 59, 59, 999));
+  return normalizedDate >= normalizedStart && normalizedDate <= normalizedEnd;
 };
 
 // 作業時間を計算（ミリ秒）
@@ -40,29 +43,51 @@ export const getDailyWorkHours = (
     }, 0) / (1000 * 60 * 60); // ミリ秒から時間に変換
 };
 
-// プロジェクトごとの作業時間を集計
+// プロジェクトごとの作業時間を集計（修正版）
 export const getProjectDistribution = (
   timeEntries: TimeEntry[],
   projects: Project[],
   startDate: Date,
   endDate: Date
 ): { projectName: string; hours: number }[] => {
-  const distribution = timeEntries
-    .filter(entry => {
-      const entryDate = new Date(entry.startTime);
-      return isWithinDateRange(entryDate, startDate, endDate);
-    })
-    .reduce((acc, entry) => {
-      const projectId = entry.projectId;
-      const duration = calculateDuration(entry.startTime, entry.endTime);
-      acc[projectId] = (acc[projectId] || 0) + duration;
-      return acc;
-    }, {} as { [key: string]: number });
+  console.log('Calculating project distribution:', { startDate, endDate });
 
-  return Object.entries(distribution).map(([projectId, duration]) => ({
-    projectName: projects.find(p => p.id === projectId)?.name || '不明なプロジェクト',
-    hours: duration / (1000 * 60 * 60)
-  }));
+  // TimeEntriesを期間でフィルタリング
+  const filteredEntries = timeEntries.filter(entry => {
+    const entryStartDate = new Date(entry.startTime);
+    const entryEndDate = entry.endTime ? new Date(entry.endTime) : new Date();
+    return (
+      (entryStartDate >= startDate && entryStartDate <= endDate) ||
+      (entryEndDate >= startDate && entryEndDate <= endDate)
+    );
+  });
+
+  console.log('Filtered entries:', filteredEntries);
+
+  // プロジェクトごとの作業時間を集計
+  const projectHours = new Map<string, number>();
+
+  filteredEntries.forEach(entry => {
+    const duration = calculateDuration(entry.startTime, entry.endTime);
+    const hours = duration / (1000 * 60 * 60); // ミリ秒から時間に変換
+    const currentHours = projectHours.get(entry.projectId) || 0;
+    projectHours.set(entry.projectId, currentHours + hours);
+  });
+
+  console.log('Project hours:', projectHours);
+
+  // プロジェクト名を付与して配列に変換
+  const distribution = Array.from(projectHours.entries())
+    .map(([projectId, hours]) => ({
+      projectName: projects.find(p => p.id === projectId)?.name || '不明なプロジェクト',
+      hours: Number(hours.toFixed(1))
+    }))
+    .filter(item => item.hours > 0)
+    .sort((a, b) => b.hours - a.hours);
+
+  console.log('Final distribution:', distribution);
+
+  return distribution;
 };
 
 // 週次の日ごとの作業時間を集計
@@ -71,17 +96,16 @@ export const getWeeklyDistribution = (
   startOfWeek: Date
 ): { date: string; hours: number }[] => {
   const result = [];
+  const days = ['月', '火', '水', '木', '金', '土', '日'];
+  
   for (let i = 0; i < 7; i++) {
-    const currentDate = new Date(
-      startOfWeek.getFullYear(),
-      startOfWeek.getMonth(),
-      startOfWeek.getDate() + i
-    );
+    const currentDate = new Date(startOfWeek);
+    currentDate.setDate(startOfWeek.getDate() + i);
     
     const hours = getDailyWorkHours(timeEntries, currentDate);
     result.push({
-      date: currentDate.toLocaleDateString('ja-JP', { weekday: 'short' }),
-      hours
+      date: days[i],
+      hours: Number(hours.toFixed(1))
     });
   }
   return result;
@@ -136,7 +160,7 @@ export const getMonthlyDistribution = (
 
     result.push({
       week: weekNumber,
-      hours: weeklyHours
+      hours: Number(weeklyHours.toFixed(1))
     });
   }
 
@@ -184,7 +208,7 @@ export const calculateMonthlyProgress = (
   const monthlyPercentage = monthlyTarget > 0 ? (monthlyHours / monthlyTarget) * 100 : 0;
 
   return {
-    monthlyHours,
-    monthlyPercentage
+    monthlyHours: Number(monthlyHours.toFixed(1)),
+    monthlyPercentage: Number(monthlyPercentage.toFixed(1))
   };
 };

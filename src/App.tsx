@@ -8,6 +8,8 @@ import {
   Tab,
 } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
+import { Project, TimeEntry } from './types';
+
 import { v4 as uuidv4 } from 'uuid';
 import { ProjectList } from './components/ProjectList';
 import { ProjectForm } from './components/ProjectForm';
@@ -15,7 +17,6 @@ import { Timer } from './components/timer/Timer';
 import { TimeEntryList } from './components/timer/TimeEntryList';
 import { ManualTimeEntryForm } from './components/timer/ManualTimeEntryForm';
 import { Dashboard } from './components/dashboard/Dashboard';
-import { Project, TimeEntry } from './types';
 import { useStorage } from './hooks/useStorage';
 
 interface TabPanelProps {
@@ -63,13 +64,14 @@ const App: React.FC = () => {
     );
   }
 
-  const handleCreateProject = (projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const handleCreateProject = (projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt' | 'isArchived'>) => {
     const timestamp = new Date().toISOString();
     const newProject: Project = {
       ...projectData,
       id: uuidv4(),
       createdAt: timestamp,
       updatedAt: timestamp,
+      isArchived: false,
     };
     setProjects([...projects, newProject]);
   };
@@ -87,12 +89,39 @@ const App: React.FC = () => {
     setEditingProject(undefined);
   };
 
-  const handleDeleteProject = (projectId: string) => {
-    if (activeProject?.id === projectId && isTimerRunning) {
+  const handleArchiveProject = (project: Project) => {
+    const updatedProject: Project = {
+      ...project,
+      isArchived: true,
+      archivedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    
+    // アクティブなプロジェクトがアーカイブされる場合、タイマーを停止
+    if (activeProject?.id === project.id && isTimerRunning) {
       handleStopTimer();
     }
-    setProjects(projects.filter((p) => p.id !== projectId));
-    setTimeEntries(timeEntries.filter((t) => t.projectId !== projectId));
+    
+    setProjects(projects.map(p => p.id === project.id ? updatedProject : p));
+  };
+
+  const handleUnarchiveProject = (project: Project) => {
+    const updatedProject: Project = {
+      ...project,
+      isArchived: false,
+      archivedAt: undefined,
+      updatedAt: new Date().toISOString(),
+    };
+    
+    setProjects(projects.map(p => p.id === project.id ? updatedProject : p));
+  };
+
+  const handleDeleteProject = (project: Project) => {
+    if (activeProject?.id === project.id && isTimerRunning) {
+      handleStopTimer();
+    }
+    setProjects(projects.filter((p) => p.id !== project.id));
+    setTimeEntries(timeEntries.filter((t) => t.projectId !== project.id));
   };
 
   const handleStartTimer = (project: Project) => {
@@ -191,6 +220,8 @@ const App: React.FC = () => {
           projects={projects}
           onEditProject={handleOpenProjectForm}
           onDeleteProject={handleDeleteProject}
+          onArchiveProject={handleArchiveProject}
+          onUnarchiveProject={handleUnarchiveProject}
           onStartTimer={handleStartTimer}
           activeProjectId={activeProject?.id || null}
           timeEntries={timeEntries}
