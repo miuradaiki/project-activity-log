@@ -1,7 +1,30 @@
-import React from 'react';
-import { Box, Typography } from '@mui/material';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { PieChart, Pie, Cell, Legend } from 'recharts';
+import React, { useState } from 'react';
+import { 
+  Box, 
+  Typography, 
+  IconButton,
+  ButtonGroup,
+  Button,
+} from '@mui/material';
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer 
+} from 'recharts';
+import { 
+  PieChart, 
+  Pie, 
+  Cell, 
+  Legend 
+} from 'recharts';
+import { 
+  ChevronLeft as ChevronLeftIcon,
+  ChevronRight as ChevronRightIcon,
+} from '@mui/icons-material';
 import { Project, TimeEntry } from '../../types';
 import { getWeeklyDistribution, getProjectDistribution } from '../../utils/analytics';
 
@@ -11,28 +34,47 @@ interface WeeklySummaryProps {
 }
 
 export const WeeklySummary: React.FC<WeeklySummaryProps> = ({ projects, timeEntries }) => {
-  // 今日を含む週の開始日（月曜日）を取得
-  const getStartOfWeek = () => {
+  const [weekOffset, setWeekOffset] = useState(0);
+
+  // 指定された週の開始日（月曜日）を取得
+  const getStartOfWeek = (offset: number = 0) => {
     const now = new Date();
     now.setHours(0, 0, 0, 0);
     const day = now.getDay();
-    // 日曜日は0なので、月曜日を基準にした調整が必要
     const diff = day === 0 ? -6 : 1 - day;
     const monday = new Date(now);
-    monday.setDate(now.getDate() + diff);
+    monday.setDate(now.getDate() + diff + (offset * 7));
     return monday;
   };
 
-  const startOfWeek = getStartOfWeek();
+  const startOfWeek = getStartOfWeek(weekOffset);
   const endOfWeek = new Date(startOfWeek);
   endOfWeek.setDate(endOfWeek.getDate() + 6);
   endOfWeek.setHours(23, 59, 59, 999);
 
   const weeklyData = getWeeklyDistribution(timeEntries, startOfWeek);
   const projectDistribution = getProjectDistribution(timeEntries, projects, startOfWeek, endOfWeek)
-    .sort((a, b) => b.hours - a.hours); // 時間の降順でソート
+    .sort((a, b) => b.hours - a.hours);
 
-  // 円グラフの色
+  // 週の移動ハンドラー
+  const handlePrevWeek = () => {
+    setWeekOffset(prev => prev - 1);
+  };
+
+  const handleNextWeek = () => {
+    setWeekOffset(prev => prev + 1);
+  };
+
+  const handleCurrentWeek = () => {
+    setWeekOffset(0);
+  };
+
+  // 週の表示文字列を生成
+  const formatWeekDisplay = (start: Date, end: Date) => {
+    return `${start.getFullYear()}年${start.getMonth() + 1}月${start.getDate()}日 〜 ${
+      end.getMonth() + 1}月${end.getDate()}日`;
+  };
+
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82ca9d', '#ffc658'];
 
   // カスタムツールチップ
@@ -60,8 +102,30 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({ projects, timeEntr
 
   return (
     <Box>
-      <Typography variant="h6" gutterBottom>
-        週間サマリー
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography variant="h6">
+          週間サマリー
+        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <ButtonGroup size="small" aria-label="週の移動">
+            <IconButton onClick={handlePrevWeek}>
+              <ChevronLeftIcon />
+            </IconButton>
+            <Button 
+              onClick={handleCurrentWeek}
+              variant={weekOffset === 0 ? "contained" : "outlined"}
+            >
+              今週
+            </Button>
+            <IconButton onClick={handleNextWeek}>
+              <ChevronRightIcon />
+            </IconButton>
+          </ButtonGroup>
+        </Box>
+      </Box>
+
+      <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+        {formatWeekDisplay(startOfWeek, endOfWeek)}
       </Typography>
 
       {/* 日別作業時間グラフ */}
@@ -118,12 +182,6 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({ projects, timeEntr
           この期間の作業記録はありません
         </Typography>
       )}
-      
-      <Box sx={{ mt: 2, p: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
-        <Typography variant="caption" component="div">
-          集計期間: {startOfWeek.toLocaleDateString()} 〜 {endOfWeek.toLocaleDateString()}
-        </Typography>
-      </Box>
     </Box>
   );
 };
