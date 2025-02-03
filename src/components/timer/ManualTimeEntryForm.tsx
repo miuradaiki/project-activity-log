@@ -11,7 +11,11 @@ import {
   Select,
   MenuItem,
   Box,
+  IconButton,
+  InputAdornment,
+  Tooltip,
 } from '@mui/material';
+import { Update } from '@mui/icons-material';
 import { Project, TimeEntry } from '../../types';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -20,9 +24,10 @@ interface ManualTimeEntryFormProps {
   onClose: () => void;
   onSave: (timeEntry: TimeEntry) => void;
   projects: Project[];
-  timeEntry?: TimeEntry; // 編集時のTimeEntry
+  timeEntry?: TimeEntry;
 }
 
+// export defaultをexportに変更
 export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
   open,
   onClose,
@@ -36,7 +41,6 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
   const [endTime, setEndTime] = useState<string>('17:00');
   const [description, setDescription] = useState<string>('');
 
-  // 編集時のデータ初期化
   useEffect(() => {
     if (timeEntry) {
       const startDate = new Date(timeEntry.startTime);
@@ -49,6 +53,20 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
       setDescription(timeEntry.description || '');
     }
   }, [timeEntry]);
+
+  const getCurrentTime = () => {
+    const now = new Date();
+    return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  };
+
+  const handleSetCurrentTime = (target: 'start' | 'end') => {
+    const currentTime = getCurrentTime();
+    if (target === 'start') {
+      setStartTime(currentTime);
+    } else {
+      setEndTime(currentTime);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,6 +143,22 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
                 fullWidth
                 required
                 InputLabelProps={{ shrink: true }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Tooltip title="現在時刻を開始時刻にセット">
+                        <IconButton
+                          onClick={() => handleSetCurrentTime('start')}
+                          edge="end"
+                          size="small"
+                          sx={{ mr: -0.5, color: 'primary.main' }}
+                        >
+                          <Update fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </InputAdornment>
+                  ),
+                }}
               />
 
               <TextField
@@ -135,6 +169,22 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
                 fullWidth
                 required
                 InputLabelProps={{ shrink: true }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Tooltip title="現在時刻を終了時刻にセット">
+                        <IconButton
+                          onClick={() => handleSetCurrentTime('end')}
+                          edge="end"
+                          size="small"
+                          sx={{ mr: -0.5, color: 'primary.main' }}
+                        >
+                          <Update fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </InputAdornment>
+                  ),
+                }}
               />
             </Box>
 
