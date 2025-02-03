@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Box, Typography, Paper, IconButton } from '@mui/material';
 import { PlayArrow, Stop } from '@mui/icons-material';
 import { Project } from '../../types';
+import { formatElapsedTime } from '../../utils/time';
 
 interface TimerProps {
   project: Project | null;
@@ -20,33 +21,49 @@ export const Timer: React.FC<TimerProps> = ({
 }) => {
   const [elapsed, setElapsed] = useState<string>('00:00:00');
 
+  const calculateElapsed = useCallback(() => {
+    if (!startTime) return '00:00:00';
+    const diff = new Date().getTime() - new Date(startTime).getTime();
+    return formatElapsedTime(diff);
+  }, [startTime]);
+
   useEffect(() => {
-    let intervalId: NodeJS.Timeout;
+    let intervalId: number;
 
     if (isRunning && startTime) {
-      intervalId = setInterval(() => {
-        const start = new Date(startTime).getTime();
-        const now = new Date().getTime();
-        const diff = now - start;
-
-        const hours = Math.floor(diff / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-        setElapsed(
-          `${hours.toString().padStart(2, '0')}:${minutes
-            .toString()
-            .padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
-        );
+      // 初回計算
+      setElapsed(calculateElapsed());
+      
+      // 1秒ごとに更新
+      intervalId = window.setInterval(() => {
+        const currentElapsed = new Date().getTime() - new Date(startTime).getTime();
+        
+        // 8時間（28800000ミリ秒）を超えた場合、タイマーを自動停止
+        if (currentElapsed >= 8 * 60 * 60 * 1000) {
+          onStop();
+          // 通知を表示
+          new Notification('作業時間が8時間を超過しました', {
+            body: 'タイマーを自動停止しました。必要に応じて新しいセッションを開始してください。'
+          });
+        } else {
+          setElapsed(formatElapsedTime(currentElapsed));
+        }
       }, 1000);
     }
 
     return () => {
       if (intervalId) {
-        clearInterval(intervalId);
+        window.clearInterval(intervalId);
       }
     };
-  }, [isRunning, startTime]);
+  }, [isRunning, startTime, calculateElapsed, onStop]);
+
+  // コンポーネントマウント時に経過時間を再計算
+  useEffect(() => {
+    if (isRunning && startTime) {
+      setElapsed(calculateElapsed());
+    }
+  }, []);
 
   if (!project) {
     return null;
