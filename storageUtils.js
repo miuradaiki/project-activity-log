@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { app } = require('electron');
+const { app, dialog, BrowserWindow } = require('electron');
 
 const USER_DATA_PATH = app.getPath('userData');
 const STORAGE_PATH = path.join(USER_DATA_PATH, 'data');
@@ -104,10 +104,66 @@ const loadTimeEntries = async () => {
   }
 };
 
+const Papa = require('papaparse');
+
+/**
+ * 時間記録データをCSVとしてエクスポート
+ * @param {Array} timeEntries 時間記録データ
+ * @param {Array} projects プロジェクトデータ
+ */
+const exportToCSV = async (timeEntries, projects) => {
+  try {
+    // プロジェクトデータをIDでマップ化
+    const projectMap = projects.reduce((map, project) => {
+      map[project.id] = project;
+      return map;
+    }, {});
+
+    // データを整形
+    const csvData = timeEntries.map(entry => {
+      const project = projectMap[entry.projectId];
+      return {
+        date: new Date(entry.startTime).toLocaleDateString(),
+        start_time: new Date(entry.startTime).toLocaleTimeString(),
+        end_time: new Date(entry.endTime).toLocaleTimeString(),
+        duration_minutes: Math.round((new Date(entry.endTime) - new Date(entry.startTime)) / (1000 * 60)),
+        project_name: project ? project.name : 'Unknown Project',
+        project_description: project ? project.description : '',
+        notes: entry.notes || ''
+      };
+    });
+
+    // CSVにエクスポート
+    const csv = Papa.unparse(csvData, {
+      header: true,
+      quotes: true
+    });
+
+    // 保存先を選択
+    const { filePath } = await dialog.showSaveDialog(BrowserWindow.getFocusedWindow(), {
+      title: '作業時間記録をエクスポート',
+      defaultPath: `work-log-${new Date().toISOString().split('T')[0]}.csv`,
+      filters: [
+        { name: 'CSV Files', extensions: ['csv'] }
+      ]
+    });
+
+    if (filePath) {
+      await fs.promises.writeFile(filePath, csv);
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error('Error exporting to CSV:', error);
+    throw error;
+  }
+};
+
 module.exports = {
   initStorage,
   saveProjects,
   loadProjects,
   saveTimeEntries,
   loadTimeEntries,
+  exportToCSV,
 };

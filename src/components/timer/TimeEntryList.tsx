@@ -13,6 +13,7 @@ import {
 import { Delete, Edit } from '@mui/icons-material';
 import { TimeEntry, Project } from '../../types';
 import { DeleteConfirmDialog } from '../DeleteConfirmDialog';
+import { ExportButton } from '../ExportButton';
 
 interface TimeEntryListProps {
   timeEntries: TimeEntry[];
@@ -113,9 +114,12 @@ export const TimeEntryList: React.FC<TimeEntryListProps> = ({
 
   return (
     <Paper elevation={2} sx={{ p: 2 }}>
-      <Typography variant="h6" gutterBottom>
-        作業履歴
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography variant="h6">
+          作業履歴
+        </Typography>
+        <ExportButton />
+      </Box>
       <List>
         {Object.entries(groupedEntries).map(([date, entries], groupIndex) => (
           <React.Fragment key={date}>

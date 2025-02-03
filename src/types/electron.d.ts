@@ -5,6 +5,7 @@ export interface ElectronAPI {
   saveProjects: (projects: Project[]) => Promise<void>;
   loadTimeEntries: () => Promise<TimeEntry[]>;
   saveTimeEntries: (entries: TimeEntry[]) => Promise<void>;
+    exportToCSV: () => Promise<{ success: boolean; error?: string; }>;
 }
 
 declare global {

@@ -6,7 +6,8 @@ const {
   loadProjects,
   saveProjects,
   loadTimeEntries,
-  saveTimeEntries
+  saveTimeEntries,
+  exportToCSV
 } = require('./storageUtils');
 
 function createWindow() {
@@ -77,6 +78,18 @@ app.whenReady().then(async () => {
 
   ipcMain.handle('save-time-entries', async (_, timeEntries) => {
     await saveTimeEntries(timeEntries);
+  });
+
+  ipcMain.handle('export-to-csv', async () => {
+    try {
+      const timeEntries = await loadTimeEntries();
+      const projects = await loadProjects();
+      const result = await exportToCSV(timeEntries, projects);
+      return { success: result };
+    } catch (error) {
+      console.error('Error in export-to-csv handler:', error);
+      return { success: false, error: error.message };
+    }
   });
 
   createWindow();
