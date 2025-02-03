@@ -132,18 +132,22 @@ export const TimeEntryList: React.FC<TimeEntryListProps> = ({
             {entries.map((entry) => (
               <ListItem
                 key={entry.id}
+                sx={{
+                  '& .MuiListItemSecondaryAction-root': {
+                    right: '8px',
+                  },
+                }}
                 secondaryAction={
-                  <Box>
-                    <IconButton 
-                      edge="end" 
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    <IconButton
+                      size="small"
                       aria-label="edit"
                       onClick={() => onEditTimeEntry(entry)}
-                      sx={{ mr: 1 }}
                     >
                       <Edit />
                     </IconButton>
-                    <IconButton 
-                      edge="end" 
+                    <IconButton
+                      size="small"
                       aria-label="delete"
                       onClick={() => handleDeleteClick(entry)}
                     >
@@ -154,26 +158,46 @@ export const TimeEntryList: React.FC<TimeEntryListProps> = ({
               >
                 <ListItemText
                   primary={
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Box component="span">
+                    <Box sx={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      alignItems: 'center',
+                      pr: 12,
+                    }}>
+                      <Typography variant="body1" component="span">
                         {getProjectName(entry.projectId)}
-                      </Box>
-                      <Box component="span" sx={{ color: 'text.secondary' }}>
+                      </Typography>
+                      <Typography 
+                        variant="body2" 
+                        component="span" 
+                        color="text.secondary"
+                        sx={{ minWidth: '70px', textAlign: 'right' }}
+                      >
                         {formatDuration(entry.startTime, entry.endTime)}
-                      </Box>
+                      </Typography>
                     </Box>
                   }
                   secondary={
-                    <>
-                      <Box component="span" sx={{ display: 'block' }}>
+                    <Box sx={{ pr: 12 }}>
+                      <Typography variant="body2" component="span" display="block">
                         {formatTime(entry.startTime)} - {entry.endTime ? formatTime(entry.endTime) : 'Running'}
-                      </Box>
+                      </Typography>
                       {entry.description && (
-                        <Box component="span" sx={{ display: 'block', color: 'text.secondary' }}>
+                        <Typography 
+                          variant="body2" 
+                          component="span" 
+                          display="block" 
+                          color="text.secondary"
+                          sx={{
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
                           {entry.description}
-                        </Box>
+                        </Typography>
                       )}
-                    </>
+                    </Box>
                   }
                 />
               </ListItem>
