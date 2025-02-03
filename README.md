@@ -106,7 +106,7 @@
 
 ### プロジェクト構造
 ```
-workload-manager/
+project-activity-log/
 ├── src/
 │   ├── components/     # Reactコンポーネント
 │   │   ├── ProjectList.tsx
@@ -143,7 +143,7 @@ workload-manager/
 1. リポジトリのクローン
 ```bash
 git clone [repository-url]
-cd workload-manager
+cd project-activity-log
 ```
 
 2. 依存パッケージのインストール
