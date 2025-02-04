@@ -13,13 +13,13 @@ import {
   YAxis, 
   CartesianGrid, 
   Tooltip, 
-  ResponsiveContainer 
+  ResponsiveContainer,
+  Legend
 } from 'recharts';
 import { 
   PieChart, 
   Pie, 
-  Cell, 
-  Legend 
+  Cell
 } from 'recharts';
 import { 
   ChevronLeft as ChevronLeftIcon,
@@ -36,7 +36,6 @@ interface WeeklySummaryProps {
 export const WeeklySummary: React.FC<WeeklySummaryProps> = ({ projects, timeEntries }) => {
   const [weekOffset, setWeekOffset] = useState(0);
 
-  // 指定された週の開始日（月曜日）を取得
   const getStartOfWeek = (offset: number = 0) => {
     const now = new Date();
     now.setHours(0, 0, 0, 0);
@@ -52,22 +51,14 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({ projects, timeEntr
   endOfWeek.setDate(endOfWeek.getDate() + 6);
   endOfWeek.setHours(23, 59, 59, 999);
 
-  const weeklyData = getWeeklyDistribution(timeEntries, startOfWeek);
+  const weeklyData = getWeeklyDistribution(timeEntries, projects, startOfWeek);
   const projectDistribution = getProjectDistribution(timeEntries, projects, startOfWeek, endOfWeek)
     .sort((a, b) => b.hours - a.hours);
 
   // 週の移動ハンドラー
-  const handlePrevWeek = () => {
-    setWeekOffset(prev => prev - 1);
-  };
-
-  const handleNextWeek = () => {
-    setWeekOffset(prev => prev + 1);
-  };
-
-  const handleCurrentWeek = () => {
-    setWeekOffset(0);
-  };
+  const handlePrevWeek = () => setWeekOffset(prev => prev - 1);
+  const handleNextWeek = () => setWeekOffset(prev => prev + 1);
+  const handleCurrentWeek = () => setWeekOffset(0);
 
   // 週の表示文字列を生成
   const formatWeekDisplay = (start: Date, end: Date) => {
@@ -78,8 +69,10 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({ projects, timeEntr
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82ca9d', '#ffc658'];
 
   // カスタムツールチップ
-  const CustomTooltip = ({ active, payload }: any) => {
+  const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
+      const totalHours = payload.reduce((sum: number, item: any) => sum + (item.value || 0), 0);
+      
       return (
         <Box sx={{ 
           bgcolor: 'background.paper', 
@@ -89,10 +82,19 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({ projects, timeEntr
           borderRadius: 1,
         }}>
           <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-            {payload[0].payload.projectName || payload[0].name}
+            {label}曜日
           </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {payload[0].value.toFixed(1)}時間
+          {payload.map((item: any, index: number) => (
+            item.value > 0 && (
+              <Box key={index} sx={{ mt: 0.5 }}>
+                <Typography variant="body2" sx={{ color: item.color }}>
+                  {item.name}: {item.value.toFixed(1)}時間
+                </Typography>
+              </Box>
+            )
+          ))}
+          <Typography variant="body2" sx={{ mt: 1, pt: 1, borderTop: '1px solid', borderColor: 'divider' }}>
+            合計: {totalHours.toFixed(1)}時間
           </Typography>
         </Box>
       );
@@ -128,7 +130,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({ projects, timeEntr
         {formatWeekDisplay(startOfWeek, endOfWeek)}
       </Typography>
 
-      {/* 日別作業時間グラフ */}
+      {/* 日別作業時間グラフ（プロジェクト別に積み上げ） */}
       <Box sx={{ width: '100%', height: 300, mb: 4 }}>
         <ResponsiveContainer>
           <BarChart data={weeklyData}>
@@ -136,7 +138,15 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({ projects, timeEntr
             <XAxis dataKey="date" />
             <YAxis unit="h" />
             <Tooltip content={<CustomTooltip />} />
-            <Bar dataKey="hours" fill="#8884d8" name="作業時間" />
+            <Legend />
+            {projects.map((project, index) => (
+              <Bar
+                key={project.id}
+                dataKey={project.name}
+                stackId="a"
+                fill={COLORS[index % COLORS.length]}
+              />
+            ))}
           </BarChart>
         </ResponsiveContainer>
       </Box>

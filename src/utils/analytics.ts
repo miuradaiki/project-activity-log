@@ -2,9 +2,12 @@ import { TimeEntry, Project } from '../types';
 
 // 日付の範囲内かどうかをチェック
 const isWithinDateRange = (date: Date, startDate: Date, endDate: Date): boolean => {
-  const normalizedDate = new Date(date.setHours(0, 0, 0, 0));
-  const normalizedStart = new Date(startDate.setHours(0, 0, 0, 0));
-  const normalizedEnd = new Date(endDate.setHours(23, 59, 59, 999));
+  const normalizedDate = new Date(date.getTime());
+  normalizedDate.setHours(0, 0, 0, 0);
+  const normalizedStart = new Date(startDate.getTime());
+  normalizedStart.setHours(0, 0, 0, 0);
+  const normalizedEnd = new Date(endDate.getTime());
+  normalizedEnd.setHours(23, 59, 59, 999);
   return normalizedDate >= normalizedStart && normalizedDate <= normalizedEnd;
 };
 
@@ -15,44 +18,74 @@ const calculateDuration = (startTime: string, endTime: string | null): number =>
   return end - start;
 };
 
-// 指定した日の作業時間を集計
+// 指定した日の作業時間を集計（プロジェクト別）
+export const getDailyProjectHours = (
+  timeEntries: TimeEntry[],
+  projects: Project[],
+  targetDate: Date
+): { [key: string]: number } => {
+  const startOfDay = new Date(targetDate);
+  startOfDay.setHours(0, 0, 0, 0);
+  const endOfDay = new Date(targetDate);
+  endOfDay.setHours(23, 59, 59, 999);
+
+  const projectHours: { [key: string]: number } = {};
+  
+  // プロジェクトごとに初期化
+  projects.forEach(project => {
+    projectHours[project.name] = 0;
+  });
+
+  timeEntries
+    .filter(entry => {
+      const entryDate = new Date(entry.startTime);
+      return isWithinDateRange(entryDate, startOfDay, endOfDay);
+    })
+    .forEach(entry => {
+      const projectName = projects.find(p => p.id === entry.projectId)?.name;
+      if (projectName) {
+        const hours = calculateDuration(entry.startTime, entry.endTime) / (1000 * 60 * 60);
+        projectHours[projectName] = (projectHours[projectName] || 0) + hours;
+      }
+    });
+
+  // 小数点第一位まで丸める
+  Object.keys(projectHours).forEach(key => {
+    projectHours[key] = Number(projectHours[key].toFixed(1));
+  });
+
+  return projectHours;
+};
+
+// 指定した日の合計作業時間を集計
 export const getDailyWorkHours = (
   timeEntries: TimeEntry[],
   targetDate: Date
 ): number => {
-  const startOfDay = new Date(
-    targetDate.getFullYear(),
-    targetDate.getMonth(),
-    targetDate.getDate(),
-    0, 0, 0, 0
-  );
-  const endOfDay = new Date(
-    targetDate.getFullYear(),
-    targetDate.getMonth(),
-    targetDate.getDate(),
-    23, 59, 59, 999
-  );
+  const startOfDay = new Date(targetDate);
+  startOfDay.setHours(0, 0, 0, 0);
+  const endOfDay = new Date(targetDate);
+  endOfDay.setHours(23, 59, 59, 999);
 
-  return timeEntries
+  const totalMilliseconds = timeEntries
     .filter(entry => {
       const entryDate = new Date(entry.startTime);
       return isWithinDateRange(entryDate, startOfDay, endOfDay);
     })
     .reduce((total, entry) => {
       return total + calculateDuration(entry.startTime, entry.endTime);
-    }, 0) / (1000 * 60 * 60); // ミリ秒から時間に変換
+    }, 0);
+
+  return Number((totalMilliseconds / (1000 * 60 * 60)).toFixed(1));
 };
 
-// プロジェクトごとの作業時間を集計（修正版）
+// プロジェクトごとの作業時間を集計
 export const getProjectDistribution = (
   timeEntries: TimeEntry[],
   projects: Project[],
   startDate: Date,
   endDate: Date
 ): { projectName: string; hours: number }[] => {
-  console.log('Calculating project distribution:', { startDate, endDate });
-
-  // TimeEntriesを期間でフィルタリング
   const filteredEntries = timeEntries.filter(entry => {
     const entryStartDate = new Date(entry.startTime);
     const entryEndDate = entry.endTime ? new Date(entry.endTime) : new Date();
@@ -62,52 +95,44 @@ export const getProjectDistribution = (
     );
   });
 
-  console.log('Filtered entries:', filteredEntries);
-
-  // プロジェクトごとの作業時間を集計
   const projectHours = new Map<string, number>();
 
   filteredEntries.forEach(entry => {
     const duration = calculateDuration(entry.startTime, entry.endTime);
-    const hours = duration / (1000 * 60 * 60); // ミリ秒から時間に変換
+    const hours = duration / (1000 * 60 * 60);
     const currentHours = projectHours.get(entry.projectId) || 0;
     projectHours.set(entry.projectId, currentHours + hours);
   });
 
-  console.log('Project hours:', projectHours);
-
-  // プロジェクト名を付与して配列に変換
-  const distribution = Array.from(projectHours.entries())
+  return Array.from(projectHours.entries())
     .map(([projectId, hours]) => ({
       projectName: projects.find(p => p.id === projectId)?.name || '不明なプロジェクト',
       hours: Number(hours.toFixed(1))
     }))
     .filter(item => item.hours > 0)
     .sort((a, b) => b.hours - a.hours);
-
-  console.log('Final distribution:', distribution);
-
-  return distribution;
 };
 
-// 週次の日ごとの作業時間を集計
+// 週次の日ごとのプロジェクト別作業時間を集計
 export const getWeeklyDistribution = (
   timeEntries: TimeEntry[],
+  projects: Project[],
   startOfWeek: Date
-): { date: string; hours: number }[] => {
-  const result = [];
+): { date: string }[] => {
   const days = ['月', '火', '水', '木', '金', '土', '日'];
+  const result = [];
   
   for (let i = 0; i < 7; i++) {
     const currentDate = new Date(startOfWeek);
     currentDate.setDate(startOfWeek.getDate() + i);
     
-    const hours = getDailyWorkHours(timeEntries, currentDate);
+    const projectHours = getDailyProjectHours(timeEntries, projects, currentDate);
     result.push({
       date: days[i],
-      hours: Number(hours.toFixed(1))
+      ...projectHours
     });
   }
+
   return result;
 };
 
@@ -186,12 +211,10 @@ export const calculateMonthlyProgress = (
   projectId: string,
   monthlyTarget: number
 ): { monthlyHours: number; monthlyPercentage: number } => {
-  // 現在の月の開始日と終了日を取得
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
   const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
 
-  // プロジェクトの当月の作業時間を集計
   const monthlyHours = timeEntries
     .filter(entry => {
       const entryDate = new Date(entry.startTime);
@@ -202,9 +225,8 @@ export const calculateMonthlyProgress = (
     })
     .reduce((total, entry) => {
       return total + calculateDuration(entry.startTime, entry.endTime);
-    }, 0) / (1000 * 60 * 60); // ミリ秒から時間に変換
+    }, 0) / (1000 * 60 * 60);
 
-  // 進捗率を計算
   const monthlyPercentage = monthlyTarget > 0 ? (monthlyHours / monthlyTarget) * 100 : 0;
 
   return {
