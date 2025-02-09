@@ -1,3 +1,5 @@
+// src/components/dashboard/WeeklySummary.tsx
+
 import React, { useState } from 'react';
 import { 
   Box, 
@@ -27,6 +29,7 @@ import {
 } from '@mui/icons-material';
 import { Project, TimeEntry } from '../../types';
 import { getWeeklyDistribution, getProjectDistribution } from '../../utils/analytics';
+import { projectColorManager } from '../../utils/colorUtils';
 
 interface WeeklySummaryProps {
   projects: Project[];
@@ -65,8 +68,6 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({ projects, timeEntr
     return `${start.getFullYear()}年${start.getMonth() + 1}月${start.getDate()}日 〜 ${
       end.getMonth() + 1}月${end.getDate()}日`;
   };
-
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82ca9d', '#ffc658'];
 
   // カスタムツールチップ
   const CustomTooltip = ({ active, payload, label }: any) => {
@@ -139,12 +140,12 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({ projects, timeEntr
             <YAxis unit="h" />
             <Tooltip content={<CustomTooltip />} />
             <Legend />
-            {projects.map((project, index) => (
+            {projects.map((project) => (
               <Bar
                 key={project.id}
                 dataKey={project.name}
                 stackId="a"
-                fill={COLORS[index % COLORS.length]}
+                fill={projectColorManager.getColorById(project.id)}
               />
             ))}
           </BarChart>
@@ -170,9 +171,15 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({ projects, timeEntr
                 fill="#8884d8"
                 paddingAngle={2}
               >
-                {projectDistribution.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
+                {projectDistribution.map((entry) => {
+                  const project = projects.find(p => p.name === entry.projectName);
+                  return (
+                    <Cell 
+                      key={entry.projectName}
+                      fill={project ? projectColorManager.getColorById(project.id) : '#CCCCCC'}
+                    />
+                  );
+                })}
               </Pie>
               <Legend
                 layout="vertical"

@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Box } from '@mui/material';
 import { Project, TimeEntry } from '../../types';
 import { DailySummary } from './DailySummary';
 import { WeeklySummary } from './WeeklySummary';
 import { MonthlySummary } from './MonthlySummary';
+import { projectColorManager } from '../../utils/colorUtils';
 
 interface DashboardProps {
   projects: Project[];
@@ -11,6 +12,11 @@ interface DashboardProps {
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ projects, timeEntries }) => {
+  // プロジェクトの色を初期化
+  useEffect(() => {
+    projectColorManager.initializeColors(projects);
+  }, [projects]);
+
   return (
     <Box sx={{ flexGrow: 1, p: 2 }}>
       {/* 日次サマリー */}
