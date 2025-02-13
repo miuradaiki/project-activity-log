@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box } from '@mui/material';
 import { Project, TimeEntry } from '../../types';
 import { DailySummary } from './DailySummary';
@@ -12,10 +12,17 @@ interface DashboardProps {
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ projects, timeEntries }) => {
+  const [isColorInitialized, setIsColorInitialized] = useState(false);
+
   // プロジェクトの色を初期化
   useEffect(() => {
     projectColorManager.initializeColors(projects);
+    setIsColorInitialized(true);
   }, [projects]);
+
+  if (!isColorInitialized) {
+    return null; // 色の初期化が完了するまでレンダリングを待機
+  }
 
   return (
     <Box sx={{ flexGrow: 1, p: 2 }}>
