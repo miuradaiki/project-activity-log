@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { 
-  Container, 
-  Box, 
-  Button, 
+import {
+  Container,
+  Box,
+  Button,
   CircularProgress,
   Tabs,
   Tab,
 } from '@mui/material';
-import { Add as AddIcon } from '@mui/icons-material';
+import { Add as AddIcon, CloudUpload as CloudUploadIcon } from '@mui/icons-material';
 import { Project, TimeEntry } from './types';
 
 import { v4 as uuidv4 } from 'uuid';
@@ -46,6 +46,33 @@ const TabPanel = (props: TabPanelProps) => {
 };
 
 const App: React.FC = () => {
+  // CSV インポート関数
+  const handleImportCSV = async () => {
+    try {
+      const filePath = await window.electronAPI.showOpenFileDialog();
+      if (!filePath) return; // ユーザーがキャンセルした場合
+
+      const { safeImportWorkLog } = await import('./utils/safeImportUtils');
+      const result = await safeImportWorkLog(
+        filePath,
+        projects,
+        timeEntries,
+        (updatedProjects, updatedTimeEntries) => {
+          setProjects(updatedProjects);
+          setTimeEntries(updatedTimeEntries);
+        }
+      );
+
+      if (result.success) {
+        console.log('インポートが成功しました。バックアップ:', result.backupPath);
+      } else {
+        console.error('インポートに失敗しました:', result.error);
+      }
+    } catch (error) {
+      console.error('インポート処理中にエラーが発生しました:', error);
+    }
+  };
+
   const { projects, setProjects, timeEntries, setTimeEntries, isLoading } = useStorage();
   const [isProjectFormOpen, setIsProjectFormOpen] = useState(false);
   const [isManualEntryFormOpen, setIsManualEntryFormOpen] = useState(false);
@@ -96,12 +123,12 @@ const App: React.FC = () => {
       archivedAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    
+
     // アクティブなプロジェクトがアーカイブされる場合、タイマーを停止
     if (activeProject?.id === project.id && isTimerRunning) {
       handleStopTimer();
     }
-    
+
     setProjects(projects.map(p => p.id === project.id ? updatedProject : p));
   };
 
@@ -112,7 +139,7 @@ const App: React.FC = () => {
       archivedAt: undefined,
       updatedAt: new Date().toISOString(),
     };
-    
+
     setProjects(projects.map(p => p.id === project.id ? updatedProject : p));
   };
 
@@ -181,8 +208,8 @@ const App: React.FC = () => {
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
-        <Tabs 
-          value={selectedTab} 
+        <Tabs
+          value={selectedTab}
           onChange={(_, newValue) => setSelectedTab(newValue)}
           aria-label="basic tabs example"
         >
@@ -199,13 +226,22 @@ const App: React.FC = () => {
           >
             作業時間を手動入力
           </Button>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => handleOpenProjectForm()}
-          >
-            プロジェクトを追加
-          </Button>
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => handleOpenProjectForm()}
+            >
+              プロジェクトを追加
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<CloudUploadIcon />}
+              onClick={handleImportCSV}
+            >
+              CSVインポート
+            </Button>
+          </Box>
         </Box>
 
         <Timer

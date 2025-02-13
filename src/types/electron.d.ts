@@ -1,11 +1,14 @@
-import { Project, TimeEntry } from '../types';
-
 export interface ElectronAPI {
-  loadProjects: () => Promise<Project[]>;
-  saveProjects: (projects: Project[]) => Promise<void>;
-  loadTimeEntries: () => Promise<TimeEntry[]>;
-  saveTimeEntries: (entries: TimeEntry[]) => Promise<void>;
-    exportToCSV: () => Promise<{ success: boolean; error?: string; }>;
+  loadProjects: () => Promise<any>;
+  saveProjects: (projects: any) => Promise<void>;
+  loadTimeEntries: () => Promise<any>;
+  saveTimeEntries: (entries: any) => Promise<void>;
+  exportToCSV: () => Promise<any>;
+  getUserDataPath: () => Promise<string>;
+  createDirectory: (path: string) => Promise<boolean>;
+  writeFile: (path: string, content: string) => Promise<boolean>;
+  readFile: (path: string, options?: { encoding: string }) => Promise<any>;
+  showOpenFileDialog: () => Promise<string | null>;
 }
 
 declare global {

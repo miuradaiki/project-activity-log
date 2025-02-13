@@ -5,7 +5,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
   saveProjects: (projects) => ipcRenderer.invoke('save-projects', projects),
   loadTimeEntries: () => ipcRenderer.invoke('load-time-entries'),
   saveTimeEntries: (entries) => ipcRenderer.invoke('save-time-entries', entries),
-  exportToCSV: () => ipcRenderer.invoke('export-to-csv')
+  exportToCSV: () => ipcRenderer.invoke('export-to-csv'),
+  getUserDataPath: () => ipcRenderer.invoke('get-user-data-path'),
+  createDirectory: (path) => ipcRenderer.invoke('create-directory', path),
+  writeFile: (path, content) => ipcRenderer.invoke('write-file', path, content),
+  readFile: (path, options) => ipcRenderer.invoke('read-file', path, options),
+  showOpenFileDialog: () => ipcRenderer.invoke('show-open-file-dialog')
 });
 
 // 通知機能の追加

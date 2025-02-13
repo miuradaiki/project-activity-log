@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const {
@@ -90,6 +90,36 @@ app.whenReady().then(async () => {
       console.error('Error in export-to-csv handler:', error);
       return { success: false, error: error.message };
     }
+  });
+
+  // 新しいIPCハンドラー
+  ipcMain.handle('get-user-data-path', () => {
+    return app.getPath('userData');
+  });
+
+  ipcMain.handle('create-directory', async (_, dirPath) => {
+    await fs.promises.mkdir(dirPath, { recursive: true });
+    return true;
+  });
+
+  ipcMain.handle('write-file', async (_, filePath, content) => {
+    await fs.promises.writeFile(filePath, content);
+    return true;
+  });
+
+  ipcMain.handle('read-file', async (_, filePath, options) => {
+    return await fs.promises.readFile(filePath, options);
+  });
+
+  ipcMain.handle('show-open-file-dialog', async () => {
+    const result = await dialog.showOpenDialog({
+      properties: ['openFile'],
+      filters: [{ name: 'CSV Files', extensions: ['csv'] }]
+    });
+    if (!result.canceled) {
+      return result.filePaths[0];
+    }
+    return null;
   });
 
   createWindow();
