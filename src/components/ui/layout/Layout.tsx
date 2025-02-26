@@ -8,7 +8,8 @@ import {
   useTheme,
   Fab,
   Tooltip,
-  useMediaQuery
+  useMediaQuery,
+  CssBaseline,
 } from '@mui/material';
 import { 
   Brightness4, 
@@ -46,13 +47,12 @@ export const Layout: React.FC<LayoutProps> = ({
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const currentDrawerWidth = sidebarOpen ? DRAWER_WIDTH : CLOSED_DRAWER_WIDTH;
 
   return (
-    <Box sx={{ 
-      display: 'flex',
-      minHeight: '100vh',
-      width: '100%'
-    }}>
+    <Box sx={{ display: 'flex' }}>
+      <CssBaseline />
+      
       {/* サイドバー */}
       <Sidebar
         open={sidebarOpen}
@@ -66,21 +66,27 @@ export const Layout: React.FC<LayoutProps> = ({
         component="main"
         sx={{
           flexGrow: 1,
-          bgcolor: 'background.default',
-          display: 'flex',
-          flexDirection: 'column',
-          minHeight: '100vh'
+          p: 0,
+          width: { sm: `calc(100% - ${currentDrawerWidth}px)` },
+          ml: { xs: 0, md: 0 }  // サイドバーの幅に応じたマージンは必要ない（Drawerが固定のため）
         }}
       >
         {/* ヘッダー */}
         <AppBar
-          position="sticky"
+          position="fixed"
           elevation={0}
           sx={{
+            width: { md: `calc(100% - ${currentDrawerWidth}px)` },
+            ml: { md: `${currentDrawerWidth}px` },
             bgcolor: 'background.paper',
             color: 'text.primary',
             borderBottom: '1px solid',
             borderColor: 'divider',
+            zIndex: (theme) => theme.zIndex.drawer - 1,
+            transition: theme.transitions.create(['width', 'margin'], {
+              easing: theme.transitions.easing.sharp,
+              duration: theme.transitions.duration.leavingScreen,
+            }),
           }}
         >
           <Toolbar>
@@ -93,15 +99,27 @@ export const Layout: React.FC<LayoutProps> = ({
           </Toolbar>
         </AppBar>
 
+        {/* ツールバーの高さ分のスペース確保 */}
+        <Toolbar />
+
         {/* コンテンツエリア */}
         <Box
           sx={{
-            flexGrow: 1,
             p: { xs: 2, md: 3 },
-            overflow: 'auto'
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            width: '100%',
           }}
         >
-          {children}
+          <Box
+            sx={{
+              width: '100%',
+              maxWidth: 'lg',
+            }}
+          >
+            {children}
+          </Box>
         </Box>
 
         {/* フローティングアクションボタン */}

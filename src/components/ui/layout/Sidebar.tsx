@@ -183,46 +183,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   // デスクトップ版レイアウト
   return (
-    <Box
+    <Drawer
+      variant="permanent"
       sx={{
         width: open ? DRAWER_WIDTH : CLOSED_DRAWER_WIDTH,
         flexShrink: 0,
-        whiteSpace: 'nowrap',
-        boxSizing: 'border-box',
-        ...(open && {
-          width: DRAWER_WIDTH,
+        '& .MuiDrawer-paper': {
+          width: open ? DRAWER_WIDTH : CLOSED_DRAWER_WIDTH,
+          boxSizing: 'border-box',
+          borderRight: `1px solid ${theme.palette.divider}`,
           transition: theme.transitions.create('width', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.enteringScreen,
           }),
-        }),
-        ...(!open && {
-          width: CLOSED_DRAWER_WIDTH,
-          transition: theme.transitions.create('width', {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
-          }),
-        }),
+          overflowX: 'hidden',
+        },
       }}
     >
-      <Drawer
-        variant="permanent"
-        open={open}
-        sx={{
-          width: 'inherit',
-          flexShrink: 0,
-          '& .MuiDrawer-paper': {
-            width: 'inherit',
-            position: 'static',
-            boxSizing: 'border-box',
-            border: 'none',
-            overflowX: 'hidden',
-            height: '100vh',
-          },
-        }}
-      >
-        {drawer}
-      </Drawer>
-    </Box>
+      {drawer}
+    </Drawer>
   );
 };
