@@ -35,10 +35,10 @@ const checkStorageFiles = async () => {
   const USER_DATA_PATH = app.getPath('userData');
   const STORAGE_PATH = path.join(USER_DATA_PATH, 'data');
   console.log('Storage Path:', STORAGE_PATH);
-  
+
   const projectsPath = path.join(STORAGE_PATH, 'projects.json');
   const timeEntriesPath = path.join(STORAGE_PATH, 'timeEntries.json');
-  
+
   try {
     if (fs.existsSync(projectsPath)) {
       const projectsData = await fs.promises.readFile(projectsPath, 'utf-8');
@@ -46,7 +46,7 @@ const checkStorageFiles = async () => {
     } else {
       console.log('Projects file does not exist');
     }
-    
+
     if (fs.existsSync(timeEntriesPath)) {
       const timeEntriesData = await fs.promises.readFile(timeEntriesPath, 'utf-8');
       console.log('Time entries file exists');
@@ -62,7 +62,7 @@ const checkStorageFiles = async () => {
 app.whenReady().then(async () => {
   initStorage();
   await checkStorageFiles();
-  
+
   // IPCハンドラーの設定
   ipcMain.handle('load-projects', async () => {
     return await loadProjects();

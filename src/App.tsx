@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import {
-  Container,
   Box,
   Button,
   CircularProgress,
-  Tabs,
-  Tab,
+  Typography,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import { Add as AddIcon, CloudUpload as CloudUploadIcon } from '@mui/icons-material';
 import { Project, TimeEntry } from './types';
@@ -18,6 +18,10 @@ import { TimeEntryList } from './components/timer/TimeEntryList';
 import { ManualTimeEntryForm } from './components/timer/ManualTimeEntryForm';
 import { Dashboard } from './components/dashboard/Dashboard';
 import { useStorage } from './hooks/useStorage';
+import { Layout } from './components/ui/layout/Layout';
+import { useThemeMode } from './components/ui/ThemeProvider';
+import { TimerFocus } from './components/ui/timer/TimerFocus';
+import { ProjectsView } from './components/ui/project/ProjectsView';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -46,6 +50,13 @@ const TabPanel = (props: TabPanelProps) => {
 };
 
 const App: React.FC = () => {
+  // テーマとレイアウト管理
+  const { isDarkMode, toggleThemeMode } = useThemeMode();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
+  const [activePage, setActivePage] = useState('timer'); // デフォルトはタイマー画面
+
   // CSV インポート関数
   const handleImportCSV = async () => {
     try {
@@ -81,8 +92,50 @@ const App: React.FC = () => {
   const [activeProject, setActiveProject] = useState<Project | null>(null);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [startTime, setStartTime] = useState<string | null>(null);
-  const [selectedTab, setSelectedTab] = useState(0);
 
+  // ページタイトルの取得
+  const getPageTitle = () => {
+    switch (activePage) {
+      case 'dashboard':
+        return 'ダッシュボード';
+      case 'projects':
+        return 'プロジェクト';
+      case 'timer':
+        return 'タイマー';
+      case 'reports':
+        return 'レポート';
+      case 'settings':
+        return '設定';
+      default:
+        return 'Project Activity Log';
+    }
+  };
+
+  // フローティングアクションボタンの設定
+  const getAddButtonConfig = () => {
+    switch (activePage) {
+      case 'projects':
+        return {
+          show: true,
+          tooltip: '新規プロジェクト',
+          onClick: () => handleOpenProjectForm(),
+        };
+      case 'timer':
+        return {
+          show: true,
+          tooltip: '作業時間を手動入力',
+          onClick: () => setIsManualEntryFormOpen(true),
+        };
+      default:
+        return {
+          show: false,
+          tooltip: '',
+          onClick: () => {},
+        };
+    }
+  };
+
+  // ローディング表示
   if (isLoading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
@@ -205,82 +258,121 @@ const App: React.FC = () => {
     }
   };
 
-  return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
-        <Tabs
-          value={selectedTab}
-          onChange={(_, newValue) => setSelectedTab(newValue)}
-          aria-label="basic tabs example"
-        >
-          <Tab label="タイマー" />
-          <Tab label="ダッシュボード" />
-        </Tabs>
-      </Box>
+  // ナビゲーション処理
+  const handleNavigate = (page: string) => {
+    setActivePage(page);
+  };
 
-      <TabPanel value={selectedTab} index={0}>
-        <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-          <Button
-            variant="outlined"
-            onClick={() => setIsManualEntryFormOpen(true)}
-          >
-            作業時間を手動入力
-          </Button>
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={() => handleOpenProjectForm()}
-            >
-              プロジェクトを追加
-            </Button>
-            <Button
-              variant="outlined"
-              startIcon={<CloudUploadIcon />}
-              onClick={handleImportCSV}
-            >
-              CSVインポート
-            </Button>
+  // フローティングボタンの設定を取得
+  const addButtonConfig = getAddButtonConfig();
+
+  // 現在のページに応じたコンテンツをレンダリング
+  const renderPageContent = () => {
+    switch (activePage) {
+      case 'dashboard':
+        return (
+          <Dashboard 
+            projects={projects} 
+            timeEntries={timeEntries} 
+          />
+        );
+      case 'projects':
+        return (
+          <ProjectsView
+            projects={projects}
+            timeEntries={timeEntries}
+            activeProjectId={activeProject?.id || null}
+            onEditProject={handleOpenProjectForm}
+            onDeleteProject={handleDeleteProject}
+            onArchiveProject={handleArchiveProject}
+            onUnarchiveProject={handleUnarchiveProject}
+            onStartTimer={handleStartTimer}
+            onAddProject={() => handleOpenProjectForm()}
+          />
+        );
+      case 'timer':
+        return (
+          <Box sx={{ width: '100%', maxWidth: 1200, mx: 'auto' }}>
+            <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="h5" component="h1" fontWeight="bold">
+                タイマー
+              </Typography>
+              <Button
+                variant="outlined"
+                startIcon={<CloudUploadIcon />}
+                onClick={handleImportCSV}
+              >
+                CSVインポート
+              </Button>
+            </Box>
+
+            <TimerFocus
+              project={activeProject}
+              isRunning={isTimerRunning}
+              startTime={startTime}
+              onStart={() => activeProject && handleStartTimer(activeProject)}
+              onStop={handleStopTimer}
+            />
+
+            <ProjectList
+              projects={projects}
+              onEditProject={handleOpenProjectForm}
+              onDeleteProject={handleDeleteProject}
+              onArchiveProject={handleArchiveProject}
+              onUnarchiveProject={handleUnarchiveProject}
+              onStartTimer={handleStartTimer}
+              activeProjectId={activeProject?.id || null}
+              timeEntries={timeEntries}
+            />
+
+            <TimeEntryList
+              timeEntries={timeEntries}
+              projects={projects}
+              onDeleteTimeEntry={handleDeleteTimeEntry}
+              onEditTimeEntry={(entry) => {
+                setEditingTimeEntry(entry);
+                setIsManualEntryFormOpen(true);
+              }}
+            />
           </Box>
-        </Box>
+        );
+      case 'reports':
+        return (
+          <Box sx={{ textAlign: 'center', py: 8 }}>
+            <Typography variant="h5" color="text.secondary">
+              レポート機能は開発中です
+            </Typography>
+          </Box>
+        );
+      case 'settings':
+        return (
+          <Box sx={{ textAlign: 'center', py: 8 }}>
+            <Typography variant="h5" color="text.secondary">
+              設定画面は開発中です
+            </Typography>
+          </Box>
+        );
+      default:
+        return null;
+    }
+  };
 
-        <Timer
-          project={activeProject}
-          isRunning={isTimerRunning}
-          startTime={startTime}
-          onStart={() => activeProject && handleStartTimer(activeProject)}
-          onStop={handleStopTimer}
-        />
+  return (
+    <Layout
+      title={getPageTitle()}
+      activePage={activePage}
+      onNavigate={handleNavigate}
+      onToggleTheme={toggleThemeMode}
+      isDarkMode={isDarkMode}
+      sidebarOpen={sidebarOpen}
+      onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+      showAddButton={addButtonConfig.show}
+      onAddButtonClick={addButtonConfig.onClick}
+      addButtonTooltip={addButtonConfig.tooltip}
+    >
+      {renderPageContent()}
 
-        <ProjectList
-          projects={projects}
-          onEditProject={handleOpenProjectForm}
-          onDeleteProject={handleDeleteProject}
-          onArchiveProject={handleArchiveProject}
-          onUnarchiveProject={handleUnarchiveProject}
-          onStartTimer={handleStartTimer}
-          activeProjectId={activeProject?.id || null}
-          timeEntries={timeEntries}
-        />
-
-        <TimeEntryList
-          timeEntries={timeEntries}
-          projects={projects}
-          onDeleteTimeEntry={handleDeleteTimeEntry}
-          onEditTimeEntry={(entry) => {
-            setEditingTimeEntry(entry);
-            setIsManualEntryFormOpen(true);
-          }}
-        />
-      </TabPanel>
-
-      <TabPanel value={selectedTab} index={1}>
-        <Dashboard
-          projects={projects}
-          timeEntries={timeEntries}
-        />
-      </TabPanel>
-
+      {/* モーダル */}
       <ProjectForm
         open={isProjectFormOpen}
         onClose={handleCloseProjectForm}
@@ -299,7 +391,7 @@ const App: React.FC = () => {
         projects={projects}
         timeEntry={editingTimeEntry}
       />
-    </Container>
+    </Layout>
   );
 };
 
