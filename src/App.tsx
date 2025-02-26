@@ -22,6 +22,7 @@ import { Layout } from './components/ui/layout/Layout';
 import { useThemeMode } from './components/ui/ThemeProvider';
 import { TimerFocus } from './components/ui/timer/TimerFocus';
 import { ProjectsView } from './components/ui/project/ProjectsView';
+import { SettingsView } from './components/settings/SettingsView';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -274,6 +275,13 @@ const App: React.FC = () => {
           <Dashboard 
             projects={projects} 
             timeEntries={timeEntries} 
+            onStartTimer={(projectId) => {
+              const project = projects.find(p => p.id === projectId);
+              if (project) handleStartTimer(project);
+            }}
+            onEditProject={handleOpenProjectForm}
+            onArchiveProject={handleArchiveProject}
+            onUnarchiveProject={handleUnarchiveProject}
           />
         );
       case 'projects':
@@ -346,11 +354,7 @@ const App: React.FC = () => {
         );
       case 'settings':
         return (
-          <Box sx={{ textAlign: 'center', py: 8 }}>
-            <Typography variant="h5" color="text.secondary">
-              設定画面は開発中です
-            </Typography>
-          </Box>
+          <SettingsView />
         );
       default:
         return null;

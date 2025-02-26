@@ -234,3 +234,121 @@ export const calculateMonthlyProgress = (
     monthlyPercentage: Number(monthlyPercentage.toFixed(1))
   };
 };
+
+/**
+ * 特定のプロジェクトの指定期間での作業時間を計算
+ */
+export const calculateProjectHours = (
+  timeEntries: TimeEntry[],
+  projectId: string,
+  startDate: Date,
+  endDate: Date
+): number => {
+  const filteredEntries = timeEntries.filter(entry => {
+    const entryDate = new Date(entry.startTime);
+    return (
+      entry.projectId === projectId &&
+      entryDate >= startDate && 
+      entryDate <= endDate
+    );
+  });
+
+  const totalHours = filteredEntries.reduce((total, entry) => {
+    return total + calculateDuration(entry.startTime, entry.endTime);
+  }, 0) / (1000 * 60 * 60);
+
+  return Number(totalHours.toFixed(1));
+};
+
+/**
+ * 稼働率から月間の目標時間を計算
+ * 基準を月間140時間（または設定値）として計算
+ * @param allocationPercentage 稼働率（0-100）
+ * @param baseMonthlyHours 基準月間時間（デフォルト: 140時間）
+ */
+export const calculateMonthlyTargetHours = (
+  allocationPercentage: number,
+  baseMonthlyHours: number = 140 // デフォルト値として140時間を使用
+): number => {
+  // 入力された値が0〜100の範囲内に収まるように調整
+  const normalizedPercentage = Math.max(0, Math.min(100, allocationPercentage));
+  const targetHours = (normalizedPercentage / 100) * baseMonthlyHours;
+  return Number(targetHours.toFixed(1));
+};
+
+/**
+ * 月間作業進捗の予想完了日を計算
+ */
+export const predictCompletionDate = (
+  currentHours: number,
+  targetHours: number,
+  dailyAverageHours: number
+): Date | null => {
+  if (currentHours >= targetHours || dailyAverageHours <= 0) {
+    return null; // すでに目標達成、または進捗がない場合
+  }
+
+  const remainingHours = targetHours - currentHours;
+  const daysNeeded = Math.ceil(remainingHours / dailyAverageHours);
+  
+  const completionDate = new Date();
+  completionDate.setDate(completionDate.getDate() + daysNeeded);
+  
+  return completionDate;
+};
+
+/**
+ * プロジェクトの1日あたりの推奨作業時間を計算
+ */
+export const calculateRecommendedDailyHours = (
+  currentHours: number,
+  targetHours: number
+): number => {
+  const now = new Date();
+  const currentDay = now.getDate();
+  const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  const remainingDays = lastDayOfMonth - currentDay + 1;
+  
+  if (remainingDays <= 0 || currentHours >= targetHours) {
+    return 0;
+  }
+  
+  const remainingHours = targetHours - currentHours;
+  const recommendedHours = remainingHours / remainingDays;
+  
+  return Number(recommendedHours.toFixed(1));
+};
+
+/**
+ * プロジェクトの日次平均作業時間を計算
+ */
+export const calculateDailyAverageHours = (
+  timeEntries: TimeEntry[],
+  projectId: string
+): number => {
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  
+  // プロジェクトの今月の作業記録
+  const filteredEntries = timeEntries.filter(entry => {
+    const entryDate = new Date(entry.startTime);
+    return entry.projectId === projectId && entryDate >= startOfMonth;
+  });
+  
+  if (filteredEntries.length === 0) return 0;
+  
+  // 作業があった日を収集
+  const workDays = new Set<string>();
+  filteredEntries.forEach(entry => {
+    const date = new Date(entry.startTime);
+    workDays.add(`${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`);
+  });
+  
+  // 合計作業時間
+  const totalHours = filteredEntries.reduce((total, entry) => {
+    return total + calculateDuration(entry.startTime, entry.endTime) / (1000 * 60 * 60);
+  }, 0);
+  
+  // 作業日数で割って平均を計算
+  return workDays.size > 0 ? Number((totalHours / workDays.size).toFixed(1)) : 0;
+};
