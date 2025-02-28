@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
 import { 
   List, 
@@ -68,6 +69,7 @@ export const ProjectList: React.FC<ProjectListProps> = ({
   timeEntries,
 }) => {
   const [tabValue, setTabValue] = useState(0);
+  const { t } = useLanguage();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
@@ -178,10 +180,10 @@ export const ProjectList: React.FC<ProjectListProps> = ({
             <Box sx={{ width: '100%' }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                 <Typography variant="body2" color="text.secondary">
-                  稼働率: {(project.monthlyCapacity * 100).toFixed(1)}%
+                  {t('projects.utilization')}: {(project.monthlyCapacity * 100).toFixed(1)}%
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {monthlyTime.toFixed(1)}時間 / {monthlyTarget.toFixed(1)}時間 ({progress.toFixed(1)}%)
+                  {monthlyTime.toFixed(1)} {t('units.hours')} / {monthlyTarget.toFixed(1)} {t('units.hours')} ({progress.toFixed(1)}%)
                 </Typography>
               </Box>
               <LinearProgress 
@@ -201,8 +203,8 @@ export const ProjectList: React.FC<ProjectListProps> = ({
     <Box sx={{ width: '100%' }}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={tabValue} onChange={handleTabChange}>
-          <Tab label={`アクティブ (${activeProjects.length})`} />
-          <Tab label={`アーカイブ (${archivedProjects.length})`} />
+          <Tab label={`${t('projects.filter.active')} (${activeProjects.length})`} />
+          <Tab label={`${t('projects.archive')} (${archivedProjects.length})`} />
         </Tabs>
       </Box>
       
@@ -222,15 +224,15 @@ export const ProjectList: React.FC<ProjectListProps> = ({
           if (selectedProject) onEditProject(selectedProject);
           handleMenuClose();
         }}>
-          <EditIcon sx={{ mr: 1 }} /> 編集
+          <EditIcon sx={{ mr: 1 }} /> {t('actions.edit')}
         </MenuItem>
         {!selectedProject?.isArchived ? (
           <MenuItem onClick={handleArchiveClick}>
-            <ArchiveIcon sx={{ mr: 1 }} /> アーカイブ
+            <ArchiveIcon sx={{ mr: 1 }} /> {t('projects.archive')}
           </MenuItem>
         ) : (
           <MenuItem onClick={handleUnarchiveClick}>
-            <UnarchiveIcon sx={{ mr: 1 }} /> アーカイブ解除
+            <UnarchiveIcon sx={{ mr: 1 }} /> {t('projects.unarchive')}
           </MenuItem>
         )}
         <MenuItem 
@@ -239,14 +241,14 @@ export const ProjectList: React.FC<ProjectListProps> = ({
           }} 
           sx={{ color: 'error.main' }}
         >
-          <DeleteIcon sx={{ mr: 1 }} /> 削除
+          <DeleteIcon sx={{ mr: 1 }} /> {t('projects.delete')}
         </MenuItem>
       </Menu>
 
       <DeleteConfirmDialog
         open={deleteConfirmOpen}
-        title="プロジェクトの削除"
-        message={`このプロジェクトをアーカイブではなく削除しますか？\n削除したプロジェクトは復元できません。`}
+        title={t('projects.delete.confirm')}
+        message={t('projects.delete.warning')}
         onConfirm={() => {
           if (selectedProject) {
             onDeleteProject(selectedProject);

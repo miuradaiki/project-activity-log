@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { Box, Grid, Paper, Typography, useTheme, useMediaQuery } from '@mui/material';
 import { Project, TimeEntry } from '../../types';
 import { DailySummary } from './DailySummary';
@@ -25,6 +26,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   onUnarchiveProject, 
 }) => {
   const theme = useTheme();
+  const { t } = useLanguage();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [isColorInitialized, setIsColorInitialized] = useState(false);
 
@@ -49,10 +51,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
       {/* ヘッダー */}
       <Box sx={{ mb: 3 }}>
         <Typography variant="h5" fontWeight="medium">
-          ダッシュボード
+          {t('dashboard.title')}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          作業状況の概要と分析
+          {t('dashboard.subtitle')}
         </Typography>
       </Box>
 

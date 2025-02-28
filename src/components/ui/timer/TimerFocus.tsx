@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useLanguage } from '../../../contexts/LanguageContext';
 import { 
   Box, 
   Typography, 
@@ -47,6 +48,7 @@ export const TimerFocus: React.FC<TimerFocusProps> = ({
   onAddNote,
 }) => {
   const theme = useTheme();
+  const { t } = useLanguage();
   const [elapsed, setElapsed] = useState<string>('00:00:00');
   const [elapsedMs, setElapsedMs] = useState<number>(0);
   const [note, setNote] = useState<string>('');
@@ -78,8 +80,8 @@ export const TimerFocus: React.FC<TimerFocusProps> = ({
         if (currentElapsed >= 8 * 60 * 60 * 1000) {
           onStop();
           // 通知を表示
-          new Notification('作業時間が8時間を超過しました', {
-            body: 'タイマーを自動停止しました。必要に応じて新しいセッションを開始してください。'
+          new Notification(t('timer.notification.maxtime'), {
+            body: t('timer.notification.maxtime.body')
           });
         } else {
           setElapsed(formatElapsedTime(currentElapsed));
@@ -133,10 +135,10 @@ export const TimerFocus: React.FC<TimerFocusProps> = ({
         }}
       >
         <Typography variant="h6" color="text.secondary" gutterBottom>
-          プロジェクトが選択されていません
+          {t('timer.project')} {t('timer.no.entries')}
         </Typography>
         <Typography variant="body1" color="text.secondary">
-          下からプロジェクトを選択して、タイマーを開始してください
+          {t('timer.title')} {t('timer.description')}
         </Typography>
       </Card>
     );
@@ -199,7 +201,7 @@ export const TimerFocus: React.FC<TimerFocusProps> = ({
         </Box>
 
         {onAddNote && (
-          <Tooltip title="メモを追加">
+          <Tooltip title={t('timer.description')}>
             <IconButton 
               onClick={() => setIsEditing(true)}
               color="primary"
@@ -279,7 +281,7 @@ export const TimerFocus: React.FC<TimerFocusProps> = ({
                 }
               }}
             >
-              開始
+              {t('timer.start')}
             </Button>
           ) : (
             <>
@@ -297,7 +299,7 @@ export const TimerFocus: React.FC<TimerFocusProps> = ({
                   }
                 }}
               >
-                完了
+              {t('timer.stop')}
               </Button>
               
               {onPause && (
@@ -317,7 +319,7 @@ export const TimerFocus: React.FC<TimerFocusProps> = ({
                     }
                   }}
                 >
-                  一時停止
+                {t('timer.manual.title')}
                 </Button>
               )}
               
@@ -335,7 +337,7 @@ export const TimerFocus: React.FC<TimerFocusProps> = ({
                     }
                   }}
                 >
-                  キャンセル
+                {t('projects.cancel')}
                 </Button>
               )}
             </>
@@ -352,7 +354,7 @@ export const TimerFocus: React.FC<TimerFocusProps> = ({
               multiline
               rows={2}
               variant="outlined"
-              placeholder="作業内容のメモを入力..."
+              placeholder={t('timer.description')}
               value={note}
               onChange={(e) => setNote(e.target.value)}
               autoFocus
@@ -368,7 +370,7 @@ export const TimerFocus: React.FC<TimerFocusProps> = ({
                 }}
                 startIcon={<Close fontSize="small" />}
               >
-                キャンセル
+              {t('projects.cancel')}
               </Button>
               <Button 
                 variant="contained" 
@@ -383,7 +385,7 @@ export const TimerFocus: React.FC<TimerFocusProps> = ({
                 }}
                 startIcon={<Check fontSize="small" />}
               >
-                保存
+              {t('actions.save')}
               </Button>
             </Box>
           </Box>

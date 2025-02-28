@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLanguage } from '../../../contexts/LanguageContext';
 import {
   Card,
   CardContent,
@@ -48,6 +49,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   onDeleteProject,
 }) => {
   const theme = useTheme();
+  const { t } = useLanguage();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   
   // 進捗率を計算
@@ -64,7 +66,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   const getStatusInfo = () => {
     if (project.isArchived) {
       return { 
-        label: 'アーカイブ', 
+        label: t('projects.archive'), 
         color: 'default' as 'default',
         bgColor: theme.palette.grey[200]
       };
@@ -72,7 +74,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
     
     if (progress >= 100) {
       return { 
-        label: '超過', 
+        label: t('projects.filter.completed'), 
         color: 'error' as 'error',
         bgColor: theme.palette.error.light
       };
@@ -80,7 +82,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
     
     if (progress >= 90) {
       return { 
-        label: '注意', 
+        label: t('projects.filter.warning'), 
         color: 'warning' as 'warning',
         bgColor: theme.palette.warning.light
       };
@@ -88,14 +90,14 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
     
     if (isActive) {
       return { 
-        label: '作業中', 
+        label: t('timer.title'), 
         color: 'secondary' as 'secondary',
         bgColor: theme.palette.secondary.light
       };
     }
     
     return { 
-      label: '進行中', 
+      label: t('projects.filter.active'), 
       color: 'primary' as 'primary',
       bgColor: theme.palette.primary.light
     };
@@ -194,7 +196,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
             height: '2.5em',
           }}
         >
-          {project.description || '説明なし'}
+          {project.description || t('projects.description')}
         </Typography>
         
         <Divider sx={{ my: 2 }} />
@@ -203,10 +205,10 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
         <Box sx={{ mt: 2 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
             <Typography variant="body2" color="text.secondary">
-              今月の進捗
+              {t('dashboard.progress.title')}
             </Typography>
             <Typography variant="body2" fontWeight="medium">
-              {monthlyTime.toFixed(1)}時間 / {monthlyTarget.toFixed(1)}時間
+              {monthlyTime.toFixed(1)} {t('units.hours')} / {monthlyTarget.toFixed(1)} {t('units.hours')}
             </Typography>
           </Box>
           
@@ -255,10 +257,10 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
             
             <Box>
               <Typography variant="body2" fontWeight="medium">
-                稼働率: {(project.monthlyCapacity * 100).toFixed(1)}%
+                {t('projects.utilization')}: {(project.monthlyCapacity * 100).toFixed(1)}%
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {project.isArchived ? 'アーカイブ済み' : isActive ? '現在作業中' : ''}
+                {project.isArchived ? t('projects.archive') : isActive ? t('timer.title') : ''}
               </Typography>
             </Box>
           </Box>
@@ -268,7 +270,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
       {/* アクションエリア */}
       <Box sx={{ p: 2, pt: 0, display: 'flex', justifyContent: 'flex-end' }}>
         {!project.isArchived && (
-          <Tooltip title={isActive ? "タイマー停止" : "タイマー開始"}>
+          <Tooltip title={isActive ? t('timer.stop') : t('timer.start')}>
             <IconButton
               color={isActive ? "secondary" : "primary"}
               onClick={() => onStartTimer(project)}
@@ -309,7 +311,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
           handleMenuClose();
         }}>
           <EditIcon fontSize="small" sx={{ mr: 1 }} />
-          編集
+          {t('actions.edit')}
         </MenuItem>
         
         {!project.isArchived && onArchiveProject && (
@@ -318,7 +320,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
             handleMenuClose();
           }}>
             <ArchiveIcon fontSize="small" sx={{ mr: 1 }} />
-            アーカイブ
+            {t('projects.archive')}
           </MenuItem>
         )}
         
@@ -328,7 +330,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
             handleMenuClose();
           }}>
             <UnarchiveIcon fontSize="small" sx={{ mr: 1 }} />
-            アーカイブ解除
+            {t('projects.unarchive')}
           </MenuItem>
         )}
         
@@ -338,7 +340,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
             onDeleteProject(project);
           }} sx={{ color: 'error.main' }}>
             <DeleteIcon fontSize="small" sx={{ mr: 1 }} />
-            削除
+            {t('projects.delete')}
           </MenuItem>
         )}
       </Menu>

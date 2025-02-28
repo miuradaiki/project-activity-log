@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { 
   Box, 
   Typography, 
@@ -62,6 +63,7 @@ export const ProjectProgressCard: React.FC<ProjectProgressCardProps> = ({
   onUpdateTarget,
 }) => {
   const theme = useTheme();
+  const { t } = useLanguage();
   const { settings } = useSettingsContext(); // 設定から基準時間を取得
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [targetDialogOpen, setTargetDialogOpen] = useState(false);
@@ -132,17 +134,17 @@ export const ProjectProgressCard: React.FC<ProjectProgressCardProps> = ({
   
   // 進捗状況に基づいて色とステータスを設定
   let statusColor = theme.palette.info.main;
-  let statusText = '進行中';
+  let statusText = t('projects.filter.active');
   
   if (progressPercentage >= 100) {
     statusColor = theme.palette.success.main;
-    statusText = '達成';
+    statusText = t('projects.filter.completed');
   } else if (progressPercentage >= 90) {
     statusColor = theme.palette.warning.main;
-    statusText = '90%達成';
+    statusText = t('projects.filter.warning');
   } else if (progressPercentage <= 25) {
     statusColor = theme.palette.grey[500];
-    statusText = '開始';
+    statusText = t('timer.start');
   }
 
   // プログレスバーの色を設定
@@ -192,11 +194,11 @@ export const ProjectProgressCard: React.FC<ProjectProgressCardProps> = ({
                 color="text.secondary"
                 sx={{ display: 'flex', alignItems: 'center' }}
               >
-                稼働率: {(project.monthlyCapacity * 100).toFixed(0)}%
+                {t('projects.utilization')}: {(project.monthlyCapacity * 100).toFixed(0)}%
               </Typography>
             </Box>
             <Box>
-              <Tooltip title="タイマー開始">
+              <Tooltip title={t('timer.start')}>
                 <IconButton 
                   size="small" 
                   color="primary"
@@ -205,7 +207,7 @@ export const ProjectProgressCard: React.FC<ProjectProgressCardProps> = ({
                   <TimerIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="その他">
+              <Tooltip title={t('actions.search')}>
                 <IconButton size="small" onClick={handleMenuOpen}>
                   <MoreIcon fontSize="small" />
                 </IconButton>
@@ -256,7 +258,7 @@ export const ProjectProgressCard: React.FC<ProjectProgressCardProps> = ({
               }}
             >
               <Typography variant="body2" fontWeight="medium">
-                進捗状況
+                {t('dashboard.progress.title')}
               </Typography>
               <Typography 
                 variant="body2" 
@@ -292,10 +294,10 @@ export const ProjectProgressCard: React.FC<ProjectProgressCardProps> = ({
               }}
             >
               <Typography variant="body2" color="text.secondary">
-                {currentHours.toFixed(1)}時間 / {targetHours.toFixed(1)}時間
+                {currentHours.toFixed(1)} {t('units.hours')} / {targetHours.toFixed(1)} {t('units.hours')}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                残り {remainingHours.toFixed(1)}時間
+                {t('projects.sort.remaining')} {remainingHours.toFixed(1)} {t('units.hours')}
               </Typography>
             </Box>
           </Box>
@@ -319,28 +321,28 @@ export const ProjectProgressCard: React.FC<ProjectProgressCardProps> = ({
           <ListItemIcon>
             <EditIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText primary="プロジェクト編集" />
+          <ListItemText primary={t('projects.edit')} />
         </MenuItem>
         
         <MenuItem onClick={handleArchive} disabled={!onArchiveProject && !onUnarchiveProject}>
           <ListItemIcon>
             {project.isArchived ? <UnarchiveIcon fontSize="small" /> : <ArchiveIcon fontSize="small" />}
           </ListItemIcon>
-          <ListItemText primary={project.isArchived ? "アーカイブ解除" : "アーカイブ"} />
+          <ListItemText primary={project.isArchived ? t('projects.unarchive') : t('projects.archive')} />
         </MenuItem>
         
         <MenuItem onClick={handleOpenTargetDialog} disabled={!onUpdateTarget}>
           <ListItemIcon>
             <AccessTimeIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText primary="月間目標時間の調整" />
+          <ListItemText primary={t('projects.monthly.target')} />
         </MenuItem>
         
         <MenuItem onClick={handleViewDetails} disabled={!onViewDetails}>
           <ListItemIcon>
             <InfoIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText primary="詳細表示" />
+          <ListItemText primary={t('timer.description')} />
         </MenuItem>
       </Menu>
 
@@ -351,16 +353,16 @@ export const ProjectProgressCard: React.FC<ProjectProgressCardProps> = ({
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>月間目標時間の調整</DialogTitle>
+        <DialogTitle>{t('projects.monthly.target')}</DialogTitle>
         <DialogContent>
           <Box sx={{ mt: 2, mb: 4 }}>
             <Typography variant="body2" color="text.secondary" gutterBottom>
-              プロジェクト: {project.name}
+              {t('projects.name')}: {project.name}
             </Typography>
             
             <Box sx={{ mt: 3 }}>
               <Typography id="monthly-capacity-slider" gutterBottom>
-                稼働率: {newMonthlyCapacity.toFixed(0)}%
+                {t('projects.utilization')}: {newMonthlyCapacity.toFixed(0)}%
               </Typography>
               <Slider
                 value={newMonthlyCapacity}
@@ -375,24 +377,24 @@ export const ProjectProgressCard: React.FC<ProjectProgressCardProps> = ({
               />
               
               <TextField
-                label="月間目標時間"
+                label={t('projects.monthly.target')}
                 type="number"
                 value={calculateMonthlyHours(newMonthlyCapacity)}
                 InputProps={{
                   readOnly: true,
-                  endAdornment: <InputAdornment position="end">時間</InputAdornment>,
+                  endAdornment: <InputAdornment position="end">{t('units.hours')}</InputAdornment>,
                 }}
                 variant="outlined"
                 fullWidth
                 size="small"
-                helperText={`稼働率に基づく月間目標時間（基準: ${settings.workHours.baseMonthlyHours}時間/月）`}
+                helperText={`${t('projects.utilization')}${t('settings.monthly.hours.example', { hours: settings.workHours.baseMonthlyHours })}`}
               />
             </Box>
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseTargetDialog}>キャンセル</Button>
-          <Button onClick={handleUpdateTarget} variant="contained">更新</Button>
+          <Button onClick={handleCloseTargetDialog}>{t('projects.cancel')}</Button>
+          <Button onClick={handleUpdateTarget} variant="contained">{t('actions.save')}</Button>
         </DialogActions>
       </Dialog>
     </>

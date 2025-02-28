@@ -1,6 +1,7 @@
 // src/components/dashboard/WeeklySummary.tsx
 
 import React, { useState } from 'react';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { 
   Box, 
   Typography, 
@@ -37,6 +38,7 @@ interface WeeklySummaryProps {
 }
 
 export const WeeklySummary: React.FC<WeeklySummaryProps> = ({ projects, timeEntries }) => {
+  const { t } = useLanguage();
   const [weekOffset, setWeekOffset] = useState(0);
 
   const getStartOfWeek = (offset: number = 0) => {
@@ -54,7 +56,8 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({ projects, timeEntr
   endOfWeek.setDate(endOfWeek.getDate() + 6);
   endOfWeek.setHours(23, 59, 59, 999);
 
-  const weeklyData = getWeeklyDistribution(timeEntries, projects, startOfWeek);
+  const isEnglish = t('language') === 'English';
+  const weeklyData = getWeeklyDistribution(timeEntries, projects, startOfWeek, isEnglish);
   const projectDistribution = getProjectDistribution(timeEntries, projects, startOfWeek, endOfWeek)
     .sort((a, b) => b.hours - a.hours);
 
@@ -65,8 +68,14 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({ projects, timeEntr
 
   // 週の表示文字列を生成
   const formatWeekDisplay = (start: Date, end: Date) => {
-    return `${start.getFullYear()}年${start.getMonth() + 1}月${start.getDate()}日 〜 ${
-      end.getMonth() + 1}月${end.getDate()}日`;
+    // 言語に応じて表示形式を切り替え
+    if (t('language') === 'English') {
+      const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+      return `${start.toLocaleDateString('en-US', options)} - ${end.toLocaleDateString('en-US', options)}`;
+    } else {
+      return `${start.getFullYear()}年${start.getMonth() + 1}月${start.getDate()}日 〜 ${
+        end.getMonth() + 1}月${end.getDate()}日`;
+    }
   };
 
   // カスタムツールチップ
@@ -83,19 +92,19 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({ projects, timeEntr
           borderRadius: 1,
         }}>
           <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-            {label}曜日
+            {t('language') === 'English' ? label : `${label}曜日`}
           </Typography>
           {payload.map((item: any, index: number) => (
             item.value > 0 && (
               <Box key={index} sx={{ mt: 0.5 }}>
                 <Typography variant="body2" sx={{ color: item.color }}>
-                  {item.name}: {item.value.toFixed(1)}時間
+                  {item.name}: {item.value.toFixed(1)} {t('units.hours')}
                 </Typography>
               </Box>
             )
           ))}
           <Typography variant="body2" sx={{ mt: 1, pt: 1, borderTop: '1px solid', borderColor: 'divider' }}>
-            合計: {totalHours.toFixed(1)}時間
+            {t('dashboard.daily.total')}: {totalHours.toFixed(1)} {t('units.hours')}
           </Typography>
         </Box>
       );
@@ -107,7 +116,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({ projects, timeEntr
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
         <Typography variant="h6">
-          週間サマリー
+          {t('dashboard.weekly.title')}
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <ButtonGroup size="small" aria-label="週の移動">
@@ -118,7 +127,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({ projects, timeEntr
               onClick={handleCurrentWeek}
               variant={weekOffset === 0 ? "contained" : "outlined"}
             >
-              今週
+              {t('time.this.week')}
             </Button>
             <IconButton onClick={handleNextWeek}>
               <ChevronRightIcon />
@@ -137,7 +146,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({ projects, timeEntr
           <BarChart data={weeklyData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="date" />
-            <YAxis unit="h" />
+            <YAxis unit={t('units.hour')[0]} />
             <Tooltip content={<CustomTooltip />} />
             <Legend />
             {projects.map((project) => (
@@ -154,7 +163,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({ projects, timeEntr
 
       {/* プロジェクト別作業時間の円グラフ */}
       <Typography variant="subtitle1" gutterBottom>
-        プロジェクト別作業時間
+        {t('dashboard.weekly.byproject')}
       </Typography>
       {projectDistribution.length > 0 ? (
         <Box sx={{ width: '100%', height: 300 }}>
@@ -196,7 +205,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({ projects, timeEntr
         </Box>
       ) : (
         <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-          この期間の作業記録はありません
+          {t('timer.no.entries')}
         </Typography>
       )}
     </Box>

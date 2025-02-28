@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLanguage } from '../../../contexts/LanguageContext';
 import {
   Box,
   Grid,
@@ -72,6 +73,7 @@ export const ProjectsGrid: React.FC<ProjectsGridProps> = ({
   onStartTimer,
 }) => {
   const [tabValue, setTabValue] = useState(0);
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortType>('name');
   
@@ -190,7 +192,7 @@ export const ProjectsGrid: React.FC<ProjectsGridProps> = ({
         gap: 2 
       }}>
         <TextField
-          placeholder="プロジェクトを検索..."
+          placeholder={t('projects.search')}
           size="small"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -205,17 +207,17 @@ export const ProjectsGrid: React.FC<ProjectsGridProps> = ({
         />
         
         <FormControl size="small" sx={{ minWidth: 150 }}>
-          <InputLabel id="sort-select-label">並べ替え</InputLabel>
+          <InputLabel id="sort-select-label">{t('actions.search')}</InputLabel>
           <Select
             labelId="sort-select-label"
             value={sortBy}
-            label="並べ替え"
+            label={t('actions.search')}
             onChange={handleSortChange}
           >
-            <MenuItem value="name">名前順</MenuItem>
-            <MenuItem value="progress">進捗率順</MenuItem>
-            <MenuItem value="capacity">稼働率順</MenuItem>
-            <MenuItem value="recent">更新日順</MenuItem>
+            <MenuItem value="name">{t('projects.sort.name')}</MenuItem>
+            <MenuItem value="progress">{t('projects.sort.progress')}</MenuItem>
+            <MenuItem value="capacity">{t('projects.utilization')}</MenuItem>
+            <MenuItem value="recent">{t('time.this.month')}</MenuItem>
           </Select>
         </FormControl>
       </Box>
@@ -229,17 +231,17 @@ export const ProjectsGrid: React.FC<ProjectsGridProps> = ({
           sx={{ borderBottom: 1, borderColor: 'divider' }}
         >
           <Tab 
-            label={`すべて (${allProjects.length})`} 
+            label={`${t('projects.filter.all')} (${allProjects.length})`} 
             id="projects-tab-0"
             aria-controls="projects-tabpanel-0"
           />
           <Tab 
-            label={`アクティブ (${activeProjects.length})`} 
+            label={`${t('projects.filter.active')} (${activeProjects.length})`} 
             id="projects-tab-1"
             aria-controls="projects-tabpanel-1"
           />
           <Tab 
-            label={`アーカイブ (${archivedProjects.length})`} 
+            label={`${t('projects.archive')} (${archivedProjects.length})`} 
             id="projects-tab-2"
             aria-controls="projects-tabpanel-2"
           />
@@ -269,7 +271,7 @@ export const ProjectsGrid: React.FC<ProjectsGridProps> = ({
         ) : (
           <Box sx={{ textAlign: 'center', py: 8 }}>
             <Typography variant="h6" color="text.secondary">
-              検索条件に一致するプロジェクトがありません
+              {t('timer.no.entries')}
             </Typography>
           </Box>
         )}
@@ -297,7 +299,7 @@ export const ProjectsGrid: React.FC<ProjectsGridProps> = ({
         ) : (
           <Box sx={{ textAlign: 'center', py: 8 }}>
             <Typography variant="h6" color="text.secondary">
-              アクティブなプロジェクトがありません
+              {t('timer.no.entries')}
             </Typography>
           </Box>
         )}
@@ -325,7 +327,7 @@ export const ProjectsGrid: React.FC<ProjectsGridProps> = ({
         ) : (
           <Box sx={{ textAlign: 'center', py: 8 }}>
             <Typography variant="h6" color="text.secondary">
-              アーカイブされたプロジェクトがありません
+              {t('timer.no.entries')}
             </Typography>
           </Box>
         )}

@@ -1,7 +1,7 @@
 import { TimeEntry, Project } from '../types';
 
 // 日付の範囲内かどうかをチェック
-const isWithinDateRange = (date: Date, startDate: Date, endDate: Date): boolean => {
+export const isWithinDateRange = (date: Date, startDate: Date, endDate: Date): boolean => {
   const normalizedDate = new Date(date.getTime());
   normalizedDate.setHours(0, 0, 0, 0);
   const normalizedStart = new Date(startDate.getTime());
@@ -117,9 +117,12 @@ export const getProjectDistribution = (
 export const getWeeklyDistribution = (
   timeEntries: TimeEntry[],
   projects: Project[],
-  startOfWeek: Date
+  startOfWeek: Date,
+  isEnglish: boolean = false
 ): { date: string }[] => {
-  const days = ['月', '火', '水', '木', '金', '土', '日'];
+  const japDays = ['月', '火', '水', '木', '金', '土', '日'];
+  const engDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const days = isEnglish ? engDays : japDays;
   const result = [];
   
   for (let i = 0; i < 7; i++) {

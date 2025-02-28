@@ -32,9 +32,9 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   });
 
   // テーマモードの切り替え
-  const toggleThemeMode = () => {
+  const toggleThemeMode = React.useCallback(() => {
     setIsDarkMode((prev) => !prev);
-  };
+  }, []);
 
   // テーマモードが変更されたらローカルストレージに保存
   useEffect(() => {
@@ -47,7 +47,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const contextValue = useMemo(() => ({
     isDarkMode,
     toggleThemeMode,
-  }), [isDarkMode]);
+  }), [isDarkMode, toggleThemeMode]);
 
   return (
     <ThemeContext.Provider value={contextValue}>

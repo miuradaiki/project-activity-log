@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLanguage } from '../../../contexts/LanguageContext';
 import { Box, Typography, Button, useTheme } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 import { Project, TimeEntry } from '../../../types';
@@ -29,6 +30,7 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({
   onAddProject,
 }) => {
   const theme = useTheme();
+  const { t } = useLanguage();
   const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
@@ -64,10 +66,10 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({
       }}>
         <Box>
           <Typography variant="h5" component="h1" fontWeight="bold" gutterBottom>
-            プロジェクト一覧
+            {t('projects.title')}
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            プロジェクトの管理と進捗状況の確認ができます
+            {t('dashboard.progress.subtitle')}
           </Typography>
         </Box>
         
@@ -82,7 +84,7 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({
             boxShadow: 2
           }}
         >
-          新規プロジェクト
+          {t('projects.new')}
         </Button>
       </Box>
 
@@ -101,8 +103,8 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({
       {/* 削除確認ダイアログ */}
       <DeleteConfirmDialog
         open={isDeleteDialogOpen}
-        title="プロジェクトの削除"
-        message={`${projectToDelete?.name} を削除してもよろしいですか？\nこのプロジェクトに関連する全ての作業記録も削除されます。\nこの操作は元に戻せません。`}
+        title={t('projects.delete.confirm')}
+        message={`${projectToDelete?.name} ${t('projects.delete.confirm')}\n${t('projects.delete.warning')}`}
         onConfirm={handleDeleteConfirm}
         onCancel={handleDeleteCancel}
       />

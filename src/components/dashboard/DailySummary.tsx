@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { Grid, Typography, Box } from '@mui/material';
 import { 
   AccessTime as AccessTimeIcon,
@@ -16,6 +17,7 @@ interface DailySummaryProps {
 }
 
 export const DailySummary: React.FC<DailySummaryProps> = ({ projects, timeEntries }) => {
+  const { t } = useLanguage();
   const today = new Date();
   const todayStart = new Date(today.setHours(0, 0, 0, 0));
   const todayEnd = new Date(today.setHours(23, 59, 59, 999));
@@ -59,18 +61,18 @@ export const DailySummary: React.FC<DailySummaryProps> = ({ projects, timeEntrie
   return (
     <Box sx={{ mb: 4 }}>
       <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
-        本日の集計
+        {t('dashboard.daily.title')}
       </Typography>
       <Grid container spacing={3}>
         {/* 合計作業時間 */}
         <Grid item xs={12} md={4}>
           <KPICard
-            title="合計作業時間"
-            value={`${totalHoursToday.toFixed(1)}時間`}
+            title={t('dashboard.daily.total')}
+            value={`${totalHoursToday.toFixed(1)} ${t('units.hours')}`}
             icon={<AccessTimeIcon />}
             trend={{
               value: hoursTrend,
-              label: '昨日比',
+              label: t('time.yesterday'),
             }}
           />
         </Grid>
@@ -78,12 +80,12 @@ export const DailySummary: React.FC<DailySummaryProps> = ({ projects, timeEntrie
         {/* 作業したプロジェクト数 */}
         <Grid item xs={12} md={4}>
           <KPICard
-            title="作業したプロジェクト数"
-            value={`${activeProjects}個`}
+            title={t('dashboard.daily.projects')}
+            value={`${activeProjects}`}
             icon={<AssignmentIcon />}
             trend={{
               value: projectsTrend,
-              label: '昨日比',
+              label: t('time.yesterday'),
             }}
             color="#8B5CF6" // パープル
           />
@@ -92,12 +94,12 @@ export const DailySummary: React.FC<DailySummaryProps> = ({ projects, timeEntrie
         {/* 最も作業したプロジェクト */}
         <Grid item xs={12} md={4}>
           <KPICard
-            title="最も作業したプロジェクト"
+            title={t('dashboard.daily.most')}
             value={mostActive.projectName}
             icon={<StarIcon />}
             trend={{
               value: Math.round((mostActive.hours / totalHoursToday) * 100),
-              label: '全体の割合',
+              label: t('dashboard.weekly.byproject'),
             }}
             color="#F59E0B" // アンバー
           />

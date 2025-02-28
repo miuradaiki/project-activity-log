@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { 
   Box, 
   Typography, 
@@ -49,6 +50,7 @@ export const ProjectProgressView: React.FC<ProjectProgressViewProps> = ({
   onUpdateTarget,
 }) => {
   const theme = useTheme();
+  const { t } = useLanguage();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { settings } = useSettingsContext(); // 設定から基準時間を取得
   
@@ -160,10 +162,10 @@ export const ProjectProgressView: React.FC<ProjectProgressViewProps> = ({
       {/* ヘッダー */}
       <Box sx={{ mb: 3 }}>
         <Typography variant="h6">
-          プロジェクト進捗状況
+          {t('dashboard.progress.title')}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          今月のプロジェクト別進捗状況
+          {t('dashboard.progress.subtitle')}
         </Typography>
       </Box>
 
@@ -179,7 +181,7 @@ export const ProjectProgressView: React.FC<ProjectProgressViewProps> = ({
         }}>
           {/* 検索フィールド */}
           <TextField
-            placeholder="プロジェクトを検索..."
+            placeholder={t('projects.search')}
             size="small"
             fullWidth
             value={searchTerm}
@@ -196,16 +198,16 @@ export const ProjectProgressView: React.FC<ProjectProgressViewProps> = ({
 
           {/* ソート選択 */}
           <FormControl size="small" sx={{ minWidth: 150 }}>
-            <InputLabel id="sort-select-label">並び替え</InputLabel>
+            <InputLabel id="sort-select-label">{t('actions.search')}</InputLabel>
             <Select
               labelId="sort-select-label"
               value={sortType}
-              label="並び替え"
+              label={t('actions.search')}
               onChange={handleSortChange}
             >
-              <MenuItem value="name">プロジェクト名</MenuItem>
-              <MenuItem value="progress">進捗率</MenuItem>
-              <MenuItem value="remaining">残り時間</MenuItem>
+              <MenuItem value="name">{t('projects.name')}</MenuItem>
+              <MenuItem value="progress">{t('projects.sort.progress')}</MenuItem>
+              <MenuItem value="remaining">{t('projects.sort.remaining')}</MenuItem>
             </Select>
           </FormControl>
         </Box>
@@ -218,10 +220,10 @@ export const ProjectProgressView: React.FC<ProjectProgressViewProps> = ({
           variant={isMobile ? "scrollable" : "standard"}
           scrollButtons={isMobile ? "auto" : false}
         >
-          <Tab label="すべて" value="all" />
-          <Tab label="進行中" value="active" />
-          <Tab label="注意" value="at-risk" />
-          <Tab label="完了" value="completed" />
+          <Tab label={t('projects.filter.all')} value="all" />
+          <Tab label={t('projects.filter.active')} value="active" />
+          <Tab label={t('projects.filter.warning')} value="at-risk" />
+          <Tab label={t('projects.filter.completed')} value="completed" />
         </Tabs>
       </Box>
 
@@ -254,7 +256,7 @@ export const ProjectProgressView: React.FC<ProjectProgressViewProps> = ({
           }}
         >
           <Typography color="text.secondary">
-            該当するプロジェクトがありません
+            {t('timer.no.entries')}
           </Typography>
         </Box>
       )}

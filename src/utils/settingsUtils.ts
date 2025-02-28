@@ -8,7 +8,7 @@ const SETTINGS_FILE_PATH = 'settings.json';
  */
 export const saveSettings = async (settings: AppSettings): Promise<void> => {
   try {
-    await window.electronAPI.writeDataFile(
+    await window.electronAPI.writeFile(
       SETTINGS_FILE_PATH,
       JSON.stringify(settings, null, 2)
     );
@@ -23,13 +23,31 @@ export const saveSettings = async (settings: AppSettings): Promise<void> => {
  */
 export const loadSettings = async (): Promise<AppSettings> => {
   try {
-    const settingsData = await window.electronAPI.readDataFile(SETTINGS_FILE_PATH);
-    if (!settingsData) {
-      // 設定ファイルが存在しない場合はデフォルト設定を保存して返す
-      await saveSettings(DEFAULT_SETTINGS);
-      return DEFAULT_SETTINGS;
+    try {
+      const settingsData = await window.electronAPI.readFile(SETTINGS_FILE_PATH);
+      // JSONパースを試みる
+      try {
+        return JSON.parse(settingsData);
+      } catch (parseError) {
+        console.error('JSONパースエラーが発生しました。設定ファイルをリセットします。', parseError);
+        // 設定ファイルが破損している場合は削除して、デフォルト設定を保存して返す
+        try {
+          await window.electronAPI.removeFile(SETTINGS_FILE_PATH);
+        } catch (removeError) {
+          console.error('破損した設定ファイルの削除に失敗しました:', removeError);
+        }
+        await saveSettings(DEFAULT_SETTINGS);
+        return DEFAULT_SETTINGS;
+      }
+    } catch (error: any) {
+      // ファイルが存在しない場合はデフォルト設定を保存して返す
+      if (error.message && error.message.includes('ENOENT')) {
+        console.log('設定ファイルが存在しないため、デフォルト設定を作成します');
+        await saveSettings(DEFAULT_SETTINGS);
+        return DEFAULT_SETTINGS;
+      }
+      throw error;
     }
-    return JSON.parse(settingsData);
   } catch (error) {
     console.error('設定の読み込みに失敗しました:', error);
     // エラーが発生した場合はデフォルト設定を返す

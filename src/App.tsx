@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useLanguage } from './contexts/LanguageContext';
 import {
   Box,
   Button,
@@ -23,6 +24,7 @@ import { useThemeMode } from './components/ui/ThemeProvider';
 import { TimerFocus } from './components/ui/timer/TimerFocus';
 import { ProjectsView } from './components/ui/project/ProjectsView';
 import { SettingsView } from './components/settings/SettingsView';
+import { KeyboardShortcutsDialog } from './components/shortcuts/KeyboardShortcuts';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -51,15 +53,153 @@ const TabPanel = (props: TabPanelProps) => {
 };
 
 const App: React.FC = () => {
+  // 多言語対応
+  const { t } = useLanguage();
   // テーマとレイアウト管理
   const { isDarkMode, toggleThemeMode } = useThemeMode();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  
+  // 状態管理
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
   const [activePage, setActivePage] = useState('timer'); // デフォルトはタイマー画面
+  const [showShortcutsDialog, setShowShortcutsDialog] = useState(false);
+  const [isProjectFormOpen, setIsProjectFormOpen] = useState(false);
+  const [isManualEntryFormOpen, setIsManualEntryFormOpen] = useState(false);
+  const [editingTimeEntry, setEditingTimeEntry] = useState<TimeEntry | undefined>(undefined);
+  const [editingProject, setEditingProject] = useState<Project | undefined>(undefined);
+  const [activeProject, setActiveProject] = useState<Project | null>(null);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [startTime, setStartTime] = useState<string | null>(null);
+
+  // データの読み込み
+  const { projects, setProjects, timeEntries, setTimeEntries, isLoading } = useStorage();
+
+  // コールバック関数
+  const openShortcutsDialog = useCallback(() => {
+    setShowShortcutsDialog(true);
+  }, []);
+  
+  const closeShortcutsDialog = useCallback(() => {
+    setShowShortcutsDialog(false);
+  }, []);
+
+  const handleOpenProjectForm = useCallback((project?: Project) => {
+    setEditingProject(project);
+    setIsProjectFormOpen(true);
+  }, []);
+
+  const handleCloseProjectForm = useCallback(() => {
+    setIsProjectFormOpen(false);
+    setEditingProject(undefined);
+  }, []);
+
+  const handleStopTimer = useCallback(() => {
+    if (!activeProject || !startTime) return;
+
+    const endTime = new Date().toISOString();
+    const newTimeEntry: TimeEntry = {
+      id: uuidv4(),
+      projectId: activeProject.id,
+      startTime,
+      endTime,
+      description: '',
+      createdAt: endTime,
+      updatedAt: endTime,
+    };
+
+    setTimeEntries(prev => [...prev, newTimeEntry]);
+    setIsTimerRunning(false);
+    setStartTime(null);
+    setActiveProject(null);
+  }, [activeProject, startTime, setTimeEntries]);
+
+  const handleStartTimer = useCallback((project: Project) => {
+    if (isTimerRunning) {
+      handleStopTimer();
+    }
+
+    const startTime = new Date().toISOString();
+    setStartTime(startTime);
+    setIsTimerRunning(true);
+    setActiveProject(project);
+  }, [isTimerRunning, handleStopTimer]);
+
+  const handleCreateProject = useCallback((projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt' | 'isArchived'>) => {
+    const timestamp = new Date().toISOString();
+    const newProject: Project = {
+      ...projectData,
+      id: uuidv4(),
+      createdAt: timestamp,
+      updatedAt: timestamp,
+      isArchived: false,
+    };
+    setProjects(prev => [...prev, newProject]);
+  }, [setProjects]);
+
+  const handleEditProject = useCallback((projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>) => {
+    if (!editingProject) return;
+
+    const updatedProject: Project = {
+      ...editingProject,
+      ...projectData,
+      updatedAt: new Date().toISOString(),
+    };
+
+    setProjects(prev => prev.map((p) => (p.id === editingProject.id ? updatedProject : p)));
+    setEditingProject(undefined);
+  }, [editingProject, setProjects]);
+
+  const handleArchiveProject = useCallback((project: Project) => {
+    const updatedProject: Project = {
+      ...project,
+      isArchived: true,
+      archivedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    // アクティブなプロジェクトがアーカイブされる場合、タイマーを停止
+    if (activeProject?.id === project.id && isTimerRunning) {
+      handleStopTimer();
+    }
+
+    setProjects(prev => prev.map(p => p.id === project.id ? updatedProject : p));
+  }, [activeProject, isTimerRunning, handleStopTimer, setProjects]);
+
+  const handleUnarchiveProject = useCallback((project: Project) => {
+    const updatedProject: Project = {
+      ...project,
+      isArchived: false,
+      archivedAt: undefined,
+      updatedAt: new Date().toISOString(),
+    };
+
+    setProjects(prev => prev.map(p => p.id === project.id ? updatedProject : p));
+  }, [setProjects]);
+
+  const handleDeleteProject = useCallback((project: Project) => {
+    if (activeProject?.id === project.id && isTimerRunning) {
+      handleStopTimer();
+    }
+    setProjects(prev => prev.filter((p) => p.id !== project.id));
+    setTimeEntries(prev => prev.filter((t) => t.projectId !== project.id));
+  }, [activeProject, isTimerRunning, handleStopTimer, setProjects, setTimeEntries]);
+
+  const handleDeleteTimeEntry = useCallback((timeEntryId: string) => {
+    setTimeEntries(prev => prev.filter((t) => t.id !== timeEntryId));
+  }, [setTimeEntries]);
+
+  const handleSaveTimeEntry = useCallback((timeEntry: TimeEntry) => {
+    if (editingTimeEntry) {
+      setTimeEntries(prev => prev.map(t => t.id === timeEntry.id ? timeEntry : t));
+      setEditingTimeEntry(undefined);
+    } else {
+      setTimeEntries(prev => [...prev, timeEntry]);
+    }
+  }, [editingTimeEntry, setTimeEntries]);
 
   // CSV インポート関数
-  const handleImportCSV = async () => {
+  const handleImportCSV = useCallback(async () => {
     try {
       const filePath = await window.electronAPI.showOpenFileDialog();
       if (!filePath) return; // ユーザーがキャンセルした場合
@@ -83,48 +223,42 @@ const App: React.FC = () => {
     } catch (error) {
       console.error('インポート処理中にエラーが発生しました:', error);
     }
-  };
+  }, [projects, timeEntries, setProjects, setTimeEntries]);
 
-  const { projects, setProjects, timeEntries, setTimeEntries, isLoading } = useStorage();
-  const [isProjectFormOpen, setIsProjectFormOpen] = useState(false);
-  const [isManualEntryFormOpen, setIsManualEntryFormOpen] = useState(false);
-  const [editingTimeEntry, setEditingTimeEntry] = useState<TimeEntry | undefined>(undefined);
-  const [editingProject, setEditingProject] = useState<Project | undefined>(undefined);
-  const [activeProject, setActiveProject] = useState<Project | null>(null);
-  const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const [startTime, setStartTime] = useState<string | null>(null);
+  // ナビゲーション処理
+  const handleNavigate = useCallback((page: string) => {
+    setActivePage(page);
+  }, []);
 
   // ページタイトルの取得
-  const getPageTitle = () => {
+  const getPageTitle = useCallback(() => {
     switch (activePage) {
       case 'dashboard':
-        return 'ダッシュボード';
+        return t('nav.dashboard');
       case 'projects':
-        return 'プロジェクト';
+        return t('nav.projects');
       case 'timer':
-        return 'タイマー';
-      case 'reports':
-        return 'レポート';
+        return t('nav.timer');
       case 'settings':
-        return '設定';
+        return t('nav.settings');
       default:
-        return 'Project Activity Log';
+        return t('app.name');
     }
-  };
+  }, [activePage, t]);
 
   // フローティングアクションボタンの設定
-  const getAddButtonConfig = () => {
+  const getAddButtonConfig = useCallback(() => {
     switch (activePage) {
       case 'projects':
         return {
           show: true,
-          tooltip: '新規プロジェクト',
+          tooltip: t('projects.new'),
           onClick: () => handleOpenProjectForm(),
         };
       case 'timer':
         return {
           show: true,
-          tooltip: '作業時間を手動入力',
+          tooltip: t('timer.manual'),
           onClick: () => setIsManualEntryFormOpen(true),
         };
       default:
@@ -134,141 +268,88 @@ const App: React.FC = () => {
           onClick: () => {},
         };
     }
-  };
+  }, [activePage, handleOpenProjectForm, t]);
 
-  // ローディング表示
-  if (isLoading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
+  // キーボードショートカットの処理
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // モーダルが開いているときは処理しない
+      if (isProjectFormOpen || isManualEntryFormOpen || showShortcutsDialog) return;
 
-  const handleCreateProject = (projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt' | 'isArchived'>) => {
-    const timestamp = new Date().toISOString();
-    const newProject: Project = {
-      ...projectData,
-      id: uuidv4(),
-      createdAt: timestamp,
-      updatedAt: timestamp,
-      isArchived: false,
-    };
-    setProjects([...projects, newProject]);
-  };
+      // ナビゲーション関連
+      if (e.ctrlKey) {
+        // ページ切替
+        if (e.key === '1') {
+          e.preventDefault();
+          setActivePage('dashboard');
+        } else if (e.key === '2') {
+          e.preventDefault();
+          setActivePage('projects');
+        } else if (e.key === '3') {
+          e.preventDefault();
+          setActivePage('timer');
+        
+        } else if (e.key === ',') {
+          e.preventDefault();
+          setActivePage('settings');
+        }
 
-  const handleEditProject = (projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>) => {
-    if (!editingProject) return;
+        // プロジェクト操作
+        if (e.key === 'n') {
+          e.preventDefault();
+          handleOpenProjectForm();
+        }
 
-    const updatedProject: Project = {
-      ...editingProject,
-      ...projectData,
-      updatedAt: new Date().toISOString(),
-    };
+        // ヘルプを表示
+        if (e.key === 'h' || e.key === '/') {
+          e.preventDefault();
+          openShortcutsDialog();
+        }
+      }
 
-    setProjects(projects.map((p) => (p.id === editingProject.id ? updatedProject : p)));
-    setEditingProject(undefined);
-  };
+      // ダークモード切替: Alt+L
+      if (e.altKey && e.key.toLowerCase() === 'l') {
+        e.preventDefault();
+        toggleThemeMode();
+      }
 
-  const handleArchiveProject = (project: Project) => {
-    const updatedProject: Project = {
-      ...project,
-      isArchived: true,
-      archivedAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+      // タイマー操作: スペース
+      if (e.key === ' ' && activePage === 'timer') {
+        e.preventDefault();
+        if (isTimerRunning) {
+          handleStopTimer();
+        } else if (activeProject) {
+          handleStartTimer(activeProject);
+        }
+      }
 
-    // アクティブなプロジェクトがアーカイブされる場合、タイマーを停止
-    if (activeProject?.id === project.id && isTimerRunning) {
-      handleStopTimer();
-    }
-
-    setProjects(projects.map(p => p.id === project.id ? updatedProject : p));
-  };
-
-  const handleUnarchiveProject = (project: Project) => {
-    const updatedProject: Project = {
-      ...project,
-      isArchived: false,
-      archivedAt: undefined,
-      updatedAt: new Date().toISOString(),
-    };
-
-    setProjects(projects.map(p => p.id === project.id ? updatedProject : p));
-  };
-
-  const handleDeleteProject = (project: Project) => {
-    if (activeProject?.id === project.id && isTimerRunning) {
-      handleStopTimer();
-    }
-    setProjects(projects.filter((p) => p.id !== project.id));
-    setTimeEntries(timeEntries.filter((t) => t.projectId !== project.id));
-  };
-
-  const handleStartTimer = (project: Project) => {
-    if (isTimerRunning) {
-      handleStopTimer();
-    }
-
-    const startTime = new Date().toISOString();
-    setStartTime(startTime);
-    setIsTimerRunning(true);
-    setActiveProject(project);
-  };
-
-  const handleStopTimer = () => {
-    if (!activeProject || !startTime) return;
-
-    const endTime = new Date().toISOString();
-    const newTimeEntry: TimeEntry = {
-      id: uuidv4(),
-      projectId: activeProject.id,
-      startTime,
-      endTime,
-      description: '',
-      createdAt: endTime,
-      updatedAt: endTime,
+      // タイマー停止: Escape
+      if (e.key === 'Escape' && isTimerRunning) {
+        e.preventDefault();
+        handleStopTimer();
+      }
     };
 
-    setTimeEntries([...timeEntries, newTimeEntry]);
-    setIsTimerRunning(false);
-    setStartTime(null);
-    setActiveProject(null);
-  };
-
-  const handleDeleteTimeEntry = (timeEntryId: string) => {
-    setTimeEntries(timeEntries.filter((t) => t.id !== timeEntryId));
-  };
-
-  const handleOpenProjectForm = (project?: Project) => {
-    setEditingProject(project);
-    setIsProjectFormOpen(true);
-  };
-
-  const handleCloseProjectForm = () => {
-    setIsProjectFormOpen(false);
-    setEditingProject(undefined);
-  };
-
-  const handleSaveTimeEntry = (timeEntry: TimeEntry) => {
-    if (editingTimeEntry) {
-      setTimeEntries(timeEntries.map(t => t.id === timeEntry.id ? timeEntry : t));
-      setEditingTimeEntry(undefined);
-    } else {
-      setTimeEntries([...timeEntries, timeEntry]);
-    }
-  };
-
-  // ナビゲーション処理
-  const handleNavigate = (page: string) => {
-    setActivePage(page);
-  };
-
-  // フローティングボタンの設定を取得
-  const addButtonConfig = getAddButtonConfig();
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [
+    activePage,
+    isTimerRunning,
+    activeProject,
+    isProjectFormOpen,
+    isManualEntryFormOpen,
+    showShortcutsDialog,
+    toggleThemeMode,
+    handleStartTimer,
+    handleStopTimer,
+    openShortcutsDialog,
+    handleOpenProjectForm
+  ]);
 
   // 現在のページに応じたコンテンツをレンダリング
-  const renderPageContent = () => {
+  const renderPageContent = useCallback(() => {
     switch (activePage) {
       case 'dashboard':
         return (
@@ -303,14 +384,14 @@ const App: React.FC = () => {
           <Box sx={{ width: '100%', maxWidth: 1200, mx: 'auto' }}>
             <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Typography variant="h5" component="h1" fontWeight="bold">
-                タイマー
+                {t('timer.title')}
               </Typography>
               <Button
                 variant="outlined"
                 startIcon={<CloudUploadIcon />}
                 onClick={handleImportCSV}
               >
-                CSVインポート
+                {t('timer.import.csv')}
               </Button>
             </Box>
 
@@ -344,14 +425,7 @@ const App: React.FC = () => {
             />
           </Box>
         );
-      case 'reports':
-        return (
-          <Box sx={{ textAlign: 'center', py: 8 }}>
-            <Typography variant="h5" color="text.secondary">
-              レポート機能は開発中です
-            </Typography>
-          </Box>
-        );
+
       case 'settings':
         return (
           <SettingsView />
@@ -359,7 +433,34 @@ const App: React.FC = () => {
       default:
         return null;
     }
-  };
+  }, [
+    activePage,
+    projects,
+    timeEntries,
+    activeProject,
+    isTimerRunning,
+    startTime,
+    handleOpenProjectForm,
+    handleDeleteProject,
+    handleArchiveProject,
+    handleUnarchiveProject,
+    handleStartTimer,
+    handleStopTimer,
+    handleDeleteTimeEntry,
+    handleImportCSV
+  ]);
+
+  // ローディング表示
+  if (isLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  // フローティングボタンの設定を取得
+  const addButtonConfig = getAddButtonConfig();
 
   return (
     <Layout
@@ -394,6 +495,12 @@ const App: React.FC = () => {
         onSave={handleSaveTimeEntry}
         projects={projects}
         timeEntry={editingTimeEntry}
+      />
+
+      {/* キーボードショートカットダイアログ */}
+      <KeyboardShortcutsDialog
+        open={showShortcutsDialog}
+        onClose={closeShortcutsDialog}
       />
     </Layout>
   );

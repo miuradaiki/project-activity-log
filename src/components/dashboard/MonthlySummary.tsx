@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { Box, Typography, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Project, TimeEntry } from '../../types';
@@ -10,6 +11,7 @@ interface MonthlySummaryProps {
 }
 
 export const MonthlySummary: React.FC<MonthlySummaryProps> = ({ projects, timeEntries }) => {
+  const { t } = useLanguage();
   const [selectedMonth, setSelectedMonth] = React.useState(() => new Date().getMonth());
   const [selectedYear, setSelectedYear] = React.useState(() => new Date().getFullYear());
 
@@ -28,30 +30,30 @@ export const MonthlySummary: React.FC<MonthlySummaryProps> = ({ projects, timeEn
   // 月の選択肢を生成
   const months = Array.from({ length: 12 }, (_, i) => ({
     value: i,
-    label: `${i + 1}月`
+    label: t('language') === 'English' ? `Month ${i + 1}` : `${i + 1}月`
   }));
 
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h6">
-          月間サマリー
+          {t('dashboard.monthly.title')}
         </Typography>
         <Box sx={{ display: 'flex', gap: 2 }}>
           <FormControl size="small" sx={{ minWidth: 100 }}>
-            <InputLabel>年</InputLabel>
+            <InputLabel>{t('language') === 'English' ? 'Year' : '年'}</InputLabel>
             <Select
               value={selectedYear}
               label="年"
               onChange={(e) => setSelectedYear(Number(e.target.value))}
             >
               {years.map(year => (
-                <MenuItem key={year} value={year}>{year}年</MenuItem>
+                <MenuItem key={year} value={year}>{year}{t('language') === 'English' ? '' : '年'}</MenuItem>
               ))}
             </Select>
           </FormControl>
           <FormControl size="small" sx={{ minWidth: 100 }}>
-            <InputLabel>月</InputLabel>
+            <InputLabel>{t('language') === 'English' ? 'Month' : '月'}</InputLabel>
             <Select
               value={selectedMonth}
               label="月"
@@ -66,7 +68,7 @@ export const MonthlySummary: React.FC<MonthlySummaryProps> = ({ projects, timeEn
       </Box>
 
       <Typography variant="subtitle1" gutterBottom>
-        月間合計作業時間: {totalHours.toFixed(1)}時間
+        {t('dashboard.monthly.total')}: {totalHours.toFixed(1)} {t('units.hours')}
       </Typography>
 
       {/* 週別作業時間の推移グラフ */}
@@ -76,18 +78,18 @@ export const MonthlySummary: React.FC<MonthlySummaryProps> = ({ projects, timeEn
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis 
               dataKey="week" 
-              label={{ value: '週', position: 'insideBottom', offset: -5 }}
+              label={{ value: t('language') === 'English' ? 'Week' : '週', position: 'insideBottom', offset: -5 }}
             />
-            <YAxis unit="h" />
+            <YAxis unit={t('units.hour')[0]} />
             <Tooltip 
-              formatter={(value: number) => [`${value.toFixed(1)}時間`, '作業時間']}
-              labelFormatter={(week) => `第${week}週`}
+              formatter={(value: number) => [`${value.toFixed(1)} ${t('units.hours')}`, t('timer.title')]}
+              labelFormatter={(week) => t('language') === 'English' ? `Week ${week}` : `第${week}週`}
             />
             <Line 
               type="monotone" 
               dataKey="hours" 
               stroke="#8884d8" 
-              name="作業時間"
+              name={t('timer.title')}
               strokeWidth={2}
             />
           </LineChart>

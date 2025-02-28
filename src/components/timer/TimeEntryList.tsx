@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLanguage } from '../../contexts/LanguageContext';
 import {
   Paper,
   Typography,
@@ -19,7 +20,6 @@ import {
 } from '@mui/material';
 import {
   CalendarToday as CalendarIcon,
-  FilterList as FilterIcon,
   Search as SearchIcon,
   Close as CloseIcon,
 } from '@mui/icons-material';
@@ -44,12 +44,12 @@ export const TimeEntryList: React.FC<TimeEntryListProps> = ({
   onEditTimeEntry,
 }) => {
   const theme = useTheme();
+  const { t } = useLanguage();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [entryToDelete, setEntryToDelete] = useState<TimeEntry | null>(null);
   const [page, setPage] = useState(1);
-  const [viewMode, setViewMode] = useState<'timeline' | 'list'>('timeline');
   const [filterProject, setFilterProject] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -77,9 +77,6 @@ export const TimeEntryList: React.FC<TimeEntryListProps> = ({
     setPage(value);
   };
 
-  const handleViewModeChange = (_event: React.SyntheticEvent, newValue: 'timeline' | 'list') => {
-    setViewMode(newValue);
-  };
 
   const handleProjectFilterChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setFilterProject(event.target.value as string[]);
@@ -131,7 +128,7 @@ export const TimeEntryList: React.FC<TimeEntryListProps> = ({
       {/* ヘッダー部分 */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
         <Typography variant="h6">
-          作業履歴
+          {t('timer.history')}
         </Typography>
         <Box sx={{ display: 'flex', gap: 1 }}>
           <ExportButton />
@@ -150,7 +147,7 @@ export const TimeEntryList: React.FC<TimeEntryListProps> = ({
           <OutlinedInput
             value={searchTerm}
             onChange={handleSearchChange}
-            placeholder="検索..."
+            placeholder={t('timer.search')}
             size="small"
             fullWidth
             startAdornment={
@@ -176,13 +173,13 @@ export const TimeEntryList: React.FC<TimeEntryListProps> = ({
 
           {/* プロジェクトフィルター */}
           <FormControl size="small" sx={{ minWidth: 200 }}>
-            <InputLabel id="project-filter-label">プロジェクト</InputLabel>
+            <InputLabel id="project-filter-label">{t('timer.project')}</InputLabel>
             <Select
               labelId="project-filter-label"
               multiple
               value={filterProject}
               onChange={handleProjectFilterChange}
-              input={<OutlinedInput label="プロジェクト" />}
+              input={<OutlinedInput label={t('timer.project')} />}
               renderValue={(selected) => (
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                   {(selected as string[]).map((value) => (
@@ -204,45 +201,24 @@ export const TimeEntryList: React.FC<TimeEntryListProps> = ({
           </FormControl>
         </Box>
 
-        {/* ビュータブ */}
-        <Tabs
-          value={viewMode}
-          onChange={handleViewModeChange}
-          sx={{ borderBottom: 1, borderColor: 'divider' }}
-        >
-          <Tab 
-            icon={<CalendarIcon fontSize="small" />} 
-            iconPosition="start"
-            label={!isMobile ? "タイムライン" : undefined} 
-            value="timeline" 
-          />
-          <Tab 
-            icon={<FilterIcon fontSize="small" />} 
-            iconPosition="start"
-            label={!isMobile ? "リスト" : undefined} 
-            value="list" 
-          />
-        </Tabs>
+        {/* タイトル */}
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', p: 1, pl: 2, mb: 2, display: 'flex', alignItems: 'center' }}>
+          <CalendarIcon fontSize="small" sx={{ mr: 1 }} />
+          <Typography variant="subtitle1" fontWeight="medium">
+            {t('timer.history.timeline')}
+          </Typography>
+        </Box>
       </Box>
 
-      {/* タイムラインまたはリスト表示 */}
+      {/* タイムライン表示 */}
       <Box sx={{ minHeight: 300 }}>
         {filteredEntries.length > 0 ? (
-          <>
-            {viewMode === 'timeline' ? (
-              <TimelineView
-                timeEntries={paginatedEntries}
-                projects={projects}
-                onEdit={onEditTimeEntry}
-                onDelete={handleDeleteClick}
-              />
-            ) : (
-              <Box>
-                {/* TODO: リスト表示コンポーネント */}
-                <Typography>リスト表示は開発中です...</Typography>
-              </Box>
-            )}
-          </>
+          <TimelineView
+            timeEntries={paginatedEntries}
+            projects={projects}
+            onEdit={onEditTimeEntry}
+            onDelete={handleDeleteClick}
+          />
         ) : (
           <Box sx={{ 
             display: 'flex', 
@@ -251,7 +227,7 @@ export const TimeEntryList: React.FC<TimeEntryListProps> = ({
             height: 200 
           }}>
             <Typography variant="body1" color="text.secondary">
-              該当する作業記録がありません
+              {t('timer.no.entries')}
             </Typography>
           </Box>
         )}
@@ -273,8 +249,8 @@ export const TimeEntryList: React.FC<TimeEntryListProps> = ({
       {/* 削除確認ダイアログ */}
       <DeleteConfirmDialog
         open={deleteDialogOpen}
-        title="作業記録の削除"
-        message={`${getProjectName(entryToDelete?.projectId || '')}の作業記録を削除してもよろしいですか？\nこの操作は取り消せません。`}
+        title={t('timer.delete.confirm')}
+        message={t('timer.delete.message')}
         onConfirm={handleDeleteConfirm}
         onCancel={handleDeleteCancel}
       />

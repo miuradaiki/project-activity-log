@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { 
   Box, 
   Toolbar, 
@@ -16,6 +16,8 @@ import {
   Brightness7,
   Add as AddIcon
 } from '@mui/icons-material';
+import { LanguageSwitcher } from '../LanguageSwitcher';
+import { useLanguage } from '../../../contexts/LanguageContext';
 import { Sidebar, DRAWER_WIDTH, CLOSED_DRAWER_WIDTH } from './Sidebar';
 
 export interface LayoutProps {
@@ -48,6 +50,12 @@ export const Layout: React.FC<LayoutProps> = ({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const currentDrawerWidth = sidebarOpen ? DRAWER_WIDTH : CLOSED_DRAWER_WIDTH;
+  const { t, language } = useLanguage(); // 翻訳関数と言語をインポート
+  
+  // 現在の言語をログ出力
+  useEffect(() => {
+    console.log(`Layout: Current language is ${language}`);
+  }, [language]);
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -90,12 +98,18 @@ export const Layout: React.FC<LayoutProps> = ({
           }}
         >
           <Toolbar>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            <Typography variant="h6" component="div" sx={{ 
+              flexGrow: 1,
+              ml: { xs: isMobile ? 5 : 0, md: 0 } // モバイル表示時に左余白を追加
+            }}>
               {title}
             </Typography>
-            <IconButton onClick={onToggleTheme} color="inherit">
-              {isDarkMode ? <Brightness7 /> : <Brightness4 />}
-            </IconButton>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <LanguageSwitcher variant="icon" />
+              <IconButton onClick={onToggleTheme} color="inherit">
+                {isDarkMode ? <Brightness7 /> : <Brightness4 />}
+              </IconButton>
+            </Box>
           </Toolbar>
         </AppBar>
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 import {
   Dialog,
   DialogTitle,
@@ -30,6 +31,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
   onClose,
   onSave,
 }) => {
+  const { t } = useLanguage();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [monthlyCapacity, setMonthlyCapacity] = useState(0);
@@ -58,7 +60,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
   useEffect(() => {
     const totalCapacity = calculateTotalCapacity(monthlyCapacity);
     if (totalCapacity > 1) {
-      setWarning(`全プロジェクトの合計稼働率が${(totalCapacity * 100).toFixed(1)}%になります。`);
+      setWarning(`${t('projects.utilization')}${(totalCapacity * 100).toFixed(1)}%。`);
     } else {
       setWarning(null);
     }
@@ -66,7 +68,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
 
   const handleSave = () => {
     if (!name.trim()) {
-      setWarning('プロジェクト名を入力してください');
+      setWarning(t('projects.name.required'));
       return;
     }
 
@@ -95,22 +97,22 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle>
-        {project ? 'プロジェクトの編集' : 'プロジェクトの追加'}
+        {project ? t('projects.edit') : t('projects.new')}
       </DialogTitle>
       <DialogContent>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
           <TextField
-            label="プロジェクト名"
+            label={t('projects.name')}
             value={name}
             onChange={(e) => setName(e.target.value)}
             fullWidth
             required
             error={!name.trim() && warning !== null}
-            helperText={!name.trim() && warning !== null ? 'プロジェクト名を入力してください' : ''}
+            helperText={!name.trim() && warning !== null ? t('projects.name.required') : ''}
           />
 
           <TextField
-            label="説明"
+            label={t('projects.description')}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             multiline
@@ -120,7 +122,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
 
           <Box sx={{ mt: 2 }}>
             <Typography gutterBottom>
-              月間稼働率: {(monthlyCapacity * 100).toFixed(1)}%
+              {t('projects.utilization')}: {(monthlyCapacity * 100).toFixed(1)}%
             </Typography>
             <Slider
               value={monthlyCapacity}
@@ -139,7 +141,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
               valueLabelFormat={(value) => `${(value * 100).toFixed(1)}%`}
             />
             <Typography color="text.secondary" variant="body2" sx={{ mt: 1 }}>
-              予定工数: {(monthlyCapacity * BASE_MONTHLY_HOURS).toFixed(1)} 時間/月
+              {t('projects.monthly.target')}: {(monthlyCapacity * BASE_MONTHLY_HOURS).toFixed(1)} {t('units.hours')}/{t('time.this.month')}
             </Typography>
           </Box>
 
@@ -152,9 +154,9 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
       </DialogContent>
 
       <DialogActions>
-        <Button onClick={handleClose}>キャンセル</Button>
+        <Button onClick={handleClose}>{t('projects.cancel')}</Button>
         <Button onClick={handleSave} variant="contained">
-          保存
+          {t('actions.save')}
         </Button>
       </DialogActions>
     </Dialog>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { 
   Box, 
   Typography, 
@@ -16,7 +17,7 @@ import {
 } from '@mui/icons-material';
 import { TimeEntry, Project } from '../../types';
 import { formatDistanceStrict } from 'date-fns';
-import { ja } from 'date-fns/locale';
+import { ja, enUS } from 'date-fns/locale';
 
 interface TimelineViewProps {
   timeEntries: TimeEntry[];
@@ -35,11 +36,13 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
   onDelete,
 }) => {
   const theme = useTheme();
+  const { t } = useLanguage();
+  const isEnglish = t('language') === 'English';
 
   // 日付をフォーマット
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('ja-JP', { 
+    return date.toLocaleDateString(isEnglish ? 'en-US' : 'ja-JP', { 
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
@@ -50,7 +53,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
   // 時間をフォーマット
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleTimeString('ja-JP', { 
+    return date.toLocaleTimeString(isEnglish ? 'en-US' : 'ja-JP', { 
       hour: '2-digit',
       minute: '2-digit'
     });
@@ -61,7 +64,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
     const start = new Date(startTime);
     const end = endTime ? new Date(endTime) : new Date();
     
-    return formatDistanceStrict(start, end, { locale: ja });
+    return formatDistanceStrict(start, end, { locale: isEnglish ? enUS : ja });
   };
 
   // プロジェクト名を取得
@@ -172,7 +175,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
                       </Box>
                       
                       <Box>
-                        <Tooltip title="編集">
+                        <Tooltip title={t('actions.edit')}>
                           <IconButton 
                             size="small" 
                             onClick={() => onEdit(entry)}
@@ -181,7 +184,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
                             <EditIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
-                        <Tooltip title="削除">
+                        <Tooltip title={t('projects.delete')}>
                           <IconButton 
                             size="small" 
                             onClick={() => onDelete(entry)}
@@ -195,7 +198,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
                     
                     {/* 時間範囲 */}
                     <Typography variant="body2" color="text.secondary">
-                      {formatTime(entry.startTime)} - {entry.endTime ? formatTime(entry.endTime) : '進行中'}
+                      {formatTime(entry.startTime)} - {entry.endTime ? formatTime(entry.endTime) : t('timer.title')}
                     </Typography>
                     
                     {/* 説明（あれば） */}

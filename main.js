@@ -111,6 +111,14 @@ app.whenReady().then(async () => {
     return await fs.promises.readFile(filePath, options);
   });
 
+  ipcMain.handle('remove-file', async (_, filePath) => {
+    if (fs.existsSync(filePath)) {
+      await fs.promises.unlink(filePath);
+      return true;
+    }
+    return false;
+  });
+
   ipcMain.handle('show-open-file-dialog', async () => {
     const result = await dialog.showOpenDialog({
       properties: ['openFile'],

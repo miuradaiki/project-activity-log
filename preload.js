@@ -10,6 +10,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   createDirectory: (path) => ipcRenderer.invoke('create-directory', path),
   writeFile: (path, content) => ipcRenderer.invoke('write-file', path, content),
   readFile: (path, options) => ipcRenderer.invoke('read-file', path, options),
+  removeFile: (path) => ipcRenderer.invoke('remove-file', path),
   showOpenFileDialog: () => ipcRenderer.invoke('show-open-file-dialog')
 });
 

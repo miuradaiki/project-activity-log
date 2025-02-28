@@ -1,19 +1,21 @@
 import React from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 import { Button } from '@mui/material';
 import { Download } from '@mui/icons-material';
 
 export const ExportButton = () => {
+  const { t } = useLanguage();
   const handleExport = async () => {
     try {
       const result = await window.electronAPI.exportToCSV();
       if (result.success) {
-        alert('データのエクスポートが完了しました');
+        alert(t('timer.export.success'));
       } else {
-        alert('エクスポート中にエラーが発生しました');
+        alert(t('timer.export.error'));
       }
     } catch (error) {
       console.error('Export error:', error);
-      alert('エクスポートに失敗しました');
+      alert(t('timer.export.error'));
     }
   };
 
@@ -24,7 +26,7 @@ export const ExportButton = () => {
       startIcon={<Download />}
       onClick={handleExport}
     >
-      作業記録をCSVエクスポート
+      {t('actions.export')}
     </Button>
   );
 };

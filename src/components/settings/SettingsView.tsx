@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLanguage } from '../../contexts/LanguageContext';
 import {
   Box,
   Paper,
@@ -16,12 +17,17 @@ import {
   IconButton,
   Tooltip,
   useTheme,
+  FormControl,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
 } from '@mui/material';
 import {
   AccessTime as AccessTimeIcon,
   Refresh as RefreshIcon,
   Save as SaveIcon,
   Info as InfoIcon,
+  Translate as TranslateIcon,
 } from '@mui/icons-material';
 import { useSettingsContext } from '../../contexts/SettingsContext';
 
@@ -31,6 +37,7 @@ import { useSettingsContext } from '../../contexts/SettingsContext';
 export const SettingsView: React.FC = () => {
   const theme = useTheme();
   const { settings, isLoading, updateBaseMonthlyHours } = useSettingsContext();
+  const { language, setLanguage, t } = useLanguage();
   
   // 月間基準時間の編集用ステート
   const [baseMonthlyHours, setBaseMonthlyHours] = useState<number>(
@@ -52,20 +59,27 @@ export const SettingsView: React.FC = () => {
   const handleSaveBaseMonthlyHours = async () => {
     try {
       await updateBaseMonthlyHours(baseMonthlyHours);
-      showNotification('月間基準時間を保存しました', 'success');
+      showNotification(t('settings.monthly.hours.saved'), 'success');
     } catch (error) {
-      showNotification('保存に失敗しました', 'error');
+      showNotification(t('settings.save.error'), 'error');
     }
   };
+  
+  // 言語設定の変更
+  const handleLanguageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setLanguage(event.target.value as 'ja' | 'en');
+    showNotification(t('settings.language.changed'), 'success');
+  };
+  
 
   // デフォルト設定にリセット
   const handleResetSettings = async () => {
     try {
       await updateBaseMonthlyHours(140); // デフォルト値にリセット
       setBaseMonthlyHours(140); // デフォルト値にリセット
-      showNotification('設定をデフォルトに戻しました', 'success');
+      showNotification(t('settings.reset.success'), 'success');
     } catch (error) {
-      showNotification('リセットに失敗しました', 'error');
+      showNotification(t('settings.reset.error'), 'error');
     }
   };
 
@@ -89,7 +103,7 @@ export const SettingsView: React.FC = () => {
   if (isLoading) {
     return (
       <Box sx={{ textAlign: 'center', py: 4 }}>
-        <Typography>設定を読み込んでいます...</Typography>
+        <Typography>{t('settings.loading')}</Typography>
       </Box>
     );
   }
@@ -97,7 +111,7 @@ export const SettingsView: React.FC = () => {
   return (
     <Box sx={{ maxWidth: 800, mx: 'auto', p: 2 }}>
       <Typography variant="h5" fontWeight="medium" sx={{ mb: 3 }}>
-        アプリケーション設定
+        {t('settings.title')}
       </Typography>
       
       <Grid container spacing={3}>
@@ -116,16 +130,16 @@ export const SettingsView: React.FC = () => {
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                 <AccessTimeIcon color="primary" sx={{ mr: 1 }} />
-                <Typography variant="h6">稼働時間設定</Typography>
+                <Typography variant="h6">{t('settings.monthly.hours')}</Typography>
               </Box>
               <Divider sx={{ mb: 3 }} />
               
               <Box sx={{ mb: 4 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                   <Typography id="monthly-hours-slider" gutterBottom>
-                    月間基準時間
+                    {t('settings.monthly.hours')}
                   </Typography>
-                  <Tooltip title="月間の稼働率(%)から目標時間を計算する際の基準となる時間です。">
+                  <Tooltip title={t('settings.monthly.hours.description')}>
                     <IconButton size="small" sx={{ ml: 1 }}>
                       <InfoIcon fontSize="small" />
                     </IconButton>
@@ -161,7 +175,7 @@ export const SettingsView: React.FC = () => {
                         }
                       }}
                       InputProps={{
-                        endAdornment: <InputAdornment position="end">時間</InputAdornment>,
+                        endAdornment: <InputAdornment position="end">{t('units.hours')}</InputAdornment>,
                       }}
                       variant="outlined"
                       size="small"
@@ -171,7 +185,7 @@ export const SettingsView: React.FC = () => {
                 </Grid>
                 
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-                  例: プロジェクトの稼働率が50%の場合、月間目標時間は {(baseMonthlyHours * 0.5).toFixed(1)} 時間になります。
+                  {t('settings.monthly.hours.example', { hours: (baseMonthlyHours * 0.5).toFixed(1) })}
                 </Typography>
               </Box>
               
@@ -181,21 +195,67 @@ export const SettingsView: React.FC = () => {
                   startIcon={<RefreshIcon />}
                   onClick={handleResetSettings}
                 >
-                  デフォルトに戻す
+                  {t('settings.reset')}
                 </Button>
                 <Button
                   variant="contained"
                   startIcon={<SaveIcon />}
                   onClick={handleSaveBaseMonthlyHours}
                 >
-                  保存
+                  {t('settings.save')}
                 </Button>
               </Box>
             </CardContent>
           </Card>
         </Grid>
         
-        {/* 将来的に他の設定セクションをここに追加できます */}
+        {/* 言語設定カード */}
+        <Grid item xs={12}>
+          <Card 
+            elevation={1}
+            sx={{
+              transition: 'transform 0.2s, box-shadow 0.2s',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: theme.shadows[4],
+              },
+            }}
+          >
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <TranslateIcon color="primary" sx={{ mr: 1 }} />
+                <Typography variant="h6">{t('settings.language')}</Typography>
+              </Box>
+              <Divider sx={{ mb: 3 }} />
+              
+              <Box sx={{ mb: 4 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  {t('settings.language.description')}
+                </Typography>
+                
+                <FormControl component="fieldset">
+                  <RadioGroup
+                    aria-label="language"
+                    name="language"
+                    value={language}
+                    onChange={handleLanguageChange}
+                  >
+                    <FormControlLabel 
+                      value="ja" 
+                      control={<Radio />} 
+                      label={t('language.japanese')} 
+                    />
+                    <FormControlLabel 
+                      value="en" 
+                      control={<Radio />} 
+                      label={t('language.english')} 
+                    />
+                  </RadioGroup>
+                </FormControl>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
       </Grid>
       
       {/* 通知 */}

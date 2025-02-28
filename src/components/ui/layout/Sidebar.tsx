@@ -15,12 +15,12 @@ import {
   Dashboard as DashboardIcon,
   ListAlt as ProjectsIcon,
   Timer as TimerIcon,
-  InsertChart as ReportsIcon,
   Settings as SettingsIcon,
   Menu as MenuIcon,
   ChevronLeft as ChevronLeftIcon,
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 // ドロワーの幅設定
 export const DRAWER_WIDTH = 240;
@@ -57,13 +57,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-
+  const { t } = useLanguage();
+  
   // ナビゲーションアイテム
   const menuItems = [
-    { id: 'dashboard', text: 'ダッシュボード', icon: <DashboardIcon /> },
-    { id: 'projects', text: 'プロジェクト', icon: <ProjectsIcon /> },
-    { id: 'timer', text: 'タイマー', icon: <TimerIcon /> },
-    { id: 'reports', text: 'レポート', icon: <ReportsIcon /> },
+    { id: 'dashboard', text: t('nav.dashboard'), icon: <DashboardIcon /> },
+    { id: 'projects', text: t('nav.projects'), icon: <ProjectsIcon /> },
+    { id: 'timer', text: t('nav.timer'), icon: <TimerIcon /> },
   ];
 
   // ドロワーの内容
@@ -77,7 +77,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       }}>
         {open && (
           <Box sx={{ fontSize: '1.2rem', fontWeight: 'bold' }}>
-            Project Activity Log
+            {t('app.name')}
           </Box>
         )}
         <IconButton onClick={onToggle}>
@@ -130,7 +130,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             >
               <SettingsIcon />
             </ListItemIcon>
-            {open && <ListItemText primary="設定" />}
+            {open && <ListItemText primary={t('nav.settings')} />}
           </StyledListItemButton>
         </ListItem>
       </List>
@@ -147,8 +147,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           onClick={onToggle}
           sx={{
             position: 'fixed',
-            top: 10,
-            left: 10,
+            top: 14, // 位置を調整
+            left: 16, // 左余白を増やして位置を調整
             zIndex: 1200,
             bgcolor: 'primary.main',
             color: 'primary.contrastText',

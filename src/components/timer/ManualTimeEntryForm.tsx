@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLanguage } from '../../contexts/LanguageContext';
 import {
   Dialog,
   DialogTitle,
@@ -35,6 +36,7 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
   projects,
   timeEntry,
 }) => {
+  const { t } = useLanguage();
   const [projectId, setProjectId] = useState<string>('');
   const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [startTime, setStartTime] = useState<string>('09:00');
@@ -103,17 +105,17 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle>
-        {timeEntry ? '作業時間の編集' : '作業時間の手動入力'}
+        {timeEntry ? t('timer.manual.edit') : t('timer.manual.title')}
       </DialogTitle>
       <form onSubmit={handleSubmit}>
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <FormControl fullWidth>
-              <InputLabel>プロジェクト</InputLabel>
+              <InputLabel>{t('timer.project')}</InputLabel>
               <Select
                 value={projectId}
                 onChange={(e) => setProjectId(e.target.value)}
-                label="プロジェクト"
+                label={t('timer.project')}
                 required
               >
                 {projects.map((project) => (
@@ -125,7 +127,7 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
             </FormControl>
 
             <TextField
-              label="日付"
+              label={t('timer.date')}
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
@@ -136,7 +138,7 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
 
             <Box sx={{ display: 'flex', gap: 2 }}>
               <TextField
-                label="開始時間"
+                label={t('timer.start.time')}
                 type="time"
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
@@ -146,7 +148,7 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
-                      <Tooltip title="現在時刻を開始時刻にセット">
+                      <Tooltip title={t('timer.now.start')}>
                         <IconButton
                           onClick={() => handleSetCurrentTime('start')}
                           edge="end"
@@ -162,7 +164,7 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
               />
 
               <TextField
-                label="終了時間"
+                label={t('timer.end.time')}
                 type="time"
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
@@ -172,7 +174,7 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
-                      <Tooltip title="現在時刻を終了時刻にセット">
+                      <Tooltip title={t('timer.now.end')}>
                         <IconButton
                           onClick={() => handleSetCurrentTime('end')}
                           edge="end"
@@ -189,7 +191,7 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
             </Box>
 
             <TextField
-              label="説明"
+              label={t('timer.description')}
               multiline
               rows={3}
               value={description}
@@ -200,13 +202,13 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
         </DialogContent>
 
         <DialogActions>
-          <Button onClick={handleClose}>キャンセル</Button>
+          <Button onClick={handleClose}>{t('projects.cancel')}</Button>
           <Button
             type="submit"
             variant="contained"
             disabled={!isFormValid}
           >
-            {timeEntry ? '更新' : '保存'}
+            {timeEntry ? t('actions.update') : t('actions.save')}
           </Button>
         </DialogActions>
       </form>
