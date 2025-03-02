@@ -146,7 +146,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({ projects, timeEntr
           <BarChart data={weeklyData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="date" />
-            <YAxis unit={t('units.hour')[0]} />
+            <YAxis unit="h" />
             <Tooltip content={<CustomTooltip />} />
             <Legend />
             {projects.map((project) => (
