@@ -26,6 +26,9 @@ import { ProjectsView } from './components/ui/project/ProjectsView';
 import { SettingsView } from './components/settings/SettingsView';
 import { KeyboardShortcutsDialog } from './components/shortcuts/KeyboardShortcuts';
 
+// アクティブページをローカルストレージに保存するためのキー
+const ACTIVE_PAGE_STORAGE_KEY = 'project_activity_log_active_page';
+
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -60,9 +63,15 @@ const App: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   
+  // アクティブページの初期値をローカルストレージから取得
+  const getInitialActivePage = (): string => {
+    const storedPage = localStorage.getItem(ACTIVE_PAGE_STORAGE_KEY);
+    return storedPage || 'timer'; // デフォルトはタイマー画面
+  };
+
   // 状態管理
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
-  const [activePage, setActivePage] = useState('timer'); // デフォルトはタイマー画面
+  const [activePage, setActivePage] = useState(getInitialActivePage);
   const [showShortcutsDialog, setShowShortcutsDialog] = useState(false);
   const [isProjectFormOpen, setIsProjectFormOpen] = useState(false);
   const [isManualEntryFormOpen, setIsManualEntryFormOpen] = useState(false);
@@ -227,7 +236,10 @@ const App: React.FC = () => {
 
   // ナビゲーション処理
   const handleNavigate = useCallback((page: string) => {
+    // アクティブページを設定
     setActivePage(page);
+    // ローカルストレージに保存
+    localStorage.setItem(ACTIVE_PAGE_STORAGE_KEY, page);
   }, []);
 
   // ページタイトルの取得
@@ -281,17 +293,17 @@ const App: React.FC = () => {
         // ページ切替
         if (e.key === '1') {
           e.preventDefault();
-          setActivePage('dashboard');
+          handleNavigate('dashboard');
         } else if (e.key === '2') {
           e.preventDefault();
-          setActivePage('projects');
+          handleNavigate('projects');
         } else if (e.key === '3') {
           e.preventDefault();
-          setActivePage('timer');
+          handleNavigate('timer');
         
         } else if (e.key === ',') {
           e.preventDefault();
-          setActivePage('settings');
+          handleNavigate('settings');
         }
 
         // プロジェクト操作
@@ -345,7 +357,8 @@ const App: React.FC = () => {
     handleStartTimer,
     handleStopTimer,
     openShortcutsDialog,
-    handleOpenProjectForm
+    handleOpenProjectForm,
+    handleNavigate
   ]);
 
   // 現在のページに応じたコンテンツをレンダリング

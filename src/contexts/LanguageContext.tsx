@@ -50,12 +50,12 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
   // 言語変更と保存
   const setLanguage = useCallback((newLanguage: Language) => {
     console.log(`Changing language to: ${newLanguage}`);
-    // フルリロードで変更を確実に反映
+    // 言語設定を保存
     localStorage.setItem(LANGUAGE_STORAGE_KEY, newLanguage);
     // ステートを更新
     setLanguageState(newLanguage);
-    // ページをリロードして確実に変更を反映
-    window.location.reload();
+    // 言語切り替え時に現在のページを維持するため、ページリロードは行わない
+    // 代わりにコンポーネントの再レンダリングを促すだけにする
   }, []);
 
   // 翻訳関数
