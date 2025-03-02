@@ -46,6 +46,9 @@ export const KPICard: React.FC<KPICardProps> = ({
       ? theme.palette.error.main 
       : theme.palette.text.secondary;
 
+  // NaN値を表示しないようにする
+  const displayTrendValue = trend && !isNaN(trend.value) ? trend.value : 0;
+
   return (
     <Card 
       sx={{
@@ -108,7 +111,7 @@ export const KPICard: React.FC<KPICardProps> = ({
               variant="body2" 
               sx={{ ml: 0.5, color: trendColor, fontWeight: 'medium' }}
             >
-              {trend.value > 0 ? '+' : ''}{trend.value}%
+              {displayTrendValue > 0 ? '+' : ''}{displayTrendValue}%
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
               {trend.label}

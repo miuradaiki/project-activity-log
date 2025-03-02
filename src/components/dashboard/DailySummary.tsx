@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { Grid, Typography, Box } from '@mui/material';
-import { 
+import {
   AccessTime as AccessTimeIcon,
   Assignment as AssignmentIcon,
   Star as StarIcon,
@@ -21,7 +21,7 @@ export const DailySummary: React.FC<DailySummaryProps> = ({ projects, timeEntrie
   const today = new Date();
   const todayStart = new Date(today.setHours(0, 0, 0, 0));
   const todayEnd = new Date(today.setHours(23, 59, 59, 999));
-  
+
   // 昨日の日付を計算
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
@@ -31,10 +31,10 @@ export const DailySummary: React.FC<DailySummaryProps> = ({ projects, timeEntrie
   // 本日と昨日の作業時間を計算
   const totalHoursToday = getDailyWorkHours(timeEntries, today);
   const totalHoursYesterday = getDailyWorkHours(timeEntries, yesterday);
-  
+
   // 前日比の計算（パーセント）
-  const hoursTrend = totalHoursYesterday > 0 
-    ? Math.round(((totalHoursToday - totalHoursYesterday) / totalHoursYesterday) * 100) 
+  const hoursTrend = totalHoursYesterday > 0
+    ? Math.round(((totalHoursToday - totalHoursYesterday) / totalHoursYesterday) * 100)
     : 0;
 
   const mostActive = getMostActiveProject(timeEntries, projects, todayStart, todayEnd);
@@ -52,10 +52,15 @@ export const DailySummary: React.FC<DailySummaryProps> = ({ projects, timeEntrie
 
   const activeProjects = new Set(todayEntries.map(entry => entry.projectId)).size;
   const activeProjectsYesterday = new Set(yesterdayEntries.map(entry => entry.projectId)).size;
-  
+
   // プロジェクト数の前日比
   const projectsTrend = activeProjectsYesterday > 0
     ? Math.round(((activeProjects - activeProjectsYesterday) / activeProjectsYesterday) * 100)
+    : 0;
+
+  // プロジェクト作業割合の計算（totalHoursToday が 0 の場合のエラー防止）
+  const projectPercentage = totalHoursToday > 0
+    ? Math.round((mostActive.hours / totalHoursToday) * 100)
     : 0;
 
   return (
@@ -76,7 +81,7 @@ export const DailySummary: React.FC<DailySummaryProps> = ({ projects, timeEntrie
             }}
           />
         </Grid>
-        
+
         {/* 作業したプロジェクト数 */}
         <Grid item xs={12} md={4}>
           <KPICard
@@ -90,15 +95,15 @@ export const DailySummary: React.FC<DailySummaryProps> = ({ projects, timeEntrie
             color="#8B5CF6" // パープル
           />
         </Grid>
-        
+
         {/* 最も作業したプロジェクト */}
         <Grid item xs={12} md={4}>
           <KPICard
             title={t('dashboard.daily.most')}
-            value={mostActive.projectName}
+            value={mostActive.projectName || '-'}
             icon={<StarIcon />}
             trend={{
-              value: Math.round((mostActive.hours / totalHoursToday) * 100),
+              value: projectPercentage,
               label: t('dashboard.weekly.byproject'),
             }}
             color="#F59E0B" // アンバー
