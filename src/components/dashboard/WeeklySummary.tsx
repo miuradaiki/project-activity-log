@@ -38,7 +38,7 @@ interface WeeklySummaryProps {
 }
 
 export const WeeklySummary: React.FC<WeeklySummaryProps> = ({ projects, timeEntries }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [weekOffset, setWeekOffset] = useState(0);
 
   const getStartOfWeek = (offset: number = 0) => {
@@ -56,7 +56,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({ projects, timeEntr
   endOfWeek.setDate(endOfWeek.getDate() + 6);
   endOfWeek.setHours(23, 59, 59, 999);
 
-  const isEnglish = t('language') === 'English';
+  const isEnglish = language === 'en';
   const weeklyData = getWeeklyDistribution(timeEntries, projects, startOfWeek, isEnglish);
   const projectDistribution = getProjectDistribution(timeEntries, projects, startOfWeek, endOfWeek)
     .sort((a, b) => b.hours - a.hours);
@@ -69,10 +69,17 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({ projects, timeEntr
   // 週の表示文字列を生成
   const formatWeekDisplay = (start: Date, end: Date) => {
     // 言語に応じて表示形式を切り替え
-    if (t('language') === 'English') {
-      const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+    if (isEnglish) {
+      // 英語形式: "Mar 3, 2025 - Mar 9, 2025"
+      const options: Intl.DateTimeFormatOptions = { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+      };
+      
       return `${start.toLocaleDateString('en-US', options)} - ${end.toLocaleDateString('en-US', options)}`;
     } else {
+      // 日本語形式: "2025年3月3日 〜 3月9日"
       return `${start.getFullYear()}年${start.getMonth() + 1}月${start.getDate()}日 〜 ${
         end.getMonth() + 1}月${end.getDate()}日`;
     }
@@ -92,7 +99,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({ projects, timeEntr
           borderRadius: 1,
         }}>
           <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-            {t('language') === 'English' ? label : `${label}曜日`}
+            {isEnglish ? label : `${label}曜日`}
           </Typography>
           {payload.map((item: any, index: number) => (
             item.value > 0 && (
@@ -119,7 +126,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({ projects, timeEntr
           {t('dashboard.weekly.title')}
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <ButtonGroup size="small" aria-label="週の移動">
+          <ButtonGroup size="small" aria-label={isEnglish ? "Week navigation" : "週の移動"}>
             <IconButton onClick={handlePrevWeek}>
               <ChevronLeftIcon />
             </IconButton>
