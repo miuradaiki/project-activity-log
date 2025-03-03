@@ -10,6 +10,7 @@ import {
   IconButton,
   useMediaQuery,
   useTheme,
+  Divider,
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
@@ -60,11 +61,39 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const { t } = useLanguage();
   
   // ナビゲーションアイテム
-  const menuItems = [
+  const mainMenuItems = [
     { id: 'dashboard', text: t('nav.dashboard'), icon: <DashboardIcon /> },
     { id: 'projects', text: t('nav.projects'), icon: <ProjectsIcon /> },
     { id: 'timer', text: t('nav.timer'), icon: <TimerIcon /> },
   ];
+
+  // 設定メニュー項目
+  const settingsMenuItem = { id: 'settings', text: t('nav.settings'), icon: <SettingsIcon /> };
+
+  // メニュー項目のレンダリング
+  const renderMenuItem = (item: { id: string; text: string; icon: React.ReactNode }) => (
+    <ListItem key={item.id} disablePadding>
+      <StyledListItemButton
+        selected={activePage === item.id}
+        onClick={() => onNavigate(item.id)}
+        sx={{ 
+          justifyContent: open ? 'initial' : 'center',
+          px: open ? 3 : 2.5,
+        }}
+      >
+        <ListItemIcon
+          sx={{
+            minWidth: open ? 36 : 'auto',
+            mr: open ? 2 : 'auto',
+            justifyContent: 'center',
+          }}
+        >
+          {item.icon}
+        </ListItemIcon>
+        {open && <ListItemText primary={item.text} />}
+      </StyledListItemButton>
+    </ListItem>
+  );
 
   // ドロワーの内容
   const drawer = (
@@ -85,54 +114,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </IconButton>
       </Box>
 
-      <List sx={{ pt: 2 }}>
-        {menuItems.map((item) => (
-          <ListItem key={item.id} disablePadding>
-            <StyledListItemButton
-              selected={activePage === item.id}
-              onClick={() => onNavigate(item.id)}
-              sx={{ 
-                justifyContent: open ? 'initial' : 'center',
-                px: open ? 3 : 2.5,
-              }}
-            >
-              <ListItemIcon
-                sx={{
-                  minWidth: open ? 36 : 'auto',
-                  mr: open ? 2 : 'auto',
-                  justifyContent: 'center',
-                }}
-              >
-                {item.icon}
-              </ListItemIcon>
-              {open && <ListItemText primary={item.text} />}
-            </StyledListItemButton>
-          </ListItem>
-        ))}
+      <List sx={{ pt: 2, flexGrow: 1 }}>
+        {mainMenuItems.map(renderMenuItem)}
       </List>
 
-      <List sx={{ mt: 'auto' }}>
-        <ListItem disablePadding>
-          <StyledListItemButton
-            selected={activePage === 'settings'}
-            onClick={() => onNavigate('settings')}
-            sx={{ 
-              justifyContent: open ? 'initial' : 'center',
-              px: open ? 3 : 2.5,
-            }}
-          >
-            <ListItemIcon
-              sx={{
-                minWidth: open ? 36 : 'auto',
-                mr: open ? 2 : 'auto',
-                justifyContent: 'center',
-              }}
-            >
-              <SettingsIcon />
-            </ListItemIcon>
-            {open && <ListItemText primary={t('nav.settings')} />}
-          </StyledListItemButton>
-        </ListItem>
+      <Divider sx={{ my: 1 }} />
+
+      <List sx={{ mb: 2 }}>
+        {renderMenuItem(settingsMenuItem)}
       </List>
     </>
   );
@@ -197,6 +186,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             duration: theme.transitions.duration.enteringScreen,
           }),
           overflowX: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
         },
       }}
     >

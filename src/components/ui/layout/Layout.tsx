@@ -19,6 +19,8 @@ import {
 import { LanguageSwitcher } from '../LanguageSwitcher';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { Sidebar, DRAWER_WIDTH, CLOSED_DRAWER_WIDTH } from './Sidebar';
+import { GlobalTimer } from '../global/GlobalTimer';
+import { Project } from '../../../types';
 
 export interface LayoutProps {
   children: React.ReactNode;
@@ -32,6 +34,11 @@ export interface LayoutProps {
   onAddButtonClick?: () => void;
   showAddButton?: boolean;
   addButtonTooltip?: string;
+  // タイマー関連の新しいプロパティ
+  activeProject?: Project | null;
+  isTimerRunning?: boolean;
+  startTime?: string | null;
+  onStopTimer?: () => void;
 }
 
 export const Layout: React.FC<LayoutProps> = ({
@@ -46,6 +53,11 @@ export const Layout: React.FC<LayoutProps> = ({
   onAddButtonClick,
   showAddButton = false,
   addButtonTooltip = '追加',
+  // タイマー関連のプロパティ
+  activeProject = null,
+  isTimerRunning = false,
+  startTime = null,
+  onStopTimer = () => {},
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -56,6 +68,13 @@ export const Layout: React.FC<LayoutProps> = ({
   useEffect(() => {
     console.log(`Layout: Current language is ${language}`);
   }, [language]);
+
+  // タイマー画面に遷移するハンドラー
+  const handleTimerClick = () => {
+    if (activePage !== 'timer') {
+      onNavigate('timer');
+    }
+  };
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -146,7 +165,7 @@ export const Layout: React.FC<LayoutProps> = ({
               sx={{
                 position: 'fixed',
                 bottom: 24,
-                right: 24,
+                right: isTimerRunning ? 90 : 24, // タイマーが実行中の場合、タイマーとの干渉を避けるために位置を調整
                 boxShadow: theme.shadows[3],
               }}
             >
@@ -154,6 +173,15 @@ export const Layout: React.FC<LayoutProps> = ({
             </Fab>
           </Tooltip>
         )}
+
+        {/* グローバルタイマー */}
+        <GlobalTimer
+          project={activeProject}
+          isRunning={isTimerRunning}
+          startTime={startTime}
+          onStop={onStopTimer}
+          onClick={handleTimerClick}
+        />
       </Box>
     </Box>
   );

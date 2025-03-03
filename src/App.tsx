@@ -460,7 +460,8 @@ const App: React.FC = () => {
     handleStartTimer,
     handleStopTimer,
     handleDeleteTimeEntry,
-    handleImportCSV
+    handleImportCSV,
+    t
   ]);
 
   // ローディング表示
@@ -487,6 +488,11 @@ const App: React.FC = () => {
       showAddButton={addButtonConfig.show}
       onAddButtonClick={addButtonConfig.onClick}
       addButtonTooltip={addButtonConfig.tooltip}
+      // グローバルタイマー関連のプロパティを渡す
+      activeProject={activeProject}
+      isTimerRunning={isTimerRunning}
+      startTime={startTime}
+      onStopTimer={handleStopTimer}
     >
       {renderPageContent()}
 
