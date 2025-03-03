@@ -16,7 +16,7 @@ import {
   AccessTime as TimeIcon,
 } from '@mui/icons-material';
 import { TimeEntry, Project } from '../../types';
-import { formatDistanceStrict } from 'date-fns';
+import { formatDistanceStrict, intervalToDuration } from 'date-fns';
 import { ja, enUS } from 'date-fns/locale';
 
 interface TimelineViewProps {
@@ -36,18 +36,32 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
   onDelete,
 }) => {
   const theme = useTheme();
-  const { t } = useLanguage();
-  const isEnglish = t('language') === 'English';
+  const { t, language } = useLanguage();
+  const isEnglish = language === 'en';
 
   // 日付をフォーマット
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString(isEnglish ? 'en-US' : 'ja-JP', { 
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      weekday: 'short'
-    });
+    
+    if (isEnglish) {
+      // 英語形式: "Feb 28, 2025 (Fri)"
+      const options: Intl.DateTimeFormatOptions = { 
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        weekday: 'short'
+      };
+      return date.toLocaleDateString('en-US', options);
+    } else {
+      // 日本語形式: "2025/02/28(金)"
+      const options: Intl.DateTimeFormatOptions = { 
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        weekday: 'short'
+      };
+      return date.toLocaleDateString('ja-JP', options);
+    }
   };
 
   // 時間をフォーマット
@@ -59,12 +73,34 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
     });
   };
 
-  // 作業時間を計算
-  const calculateDuration = (startTime: string, endTime: string | null) => {
+  // 作業時間を計算して表示
+  const formatDuration = (startTime: string, endTime: string | null) => {
     const start = new Date(startTime);
     const end = endTime ? new Date(endTime) : new Date();
     
-    return formatDistanceStrict(start, end, { locale: isEnglish ? enUS : ja });
+    // 時間と分を計算
+    const duration = intervalToDuration({ start, end });
+    const hours = duration.hours || 0;
+    const minutes = duration.minutes || 0;
+    
+    // 言語に応じて形式を変える
+    if (isEnglish) {
+      if (hours === 0) {
+        return `${minutes}m`;
+      } else if (minutes === 0) {
+        return `${hours}h`;
+      } else {
+        return `${hours}h ${minutes}m`;
+      }
+    } else {
+      if (hours === 0) {
+        return `${minutes}分`;
+      } else if (minutes === 0) {
+        return `${hours}時間`;
+      } else {
+        return `${hours}時間 ${minutes}分`;
+      }
+    }
   };
 
   // プロジェクト名を取得
@@ -84,7 +120,12 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
 
   // 日付ごとにソート
   const sortedDates = Object.keys(groupedEntries).sort(
-    (a, b) => new Date(b.replace(/[年月日]/g, '-')).getTime() - new Date(a.replace(/[年月日]/g, '-')).getTime()
+    (a, b) => {
+      // 日付文字列をDateオブジェクトに変換して比較
+      const dateA = new Date(timeEntries.find(entry => formatDate(entry.startTime) === a)?.startTime || '');
+      const dateB = new Date(timeEntries.find(entry => formatDate(entry.startTime) === b)?.startTime || '');
+      return dateB.getTime() - dateA.getTime();
+    }
   );
 
   return (
@@ -168,7 +209,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
                         </Typography>
                         <Chip 
                           size="small" 
-                          label={calculateDuration(entry.startTime, entry.endTime)}
+                          label={formatDuration(entry.startTime, entry.endTime)}
                           icon={<TimeIcon fontSize="small" />}
                           sx={{ ml: 2, fontWeight: 'medium' }}
                         />
