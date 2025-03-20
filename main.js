@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog, powerMonitor } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const {
@@ -10,10 +10,8 @@ const {
   exportToCSV
 } = require('./storageUtils');
 
-let mainWindow;
-
 function createWindow() {
-  mainWindow = new BrowserWindow({
+  const win = new BrowserWindow({
     width: 1200,
     height: 800,
     minWidth: 900,  // 最小幅を設定
@@ -27,10 +25,10 @@ function createWindow() {
   });
 
   if (process.env.NODE_ENV === 'development') {
-    mainWindow.loadURL('http://localhost:5175');
-    mainWindow.webContents.openDevTools();
+    win.loadURL('http://localhost:5173');
+    win.webContents.openDevTools();
   } else {
-    mainWindow.loadFile('dist/index.html');
+    win.loadFile('dist/index.html');
   }
 }
 
@@ -62,36 +60,8 @@ const checkStorageFiles = async () => {
   }
 };
 
-// スリープモードと復帰のイベントをレンダラープロセスに通知する関数
-function sendPowerStateToRenderer(state) {
-  if (mainWindow && !mainWindow.isDestroyed()) {
-    mainWindow.webContents.send('power-state-change', state);
-  }
-}
-
 // ストレージの初期化
 app.whenReady().then(async () => {
-  // パワーモニターのセットアップ
-  powerMonitor.on('suspend', () => {
-    console.log('System is going to sleep');
-    sendPowerStateToRenderer('suspend');
-  });
-  
-  powerMonitor.on('resume', () => {
-    console.log('System is resuming from sleep');
-    sendPowerStateToRenderer('resume');
-  });
-  
-  powerMonitor.on('lock-screen', () => {
-    console.log('Screen is locked');
-    sendPowerStateToRenderer('lock-screen');
-  });
-  
-  powerMonitor.on('unlock-screen', () => {
-    console.log('Screen is unlocked');
-    sendPowerStateToRenderer('unlock-screen');
-  });
-  
   initStorage();
   await checkStorageFiles();
 
