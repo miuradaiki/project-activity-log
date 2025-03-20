@@ -137,7 +137,7 @@ export const ProjectProgressCard: React.FC<ProjectProgressCardProps> = ({
   let statusText = t('projects.filter.active');
   
   if (progressPercentage >= 100) {
-    statusColor = theme.palette.success.main;
+    statusColor = theme.palette.error.main;
     statusText = t('projects.filter.completed');
   } else if (progressPercentage >= 90) {
     statusColor = theme.palette.warning.main;
@@ -149,7 +149,7 @@ export const ProjectProgressCard: React.FC<ProjectProgressCardProps> = ({
 
   // プログレスバーの色を設定
   const getProgressColor = () => {
-    if (progressPercentage >= 100) return theme.palette.success.main;
+    if (progressPercentage >= 100) return theme.palette.error.main;
     if (progressPercentage >= 90) return theme.palette.warning.main;
     return theme.palette.primary.main;
   };
