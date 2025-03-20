@@ -355,3 +355,60 @@ export const calculateDailyAverageHours = (
   // 作業日数で割って平均を計算
   return workDays.size > 0 ? Number((totalHours / workDays.size).toFixed(1)) : 0;
 };
+
+/**
+ * 指定した日の最も長い作業セッションの時間（分単位）を取得
+ */
+export const getLongestWorkSession = (
+  timeEntries: TimeEntry[],
+  targetDate: Date
+): number => {
+  const startOfDay = new Date(targetDate);
+  startOfDay.setHours(0, 0, 0, 0);
+  const endOfDay = new Date(targetDate);
+  endOfDay.setHours(23, 59, 59, 999);
+
+  const todayEntries = timeEntries.filter(entry => {
+    const entryDate = new Date(entry.startTime);
+    return isWithinDateRange(entryDate, startOfDay, endOfDay);
+  });
+
+  if (todayEntries.length === 0) return 0;
+
+  // 各エントリーの作業時間を計算し、最も長いものを取得（分単位）
+  const longestSession = todayEntries.reduce((longest, entry) => {
+    const duration = calculateDuration(entry.startTime, entry.endTime) / (1000 * 60); // ミリ秒から分に変換
+    return duration > longest ? duration : longest;
+  }, 0);
+
+  return Math.round(longestSession); // 分単位で返す（整数に丸める）
+};
+
+/**
+ * 指定した日の平均作業セッション時間（分単位）を取得
+ */
+export const getAverageWorkSession = (
+  timeEntries: TimeEntry[],
+  targetDate: Date
+): number => {
+  const startOfDay = new Date(targetDate);
+  startOfDay.setHours(0, 0, 0, 0);
+  const endOfDay = new Date(targetDate);
+  endOfDay.setHours(23, 59, 59, 999);
+
+  const todayEntries = timeEntries.filter(entry => {
+    const entryDate = new Date(entry.startTime);
+    return isWithinDateRange(entryDate, startOfDay, endOfDay);
+  });
+
+  if (todayEntries.length === 0) return 0;
+
+  // 各エントリーの作業時間の合計を計算（分単位）
+  const totalDuration = todayEntries.reduce((total, entry) => {
+    const duration = calculateDuration(entry.startTime, entry.endTime) / (1000 * 60); // ミリ秒から分に変換
+    return total + duration;
+  }, 0);
+
+  // エントリー数で割って平均を計算
+  return Math.round(totalDuration / todayEntries.length); // 分単位で返す（整数に丸める）
+};

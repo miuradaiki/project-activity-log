@@ -8,7 +8,7 @@ import {
   TrendingUp as TrendingUpIcon,
 } from '@mui/icons-material';
 import { Project, TimeEntry } from '../../types';
-import { getDailyWorkHours, getMostActiveProject } from '../../utils/analytics';
+import { getDailyWorkHours, getMostActiveProject, getLongestWorkSession, getAverageWorkSession } from '../../utils/analytics';
 import { KPICard } from '../ui/KPICard';
 
 interface DailySummaryProps {
@@ -37,30 +37,26 @@ export const DailySummary: React.FC<DailySummaryProps> = ({ projects, timeEntrie
     ? Math.round(((totalHoursToday - totalHoursYesterday) / totalHoursYesterday) * 100)
     : 0;
 
-  const mostActive = getMostActiveProject(timeEntries, projects, todayStart, todayEnd);
-
-  const todayEntries = timeEntries.filter(entry => {
-    const entryDate = new Date(entry.startTime);
-    return entryDate >= todayStart && entryDate <= todayEnd;
-  });
-
-  // 昨日のアクティブプロジェクト数
-  const yesterdayEntries = timeEntries.filter(entry => {
-    const entryDate = new Date(entry.startTime);
-    return entryDate >= yesterdayStart && entryDate <= yesterdayEnd;
-  });
-
-  const activeProjects = new Set(todayEntries.map(entry => entry.projectId)).size;
-  const activeProjectsYesterday = new Set(yesterdayEntries.map(entry => entry.projectId)).size;
-
-  // プロジェクト数の前日比
-  const projectsTrend = activeProjectsYesterday > 0
-    ? Math.round(((activeProjects - activeProjectsYesterday) / activeProjectsYesterday) * 100)
+  // 最も長い作業時間を計算
+  const longestWorkTime = getLongestWorkSession(timeEntries, today);
+  
+  // 昨日の最も長い作業時間を計算
+  const longestWorkTimeYesterday = getLongestWorkSession(timeEntries, yesterday);
+  
+  // 最長作業時間の前日比
+  const longestTimeTrend = longestWorkTimeYesterday > 0
+    ? Math.round(((longestWorkTime - longestWorkTimeYesterday) / longestWorkTimeYesterday) * 100)
     : 0;
-
-  // プロジェクト作業割合の計算（totalHoursToday が 0 の場合のエラー防止）
-  const projectPercentage = totalHoursToday > 0
-    ? Math.round((mostActive.hours / totalHoursToday) * 100)
+    
+  // 平均作業時間を計算
+  const averageWorkTime = getAverageWorkSession(timeEntries, today);
+  
+  // 昨日の平均作業時間を計算
+  const averageWorkTimeYesterday = getAverageWorkSession(timeEntries, yesterday);
+  
+  // 平均作業時間の前日比
+  const averageTimeTrend = averageWorkTimeYesterday > 0
+    ? Math.round(((averageWorkTime - averageWorkTimeYesterday) / averageWorkTimeYesterday) * 100)
     : 0;
 
   return (
@@ -82,29 +78,29 @@ export const DailySummary: React.FC<DailySummaryProps> = ({ projects, timeEntrie
           />
         </Grid>
 
-        {/* 作業したプロジェクト数 */}
+        {/* 最も長い作業時間 */}
         <Grid item xs={12} md={4}>
           <KPICard
-            title={t('dashboard.daily.projects')}
-            value={`${activeProjects}`}
-            icon={<AssignmentIcon />}
+            title={t('dashboard.daily.longest')}
+            value={`${longestWorkTime} ${t('units.minutes')}`}
+            icon={<TrendingUpIcon />}
             trend={{
-              value: projectsTrend,
+              value: longestTimeTrend,
               label: t('time.yesterday'),
             }}
             color="#8B5CF6" // パープル
           />
         </Grid>
 
-        {/* 最も作業したプロジェクト */}
+        {/* 平均作業時間 */}
         <Grid item xs={12} md={4}>
           <KPICard
-            title={t('dashboard.daily.most')}
-            value={mostActive.projectName || '-'}
+            title={t('dashboard.daily.average')}
+            value={`${averageWorkTime} ${t('units.minutes')}`}
             icon={<StarIcon />}
             trend={{
-              value: projectPercentage,
-              label: t('dashboard.weekly.byproject'),
+              value: averageTimeTrend,
+              label: t('time.yesterday'),
             }}
             color="#F59E0B" // アンバー
           />
