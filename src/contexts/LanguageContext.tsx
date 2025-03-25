@@ -32,15 +32,13 @@ interface LanguageProviderProps {
 import { translations } from '../i18n/translations';
 
 export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
-  console.log('LanguageProvider rendering');
-  
   // 初期言語設定（ローカルストレージから取得、なければブラウザの言語設定、それもなければ日本語）
   const getInitialLanguage = (): Language => {
     const storedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY) as Language | null;
     if (storedLanguage && (storedLanguage === 'ja' || storedLanguage === 'en')) {
       return storedLanguage;
     }
-    
+
     const browserLanguage = navigator.language.split('-')[0];
     return browserLanguage === 'en' ? 'en' : 'ja'; // デフォルトは日本語
   };

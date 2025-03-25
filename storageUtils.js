@@ -29,10 +29,10 @@ const recoverProjects = async () => {
     // タイムエントリーからプロジェクトIDを収集
     const timeEntriesData = await fs.promises.readFile(timeEntriesPath, 'utf-8');
     const timeEntries = JSON.parse(timeEntriesData);
-    
+
     // ユニークなプロジェクトIDを抽出
     const projectIds = [...new Set(timeEntries.map(entry => entry.projectId))];
-    
+
     // プロジェクトデータを復元
     const recoveredProjects = projectIds.map(id => ({
       id,
@@ -46,7 +46,7 @@ const recoverProjects = async () => {
     // 復元したプロジェクトデータを保存
     await saveProjects(recoveredProjects);
     console.log('Projects recovered:', recoveredProjects);
-    
+
     return recoveredProjects;
   } catch (error) {
     console.error('Error recovering projects:', error);
@@ -69,12 +69,12 @@ const loadProjects = async () => {
     const data = await fs.promises.readFile(filePath, 'utf-8');
     const projects = JSON.parse(data);
     console.log('Loaded projects:', projects);
-    
+
     // プロジェクトデータが空の場合は復元を試みる
     if (projects.length === 0) {
       return await recoverProjects();
     }
-    
+
     return projects;
   } catch (error) {
     console.error('Error loading projects:', error);
@@ -96,7 +96,6 @@ const loadTimeEntries = async () => {
     console.log('Loading time entries from:', filePath);
     const data = await fs.promises.readFile(filePath, 'utf-8');
     const entries = JSON.parse(data);
-    console.log('Loaded time entries:', entries);
     return entries;
   } catch (error) {
     console.error('Error loading time entries:', error);

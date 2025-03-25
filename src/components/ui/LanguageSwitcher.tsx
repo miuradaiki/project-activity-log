@@ -29,7 +29,6 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
 
   // 現在の言語をログ出力
   useEffect(() => {
-    console.log(`LanguageSwitcher: Current language is ${language}`);
   }, [language]);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {

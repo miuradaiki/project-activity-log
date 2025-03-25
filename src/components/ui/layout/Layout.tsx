@@ -1,18 +1,18 @@
 import React, { useEffect } from 'react';
-import { 
-  Box, 
-  Toolbar, 
-  AppBar, 
-  IconButton, 
-  Typography, 
+import {
+  Box,
+  Toolbar,
+  AppBar,
+  IconButton,
+  Typography,
   useTheme,
   Fab,
   Tooltip,
   useMediaQuery,
   CssBaseline,
 } from '@mui/material';
-import { 
-  Brightness4, 
+import {
+  Brightness4,
   Brightness7,
   Add as AddIcon
 } from '@mui/icons-material';
@@ -63,10 +63,9 @@ export const Layout: React.FC<LayoutProps> = ({
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const currentDrawerWidth = sidebarOpen ? DRAWER_WIDTH : CLOSED_DRAWER_WIDTH;
   const { t, language } = useLanguage(); // 翻訳関数と言語をインポート
-  
+
   // 現在の言語をログ出力
   useEffect(() => {
-    console.log(`Layout: Current language is ${language}`);
   }, [language]);
 
   // タイマー画面に遷移するハンドラー
@@ -79,7 +78,7 @@ export const Layout: React.FC<LayoutProps> = ({
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-      
+
       {/* サイドバー */}
       <Sidebar
         open={sidebarOpen}
@@ -117,7 +116,7 @@ export const Layout: React.FC<LayoutProps> = ({
           }}
         >
           <Toolbar>
-            <Typography variant="h6" component="div" sx={{ 
+            <Typography variant="h6" component="div" sx={{
               flexGrow: 1,
               ml: { xs: isMobile ? 5 : 0, md: 0 } // モバイル表示時に左余白を追加
             }}>

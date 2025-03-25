@@ -13,10 +13,7 @@ export const useStorage = () => {
         window.electronAPI.loadProjects(),
         window.electronAPI.loadTimeEntries()
       ]);
-      
-      console.log('Loaded Projects:', loadedProjects);
-      console.log('Loaded Time Entries:', loadedTimeEntries);
-      
+
       if (Array.isArray(loadedProjects) && loadedProjects.length > 0) {
         setProjects(loadedProjects);
       }
@@ -24,7 +21,7 @@ export const useStorage = () => {
       if (Array.isArray(loadedTimeEntries) && loadedTimeEntries.length > 0) {
         setTimeEntries(loadedTimeEntries);
       }
-      
+
       setIsDataLoaded(true);
     } catch (error) {
       console.error('Error loading data:', error);
@@ -50,10 +47,6 @@ export const useStorage = () => {
         console.warn('Some time entries reference non-existent projects');
         setTimeEntries(validTimeEntries);
       }
-
-      console.log('Saving Projects:', projects);
-      console.log('Saving Time Entries:', validTimeEntries);
-      
       await Promise.all([
         window.electronAPI.saveProjects(projects),
         window.electronAPI.saveTimeEntries(validTimeEntries)
