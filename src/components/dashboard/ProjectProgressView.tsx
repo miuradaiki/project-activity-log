@@ -112,6 +112,11 @@ export const ProjectProgressView: React.FC<ProjectProgressViewProps> = ({
   // フィルタリング
   const filteredProjects = useMemo(() => {
     return projectProgressData.filter(item => {
+      // アーカイブされたプロジェクトは非表示にする
+      if (item.project.isArchived) {
+        return false;
+      }
+
       // フィルターに基づいてプロジェクトをフィルタリング
       const filterMatch = 
         filterType === 'all' || 
