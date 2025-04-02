@@ -72,7 +72,7 @@ export const ProjectsGrid: React.FC<ProjectsGridProps> = ({
   onUnarchiveProject,
   onStartTimer,
 }) => {
-  const [tabValue, setTabValue] = useState(0);
+  const [tabValue, setTabValue] = useState(1);
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortType>('name');
