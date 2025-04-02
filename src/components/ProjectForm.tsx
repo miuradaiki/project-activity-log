@@ -52,7 +52,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
 
   const calculateTotalCapacity = useCallback((capacity: number): number => {
     const otherProjectsCapacity = projects
-      .filter(p => p.id !== project?.id)
+      .filter(p => p.id !== project?.id && !p.isArchived) // アーカイブされたプロジェクトを除外
       .reduce((sum, p) => sum + p.monthlyCapacity, 0);
     return otherProjectsCapacity + capacity;
   }, [projects, project]);
