@@ -65,10 +65,14 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   // ステータスを決定
   const getStatusInfo = () => {
     if (project.isArchived) {
+      // ダークモードでは少し明るい灰色、ライトモードでは少し暗い灰色を使用
+      const bgColor = theme.palette.mode === 'dark' ? theme.palette.grey[600] : theme.palette.grey[300];
       return { 
         label: t('projects.archive'), 
         color: 'default' as 'default',
-        bgColor: theme.palette.grey[200]
+        bgColor: bgColor,
+        // getContrastTextで自動的に適切なテキスト色を計算
+        textColor: theme.palette.getContrastText(bgColor)
       };
     }
     
@@ -76,7 +80,8 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
       return { 
         label: t('projects.filter.completed'), 
         color: 'error' as 'error',
-        bgColor: theme.palette.error.light
+        bgColor: theme.palette.error.light,
+        textColor: theme.palette.getContrastText(theme.palette.error.light)
       };
     }
     
@@ -84,7 +89,8 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
       return { 
         label: t('projects.filter.warning'), 
         color: 'warning' as 'warning',
-        bgColor: theme.palette.warning.light
+        bgColor: theme.palette.warning.light,
+        textColor: theme.palette.getContrastText(theme.palette.warning.light)
       };
     }
     
@@ -92,14 +98,16 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
       return { 
         label: t('timer.title'), 
         color: 'secondary' as 'secondary',
-        bgColor: theme.palette.secondary.light
+        bgColor: theme.palette.secondary.light,
+        textColor: theme.palette.getContrastText(theme.palette.secondary.light)
       };
     }
     
     return { 
       label: t('projects.filter.active'), 
       color: 'primary' as 'primary',
-      bgColor: theme.palette.primary.light
+      bgColor: theme.palette.primary.light,
+      textColor: theme.palette.getContrastText(theme.palette.primary.light)
     };
   };
 
@@ -142,7 +150,9 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
           width: 6,
           borderTopLeftRadius: 8,
           borderBottomLeftRadius: 8,
-          bgcolor: project.isArchived ? theme.palette.grey[400] : progressColor
+          bgcolor: project.isArchived 
+            ? theme.palette.mode === 'dark' ? theme.palette.grey[500] : theme.palette.grey[400] 
+            : progressColor
         }}
       />
       
@@ -178,7 +188,8 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
           sx={{ 
             mb: 2,
             bgcolor: statusInfo.bgColor,
-            fontWeight: 'medium'
+            fontWeight: 'medium',
+            color: statusInfo.textColor
           }}
         />
         
