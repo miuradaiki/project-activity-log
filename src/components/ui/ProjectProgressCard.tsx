@@ -142,9 +142,6 @@ export const ProjectProgressCard: React.FC<ProjectProgressCardProps> = ({
   } else if (progressPercentage >= 90) {
     statusColor = theme.palette.warning.main;
     statusText = t('projects.filter.warning');
-  } else if (progressPercentage <= 25) {
-    statusColor = theme.palette.grey[500];
-    statusText = t('timer.start');
   }
 
   // プログレスバーの色を設定
