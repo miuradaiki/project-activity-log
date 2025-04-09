@@ -70,7 +70,7 @@ const App: React.FC = () => {
   };
 
   // 状態管理
-  const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activePage, setActivePage] = useState(getInitialActivePage);
   const [showShortcutsDialog, setShowShortcutsDialog] = useState(false);
   const [isProjectFormOpen, setIsProjectFormOpen] = useState(false);
