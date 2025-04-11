@@ -102,7 +102,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </Grid>
 
         {/* プロジェクト進捗カード */}
-        <Grid item xs={12}>
+        <Grid item xs={12} lg={12}>
           <Paper 
             elevation={1} 
             sx={{ 

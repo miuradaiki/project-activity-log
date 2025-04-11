@@ -412,3 +412,19 @@ export const getAverageWorkSession = (
   // エントリー数で割って平均を計算
   return Math.round(totalDuration / todayEntries.length); // 分単位で返す（整数に丸める）
 };
+
+/**
+ * 前月のプロジェクトごとの作業時間を集計
+ */
+export const getPreviousMonthProjectDistribution = (
+  timeEntries: TimeEntry[],
+  projects: Project[]
+): { projectName: string; hours: number }[] => {
+  const now = new Date();
+  // 前月の開始日と終了日を計算
+  const startOfPrevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1, 0, 0, 0, 0);
+  const endOfPrevMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+  
+  // 前月のプロジェクト分布を取得
+  return getProjectDistribution(timeEntries, projects, startOfPrevMonth, endOfPrevMonth);
+};
