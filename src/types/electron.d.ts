@@ -9,6 +9,17 @@ export interface ElectronAPI {
   writeFile: (path: string, content: string) => Promise<boolean>;
   readFile: (path: string, options?: { encoding: string }) => Promise<any>;
   showOpenFileDialog: () => Promise<string | null>;
+  
+  // タイマー関連API
+  timerStart: (projectName: string) => Promise<boolean>;
+  timerStop: () => Promise<boolean>;
+  timerGetState: () => Promise<{
+    isRunning: boolean;
+    projectName: string;
+    startTime: number | null;
+    elapsedTime: number;
+  }>;
+  onTrayStopTimer: (callback: () => void) => void;
 }
 
 declare global {

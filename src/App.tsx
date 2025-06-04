@@ -103,7 +103,7 @@ const App: React.FC = () => {
     setEditingProject(undefined);
   }, []);
 
-  const handleStopTimer = useCallback(() => {
+  const handleStopTimer = useCallback(async () => {
     if (!activeProject || !startTime) return;
 
     const endTime = new Date().toISOString();
@@ -121,9 +121,14 @@ const App: React.FC = () => {
     setIsTimerRunning(false);
     setStartTime(null);
     setActiveProject(null);
+    
+    // トレイにタイマー停止を通知
+    if (window.electronAPI?.timerStop) {
+      await window.electronAPI.timerStop();
+    }
   }, [activeProject, startTime, setTimeEntries]);
 
-  const handleStartTimer = useCallback((project: Project) => {
+  const handleStartTimer = useCallback(async (project: Project) => {
     if (isTimerRunning) {
       handleStopTimer();
     }
@@ -132,6 +137,11 @@ const App: React.FC = () => {
     setStartTime(startTime);
     setIsTimerRunning(true);
     setActiveProject(project);
+    
+    // トレイにタイマー開始を通知
+    if (window.electronAPI?.timerStart) {
+      await window.electronAPI.timerStart(project.name);
+    }
   }, [isTimerRunning, handleStopTimer]);
 
   const handleCreateProject = useCallback((projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt' | 'isArchived'>) => {
@@ -348,18 +358,28 @@ const App: React.FC = () => {
     };
   }, [
     activePage,
-    isTimerRunning,
-    activeProject,
+    handleOpenProjectForm,
+    handleNavigate,
+    toggleThemeMode,
+    openShortcutsDialog,
     isProjectFormOpen,
     isManualEntryFormOpen,
     showShortcutsDialog,
-    toggleThemeMode,
+    isTimerRunning,
+    activeProject,
     handleStartTimer,
     handleStopTimer,
-    openShortcutsDialog,
-    handleOpenProjectForm,
-    handleNavigate
+    t
   ]);
+
+  // トレイからのタイマー停止イベントの処理
+  useEffect(() => {
+    if (window.electronAPI?.onTrayStopTimer) {
+      window.electronAPI.onTrayStopTimer(() => {
+        handleStopTimer();
+      });
+    }
+  }, [handleStopTimer]);
 
   // 現在のページに応じたコンテンツをレンダリング
   const renderPageContent = useCallback(() => {

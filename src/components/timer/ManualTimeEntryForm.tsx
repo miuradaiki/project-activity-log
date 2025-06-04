@@ -118,11 +118,13 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
                 label={t('timer.project')}
                 required
               >
-                {projects.map((project) => (
-                  <MenuItem key={project.id} value={project.id}>
-                    {project.name}
-                  </MenuItem>
-                ))}
+                {projects
+                  .filter((project) => !project.isArchived)
+                  .map((project) => (
+                    <MenuItem key={project.id} value={project.id}>
+                      {project.name}
+                    </MenuItem>
+                  ))}
               </Select>
             </FormControl>
 

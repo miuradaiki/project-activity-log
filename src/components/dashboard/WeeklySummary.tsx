@@ -156,14 +156,16 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({ projects, timeEntr
             <YAxis unit="h" />
             <Tooltip content={<CustomTooltip />} />
             <Legend />
-            {projects.map((project) => (
-              <Bar
-                key={project.id}
-                dataKey={project.name}
-                stackId="a"
-                fill={projectColorManager.getColorById(project.id)}
-              />
-            ))}
+            {projects
+              .filter((project) => !project.isArchived)
+              .map((project) => (
+                <Bar
+                  key={project.id}
+                  dataKey={project.name}
+                  stackId="a"
+                  fill={projectColorManager.getColorById(project.id)}
+                />
+              ))}
           </BarChart>
         </ResponsiveContainer>
       </Box>

@@ -192,11 +192,13 @@ export const TimeEntryList: React.FC<TimeEntryListProps> = ({
                 </Box>
               )}
             >
-              {projects.map((project) => (
-                <MenuItem key={project.id} value={project.id}>
-                  {project.name}
-                </MenuItem>
-              ))}
+              {projects
+                .filter((project) => !project.isArchived)
+                .map((project) => (
+                  <MenuItem key={project.id} value={project.id}>
+                    {project.name}
+                  </MenuItem>
+                ))}
             </Select>
           </FormControl>
         </Box>

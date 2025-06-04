@@ -31,10 +31,12 @@ export const getDailyProjectHours = (
 
   const projectHours: { [key: string]: number } = {};
   
-  // プロジェクトごとに初期化
-  projects.forEach(project => {
-    projectHours[project.name] = 0;
-  });
+  // アーカイブされていないプロジェクトのみを初期化
+  projects
+    .filter(project => !project.isArchived)
+    .forEach(project => {
+      projectHours[project.name] = 0;
+    });
 
   timeEntries
     .filter(entry => {
@@ -42,10 +44,10 @@ export const getDailyProjectHours = (
       return isWithinDateRange(entryDate, startOfDay, endOfDay);
     })
     .forEach(entry => {
-      const projectName = projects.find(p => p.id === entry.projectId)?.name;
-      if (projectName) {
+      const project = projects.find(p => p.id === entry.projectId);
+      if (project && !project.isArchived) {
         const hours = calculateDuration(entry.startTime, entry.endTime) / (1000 * 60 * 60);
-        projectHours[projectName] = (projectHours[projectName] || 0) + hours;
+        projectHours[project.name] = (projectHours[project.name] || 0) + hours;
       }
     });
 
@@ -105,11 +107,16 @@ export const getProjectDistribution = (
   });
 
   return Array.from(projectHours.entries())
-    .map(([projectId, hours]) => ({
-      projectName: projects.find(p => p.id === projectId)?.name || '不明なプロジェクト',
-      hours: Number(hours.toFixed(1))
-    }))
-    .filter(item => item.hours > 0)
+    .map(([projectId, hours]) => {
+      const project = projects.find(p => p.id === projectId);
+      return {
+        projectName: project && !project.isArchived ? project.name : null,
+        hours: Number(hours.toFixed(1))
+      };
+    })
+    .filter((item): item is { projectName: string; hours: number } => 
+      item.projectName !== null && item.hours > 0
+    )
     .sort((a, b) => b.hours - a.hours);
 };
 

@@ -11,7 +11,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
   writeFile: (path, content) => ipcRenderer.invoke('write-file', path, content),
   readFile: (path, options) => ipcRenderer.invoke('read-file', path, options),
   removeFile: (path) => ipcRenderer.invoke('remove-file', path),
-  showOpenFileDialog: () => ipcRenderer.invoke('show-open-file-dialog')
+  showOpenFileDialog: () => ipcRenderer.invoke('show-open-file-dialog'),
+  
+  // タイマー関連API
+  timerStart: (projectName) => ipcRenderer.invoke('timer-start', projectName),
+  timerStop: () => ipcRenderer.invoke('timer-stop'),
+  timerGetState: () => ipcRenderer.invoke('timer-get-state'),
+  onTrayStopTimer: (callback) => ipcRenderer.on('tray-stop-timer', callback)
 });
 
 // 通知機能の追加
