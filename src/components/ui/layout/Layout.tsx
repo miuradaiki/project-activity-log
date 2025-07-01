@@ -10,17 +10,20 @@ import {
   Tooltip,
   useMediaQuery,
   CssBaseline,
+  Chip,
 } from '@mui/material';
 import {
   Brightness4,
   Brightness7,
-  Add as AddIcon
+  Add as AddIcon,
+  Science as ScienceIcon,
 } from '@mui/icons-material';
 import { LanguageSwitcher } from '../LanguageSwitcher';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { Sidebar, DRAWER_WIDTH, CLOSED_DRAWER_WIDTH } from './Sidebar';
 import { GlobalTimer } from '../global/GlobalTimer';
 import { Project } from '../../../types';
+import { useStorage } from '../../../hooks/useStorage';
 
 export interface LayoutProps {
   children: React.ReactNode;
@@ -63,6 +66,7 @@ export const Layout: React.FC<LayoutProps> = ({
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const currentDrawerWidth = sidebarOpen ? DRAWER_WIDTH : CLOSED_DRAWER_WIDTH;
   const { t, language } = useLanguage(); // 翻訳関数と言語をインポート
+  const { isTestMode } = useStorage(); // テストモードの状態を取得
 
   // 現在の言語をログ出力
   useEffect(() => {
@@ -118,9 +122,28 @@ export const Layout: React.FC<LayoutProps> = ({
           <Toolbar>
             <Typography variant="h6" component="div" sx={{
               flexGrow: 1,
-              ml: { xs: isMobile ? 5 : 0, md: 0 } // モバイル表示時に左余白を追加
+              ml: { xs: isMobile ? 5 : 0, md: 0 }, // モバイル表示時に左余白を追加
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2,
             }}>
               {title}
+              {isTestMode && import.meta.env.VITE_ENABLE_TEST_DATA === 'true' && (
+                <Chip
+                  icon={<ScienceIcon />}
+                  label="テストモード"
+                  color="warning"
+                  size="small"
+                  sx={{ 
+                    animation: 'pulse 2s ease-in-out infinite',
+                    '@keyframes pulse': {
+                      '0%': { opacity: 0.7 },
+                      '50%': { opacity: 1 },
+                      '100%': { opacity: 0.7 },
+                    },
+                  }}
+                />
+              )}
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <LanguageSwitcher variant="icon" />
