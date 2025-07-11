@@ -24,6 +24,7 @@ import { Sidebar, DRAWER_WIDTH, CLOSED_DRAWER_WIDTH } from './Sidebar';
 import { GlobalTimer } from '../global/GlobalTimer';
 import { Project } from '../../../types';
 import { useStorage } from '../../../hooks/useStorage';
+import { isTestDataEnabled } from '../../../utils/env';
 
 export interface LayoutProps {
   children: React.ReactNode;
@@ -128,7 +129,7 @@ export const Layout: React.FC<LayoutProps> = ({
               gap: 2,
             }}>
               {title}
-              {isTestMode && import.meta.env.VITE_ENABLE_TEST_DATA === 'true' && (
+              {isTestMode && isTestDataEnabled() && (
                 <Chip
                   icon={<ScienceIcon />}
                   label="テストモード"

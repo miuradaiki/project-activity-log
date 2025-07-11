@@ -2,6 +2,7 @@ import React, { createContext, useContext, ReactNode, useState, useEffect } from
 import { AppSettings, DEFAULT_SETTINGS } from '../types/settings';
 import { loadSettings, updateSettings } from '../utils/settingsUtils';
 import { useStorage } from '../hooks/useStorage';
+import { isTestDataEnabled } from '../utils/env';
 
 // コンテキストの型定義
 interface SettingsContextType {
@@ -43,7 +44,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
   useEffect(() => {
     const checkTestMode = () => {
       const testModeEnabled = localStorage.getItem('project_activity_log_test_mode') === 'true' && 
-                             import.meta.env.VITE_ENABLE_TEST_DATA === 'true';
+                             isTestDataEnabled();
       setIsTestMode(testModeEnabled);
     };
     

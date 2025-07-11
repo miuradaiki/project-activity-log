@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { isTestDataEnabled } from '../../utils/env';
 import {
   Box,
   Paper,
@@ -47,7 +48,7 @@ export const SettingsView: React.FC = () => {
   const { projects, timeEntries, setProjects, setTimeEntries, isTestMode, toggleTestMode, testDataStats } = useStorage();
   
   // テストデータ機能の有効化フラグ（環境変数から取得）
-  const isTestDataEnabled = import.meta.env.VITE_ENABLE_TEST_DATA === 'true';
+  const testDataFeatureEnabled = isTestDataEnabled();
   
   // 月間基準時間の編集用ステート
   const [baseMonthlyHours, setBaseMonthlyHours] = useState<number>(
@@ -297,7 +298,7 @@ export const SettingsView: React.FC = () => {
         </Grid>
         
         {/* テストデータカード（開発環境のみ） */}
-        {isTestDataEnabled && (
+        {testDataFeatureEnabled && (
           <Grid item xs={12}>
             <Card 
               elevation={1}

@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Project, TimeEntry } from '../types';
+import { isTestDataEnabled } from '../utils/env';
 
 // テストモードのキー
 const TEST_MODE_KEY = 'project_activity_log_test_mode';
@@ -15,7 +16,7 @@ export const useStorage = () => {
   // テストモードの状態管理
   const [isTestMode, setIsTestModeState] = useState(() => {
     // 環境変数とローカルストレージの両方をチェック
-    const isTestEnv = import.meta.env.VITE_ENABLE_TEST_DATA === 'true';
+    const isTestEnv = isTestDataEnabled();
     const savedTestMode = localStorage.getItem(TEST_MODE_KEY) === 'true';
     return isTestEnv && savedTestMode;
   });
@@ -142,7 +143,7 @@ export const useStorage = () => {
 
   // テストモードの切り替え
   const toggleTestMode = useCallback(async (enabled: boolean) => {
-    const isTestEnv = import.meta.env.VITE_ENABLE_TEST_DATA === 'true';
+    const isTestEnv = isTestDataEnabled();
     if (!isTestEnv) {
       console.warn('Test mode is not enabled in environment');
       return;
