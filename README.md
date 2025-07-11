@@ -206,6 +206,18 @@ npm run start
 npm run electron:build
 ```
 
+### テスト実行
+```bash
+# 全テスト実行
+npm test
+
+# ウォッチモード
+npm run test:watch
+
+# カバレッジレポート付き
+npm run test:coverage
+```
+
 ## 機能の使用方法
 
 ### プロジェクト管理
@@ -323,6 +335,18 @@ npm run electron:build
 - コミットメッセージは具体的に記述
 - 機能単位でコミットを分割
 - 変更内容が分かりやすいコミットメッセージを心がける
+
+## ドキュメント
+
+### テスト・リファクタリング関連
+
+- [テスト環境構築ドキュメント](./docs/testing-setup.md) - テスト環境の詳細設定と技術スタック
+- [テスト実行ガイド](./docs/testing-guide.md) - テストの実行方法とトラブルシューティング
+- [リファクタリング戦略](./docs/refactoring-strategy.md) - t-wadaアプローチによる段階的改善計画
+
+### 開発者向け
+
+- [CLAUDE.md](./CLAUDE.md) - Claude Code用の開発ガイダンス
 
 ## ライセンス
 
