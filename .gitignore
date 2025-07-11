@@ -2,3 +2,10 @@ node_modules
 release
 dist
 .env.local
+
+# Test coverage
+coverage
+*.lcov
+
+# Jest cache
+.jest
