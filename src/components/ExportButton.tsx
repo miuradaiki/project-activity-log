@@ -7,12 +7,10 @@ export const ExportButton = () => {
   const { t } = useLanguage();
   const handleExport = async () => {
     try {
-      const result = await window.electronAPI.exportToCSV();
-      if (result.success) {
-        alert(t('timer.export.success'));
-      } else {
-        alert(t('timer.export.error'));
-      }
+      const timeEntries = await window.electronAPI.loadTimeEntries();
+      const projects = await window.electronAPI.loadProjects();
+      await window.electronAPI.exportCSV(timeEntries, projects);
+      alert(t('timer.export.success'));
     } catch (error) {
       console.error('Export error:', error);
       alert(t('timer.export.error'));

@@ -1,4 +1,5 @@
-import { Project, TimeEntry, AppSettings } from '../types/types';
+import { Project, TimeEntry } from '../types';
+import { AppSettings } from '../types/settings';
 
 export class MockElectronAPI {
   private static instance: MockElectronAPI;

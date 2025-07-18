@@ -1,9 +1,24 @@
+import { Project, TimeEntry } from '../types';
+import { AppSettings } from '../types/settings';
+
 export interface ElectronAPI {
-  loadProjects: () => Promise<any>;
-  saveProjects: (projects: any) => Promise<void>;
-  loadTimeEntries: () => Promise<any>;
-  saveTimeEntries: (entries: any) => Promise<void>;
-  exportToCSV: () => Promise<any>;
+  loadProjects: () => Promise<Project[]>;
+  saveProjects: (projects: Project[]) => Promise<void>;
+  loadTimeEntries: () => Promise<TimeEntry[]>;
+  saveTimeEntries: (entries: TimeEntry[]) => Promise<void>;
+  loadSettings: () => Promise<AppSettings>;
+  saveSettings: (settings: AppSettings) => Promise<void>;
+  exportCSV: (entries: TimeEntry[], projects: Project[]) => Promise<void>;
+  importCSV: (filePath: string) => Promise<any[]>;
+  showOpenDialog: () => Promise<{ canceled: boolean; filePaths: string[] }>;
+  showNotification: (title: string, body: string) => void;
+  onTimerStop: (callback: () => void) => void;
+  removeAllTimerStopListeners: () => void;
+  updateTrayTimer: (minutes: number, seconds: number) => void;
+  clearTrayTimer: () => void;
+  removeFile: (path: string) => Promise<boolean>;
+  deleteData: (dataType: string) => Promise<void>;
+  
   getUserDataPath: () => Promise<string>;
   createDirectory: (path: string) => Promise<boolean>;
   writeFile: (path: string, content: string) => Promise<boolean>;

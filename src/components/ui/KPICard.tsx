@@ -40,9 +40,9 @@ export const KPICard: React.FC<KPICardProps> = ({
   };
 
   const trendIcon = getTrendIcon();
-  const trendColor = trend?.value > 0 
+  const trendColor = trend && trend.value > 0 
     ? theme.palette.success.main 
-    : trend?.value < 0 
+    : trend && trend.value < 0 
       ? theme.palette.error.main 
       : theme.palette.text.secondary;
 

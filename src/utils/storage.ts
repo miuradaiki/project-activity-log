@@ -1,16 +1,5 @@
 import { Project, TimeEntry } from '../types';
 
-declare global {
-  interface Window {
-    electronAPI: {
-      loadProjects: () => Promise<Project[]>;
-      saveProjects: (projects: Project[]) => Promise<void>;
-      loadTimeEntries: () => Promise<TimeEntry[]>;
-      saveTimeEntries: (entries: TimeEntry[]) => Promise<void>;
-    }
-  }
-}
-
 // データストレージの型定義
 export interface StorageData {
   projects: Project[];

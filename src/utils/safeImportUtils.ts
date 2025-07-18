@@ -8,9 +8,11 @@ export const safeImportWorkLog = async (
   currentTimeEntries: TimeEntry[],
   onSuccess: (projects: Project[], timeEntries: TimeEntry[]) => void
 ) => {
+  let backup: { success: boolean; backupPath?: string } | null = null;
+  
   try {
     // 1. バックアップを作成
-    const backup = await createBackup();
+    backup = await createBackup();
     if (!backup.success) {
       throw new Error('バックアップの作成に失敗しました');
     }

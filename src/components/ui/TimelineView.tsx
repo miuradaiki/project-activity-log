@@ -170,7 +170,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
 
             {groupedEntries[date].map((entry, index) => {
               const project = getProject(entry.projectId);
-              const projectColor = project?.color || theme.palette.primary.main;
+              const projectColor = theme.palette.primary.main;
               
               return (
                 <Box key={entry.id} sx={{ position: 'relative', pl: 4, mb: 2 }}>

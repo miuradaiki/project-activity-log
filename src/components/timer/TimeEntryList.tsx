@@ -15,6 +15,7 @@ import {
   Chip,
   InputAdornment,
   IconButton,
+  SelectChangeEvent,
   useTheme,
   useMediaQuery,
 } from '@mui/material';
@@ -78,8 +79,9 @@ export const TimeEntryList: React.FC<TimeEntryListProps> = ({
   };
 
 
-  const handleProjectFilterChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setFilterProject(event.target.value as string[]);
+  const handleProjectFilterChange = (event: SelectChangeEvent<string[]>) => {
+    const value = event.target.value;
+    setFilterProject(typeof value === 'string' ? value.split(',') : value);
     setPage(1);  // フィルター変更時にページを1に戻す
   };
 

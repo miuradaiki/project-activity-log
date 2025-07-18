@@ -28,7 +28,6 @@ export const TimeTracker: React.FC<TimeTrackerProps> = ({
         format: ['hours', 'minutes', 'seconds'],
         zero: true,
         delimiter: ':',
-        padding: true,
       });
       
       setDuration(formatted);

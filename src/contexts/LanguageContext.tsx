@@ -65,7 +65,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
     }
 
     // キーが存在するかチェック
-    const translation = translations[language][key];
+    const translation = (translations as any)[language][key];
     if (!translation) {
       console.warn(`Translation key "${key}" not found for language "${language}".`);
       return key;

@@ -10,9 +10,8 @@ const mockProjects: Project[] = [
   {
     id: 'project-1',
     name: 'Project 1',
-    color: '#FF0000',
-    baseHoursPerMonth: 160,
-    allocatedPercentage: 50,
+    description: 'Test project 1',
+    monthlyCapacity: 0.5,
     isArchived: false,
     createdAt: '2025-01-01T00:00:00Z',
     updatedAt: '2025-01-01T00:00:00Z',
@@ -20,9 +19,8 @@ const mockProjects: Project[] = [
   {
     id: 'project-2',
     name: 'Project 2',
-    color: '#00FF00',
-    baseHoursPerMonth: 160,
-    allocatedPercentage: 30,
+    description: 'Test project 2',
+    monthlyCapacity: 0.3,
     isArchived: false,
     createdAt: '2025-01-01T00:00:00Z',
     updatedAt: '2025-01-01T00:00:00Z',

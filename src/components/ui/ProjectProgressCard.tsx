@@ -29,7 +29,7 @@ import {
   Edit as EditIcon,
   Archive as ArchiveIcon,
   Unarchive as UnarchiveIcon,
-  Target as TargetIcon,
+  FlagCircle as TargetIcon,
   InfoOutlined as InfoIcon,
   AccessTime as AccessTimeIcon,
 } from '@mui/icons-material';

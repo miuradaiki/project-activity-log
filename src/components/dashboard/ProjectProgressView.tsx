@@ -12,6 +12,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  SelectChangeEvent,
   useTheme,
   useMediaQuery,
 } from '@mui/material';
@@ -154,7 +155,7 @@ export const ProjectProgressView: React.FC<ProjectProgressViewProps> = ({
     setFilterType(newValue);
   };
 
-  const handleSortChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+  const handleSortChange = (event: SelectChangeEvent<SortType>) => {
     setSortType(event.target.value as SortType);
   };
 

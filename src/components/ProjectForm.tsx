@@ -77,6 +77,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
       name: name.trim(),
       description: description.trim(),
       monthlyCapacity,
+      isArchived: false,
     });
 
     handleClose();
