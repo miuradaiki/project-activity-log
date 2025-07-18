@@ -9,3 +9,6 @@ coverage
 
 # Jest cache
 .jest
+
+# devcontainer
+.devcontainer
