@@ -49,7 +49,6 @@ export const loadSettings = async (): Promise<AppSettings> => {
     } catch (error: any) {
       // ファイルが存在しない場合はデフォルト設定を保存して返す
       if (error.message && error.message.includes('ENOENT')) {
-        console.log('設定ファイルが存在しないため、デフォルト設定を作成します');
         await saveSettings(DEFAULT_SETTINGS);
         return DEFAULT_SETTINGS;
       }

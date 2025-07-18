@@ -6,10 +6,6 @@ export const generateTestData = (
   existingProjects: Project[],
   existingTimeEntries: TimeEntry[]
 ) => {
-  console.log('generateTestData started', {
-    existingProjects: existingProjects.length,
-    existingTimeEntries: existingTimeEntries.length,
-  });
 
   const now = new Date();
 
@@ -61,7 +57,6 @@ export const generateTestData = (
     },
   ];
 
-  console.log('Projects created', newProjects.length);
 
   // 時間エントリーを生成（過去30日分）
   const newTimeEntries: TimeEntry[] = [];
@@ -115,7 +110,6 @@ export const generateTestData = (
     }
   }
 
-  console.log('Time entries created', newTimeEntries.length);
 
   // 今日の実行中のタイマーを追加（50%の確率）
   if (Math.random() > 0.5) {
@@ -135,7 +129,6 @@ export const generateTestData = (
       createdAt: startTime.toISOString(),
       updatedAt: startTime.toISOString(),
     });
-    console.log('Running timer added');
   }
 
   // 既存のデータと新規データをマージして返す
@@ -144,10 +137,6 @@ export const generateTestData = (
     timeEntries: [...existingTimeEntries, ...newTimeEntries],
   };
 
-  console.log('generateTestData completed', {
-    projects: result.projects.length,
-    timeEntries: result.timeEntries.length,
-  });
 
   return result;
 };

@@ -63,7 +63,6 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
 
   // 言語変更と保存
   const setLanguage = useCallback((newLanguage: Language) => {
-    console.log(`Changing language to: ${newLanguage}`);
     // 言語設定を保存
     localStorage.setItem(LANGUAGE_STORAGE_KEY, newLanguage);
     // ステートを更新

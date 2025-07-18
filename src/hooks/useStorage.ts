@@ -74,7 +74,6 @@ export const useStorage = () => {
   const saveData = useCallback(async () => {
     // テストモードの場合は保存しない
     if (isTestMode) {
-      console.log('Test mode: Skipping data save');
       return;
     }
 

@@ -10,7 +10,6 @@ const initStorage = () => {
   if (!fs.existsSync(STORAGE_PATH)) {
     fs.mkdirSync(STORAGE_PATH, { recursive: true });
   }
-  console.log('Storage path:', STORAGE_PATH);
 };
 
 // プロジェクトデータの復元
@@ -45,7 +44,6 @@ const recoverProjects = async () => {
 
     // 復元したプロジェクトデータを保存
     await saveProjects(recoveredProjects);
-    console.log('Projects recovered:', recoveredProjects);
 
     return recoveredProjects;
   } catch (error) {
@@ -57,7 +55,6 @@ const recoverProjects = async () => {
 // プロジェクトデータの保存
 const saveProjects = async (projects) => {
   const filePath = path.join(STORAGE_PATH, 'projects.json');
-  console.log('Saving projects to:', filePath);
   await fs.promises.writeFile(filePath, JSON.stringify(projects, null, 2));
 };
 
@@ -65,10 +62,8 @@ const saveProjects = async (projects) => {
 const loadProjects = async () => {
   const filePath = path.join(STORAGE_PATH, 'projects.json');
   try {
-    console.log('Loading projects from:', filePath);
     const data = await fs.promises.readFile(filePath, 'utf-8');
     const projects = JSON.parse(data);
-    console.log('Loaded projects:', projects);
 
     // プロジェクトデータが空の場合は復元を試みる
     if (projects.length === 0) {
@@ -85,7 +80,6 @@ const loadProjects = async () => {
 // 時間記録データの保存
 const saveTimeEntries = async (timeEntries) => {
   const filePath = path.join(STORAGE_PATH, 'timeEntries.json');
-  console.log('Saving time entries to:', filePath);
   await fs.promises.writeFile(filePath, JSON.stringify(timeEntries, null, 2));
 };
 
@@ -93,7 +87,6 @@ const saveTimeEntries = async (timeEntries) => {
 const loadTimeEntries = async () => {
   const filePath = path.join(STORAGE_PATH, 'timeEntries.json');
   try {
-    console.log('Loading time entries from:', filePath);
     const data = await fs.promises.readFile(filePath, 'utf-8');
     const entries = JSON.parse(data);
     return entries;

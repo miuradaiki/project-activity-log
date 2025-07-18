@@ -167,7 +167,6 @@ function updateTrayMenu() {
 const checkStorageFiles = async () => {
   const USER_DATA_PATH = app.getPath('userData');
   const STORAGE_PATH = path.join(USER_DATA_PATH, 'data');
-  console.log('Storage Path:', STORAGE_PATH);
 
   const projectsPath = path.join(STORAGE_PATH, 'projects.json');
   const timeEntriesPath = path.join(STORAGE_PATH, 'timeEntries.json');
@@ -175,16 +174,12 @@ const checkStorageFiles = async () => {
   try {
     if (fs.existsSync(projectsPath)) {
       const projectsData = await fs.promises.readFile(projectsPath, 'utf-8');
-      console.log('Projects file content:', projectsData);
     } else {
-      console.log('Projects file does not exist');
     }
 
     if (fs.existsSync(timeEntriesPath)) {
       const timeEntriesData = await fs.promises.readFile(timeEntriesPath, 'utf-8');
-      console.log('Time entries file exists');
     } else {
-      console.log('Time entries file does not exist');
     }
   } catch (error) {
     console.error('Error checking storage files:', error);

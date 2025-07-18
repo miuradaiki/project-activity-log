@@ -301,15 +301,9 @@ const App: React.FC = () => {
       );
 
       if (result.success) {
-        console.log(
-          'インポートが成功しました。バックアップ:',
-          result.backupPath
-        );
       } else {
-        console.error('インポートに失敗しました:', result.error);
       }
     } catch (error) {
-      console.error('インポート処理中にエラーが発生しました:', error);
     }
   }, [projects, timeEntries, setProjects, setTimeEntries]);
 
