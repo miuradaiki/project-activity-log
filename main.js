@@ -1,14 +1,19 @@
-const { app, BrowserWindow, ipcMain, dialog, Tray, Menu, nativeImage } = require('electron');
-const path = require('path');
-const fs = require('fs');
-const {
+import { app, BrowserWindow, ipcMain, dialog, Tray, Menu, nativeImage } from 'electron';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+import {
   initStorage,
   loadProjects,
   saveProjects,
   loadTimeEntries,
   saveTimeEntries,
   exportToCSV
-} = require('./storageUtils');
+} from './storageUtils.js';
 
 // グローバル変数
 let mainWindow = null;

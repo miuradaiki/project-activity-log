@@ -1,6 +1,6 @@
-const fs = require('fs');
-const path = require('path');
-const { app, dialog, BrowserWindow } = require('electron');
+import fs from 'fs';
+import path from 'path';
+import { app, dialog, BrowserWindow } from 'electron';
 
 const USER_DATA_PATH = app.getPath('userData');
 const STORAGE_PATH = path.join(USER_DATA_PATH, 'data');
@@ -96,7 +96,7 @@ const loadTimeEntries = async () => {
   }
 };
 
-const Papa = require('papaparse');
+import Papa from 'papaparse';
 
 /**
  * 時間記録データをCSVとしてエクスポート
@@ -151,7 +151,7 @@ const exportToCSV = async (timeEntries, projects) => {
   }
 };
 
-module.exports = {
+export {
   initStorage,
   saveProjects,
   loadProjects,
