@@ -5,7 +5,7 @@ import { createMockProject } from '../../../__mocks__/electron';
 
 // タイマーのプロップスのモック型
 interface TimerProps {
-  project: any;
+  project: Project;
   isRunning: boolean;
   startTime: string | null;
   onStart: () => void;

@@ -98,10 +98,10 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({
   };
 
   // カスタムツールチップ
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ value: number; color: string; dataKey: string }>; label?: string }) => {
     if (active && payload && payload.length) {
       const totalHours = payload.reduce(
-        (sum: number, item: any) => sum + (item.value || 0),
+        (sum: number, item: { value?: number }) => sum + (item.value || 0),
         0
       );
 
@@ -119,7 +119,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({
             {isEnglish ? label : `${label}曜日`}
           </Typography>
           {payload.map(
-            (item: any, index: number) =>
+            (item: { value?: number; color: string; dataKey: string }, index: number) =>
               item.value > 0 && (
                 <Box key={index} sx={{ mt: 0.5 }}>
                   <Typography variant="body2" sx={{ color: item.color }}>
@@ -244,7 +244,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({
                 layout="vertical"
                 align="right"
                 verticalAlign="middle"
-                formatter={(value, entry: any) => {
+                formatter={(value, entry: { payload: { hours: number } }) => {
                   const { payload } = entry;
                   return `${value} (${payload.hours.toFixed(1)}h)`;
                 }}
