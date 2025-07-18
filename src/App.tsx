@@ -5,11 +5,9 @@ import {
   Button,
   CircularProgress,
   Typography,
-  useMediaQuery,
   useTheme,
 } from '@mui/material';
 import {
-  Add as AddIcon,
   CloudUpload as CloudUploadIcon,
 } from '@mui/icons-material';
 import { Project, TimeEntry } from './types';
@@ -17,7 +15,6 @@ import { Project, TimeEntry } from './types';
 import { v4 as uuidv4 } from 'uuid';
 import { ProjectList } from './components/ProjectList';
 import { ProjectForm } from './components/ProjectForm';
-import { Timer } from './components/timer/Timer';
 import { TimeEntryList } from './components/timer/TimeEntryList';
 import { ManualTimeEntryForm } from './components/timer/ManualTimeEntryForm';
 import { Dashboard } from './components/dashboard/Dashboard';
@@ -54,13 +51,13 @@ const TabPanel = (props: TabPanelProps) => {
   );
 };
 
+
 const App: React.FC = () => {
   // 多言語対応
   const { t } = useLanguage();
   // テーマとレイアウト管理
   const { isDarkMode, toggleThemeMode } = useThemeMode();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   // アクティブページの初期値をローカルストレージから取得
   const getInitialActivePage = (): string => {
@@ -301,9 +298,12 @@ const App: React.FC = () => {
       );
 
       if (result.success) {
+        // インポート成功時の処理は不要
       } else {
+        // インポート失敗時の処理は不要
       }
-    } catch (error) {
+    } catch {
+      // エラーハンドリングは不要
     }
   }, [projects, timeEntries, setProjects, setTimeEntries]);
 

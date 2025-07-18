@@ -30,7 +30,6 @@ import {
   Cell,
 } from 'recharts';
 import {
-  Info as InfoIcon,
   ViewWeek as ViewWeekIcon,
   DonutLarge as DonutLargeIcon,
 } from '@mui/icons-material';

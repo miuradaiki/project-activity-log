@@ -7,7 +7,6 @@ import React, {
 } from 'react';
 import { AppSettings, DEFAULT_SETTINGS } from '../types/settings';
 import { loadSettings, updateSettings } from '../utils/settingsUtils';
-import { useStorage } from '../hooks/useStorage';
 import { isTestDataEnabled } from '../utils/env';
 
 // コンテキストの型定義

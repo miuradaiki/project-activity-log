@@ -160,7 +160,7 @@ export const getWeeklyDistribution = (
 };
 
 // 指定した日付の週番号を取得（月内）
-const getWeekNumber = (date: Date): number => {
+export const getWeekNumber = (date: Date): number => {
   const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
   const firstWeekday = firstDayOfMonth.getDay();
   return Math.ceil((date.getDate() + firstWeekday) / 7);

@@ -16,7 +16,6 @@ import {
 } from '@mui/material';
 import {
   PlayArrow,
-  Stop,
   Pause,
   Check,
   Close,

@@ -35,6 +35,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const theme = useTheme();
   const { t } = useLanguage();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  // 将来のレスポンシブ対応のために保持
+  void isMobile;
   const [isColorInitialized, setIsColorInitialized] = useState(false);
 
   // プロジェクトの色を初期化
@@ -137,9 +139,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   monthlyCapacity: newMonthlyCapacity,
                   updatedAt: new Date().toISOString(),
                 };
-                const updatedProjects = projects.map((p) =>
-                  p.id === project.id ? updatedProject : p
-                );
                 // App.tsxのsetProjectsを直接使えないため、onEditProjectを使用
                 if (onEditProject) {
                   onEditProject(updatedProject);

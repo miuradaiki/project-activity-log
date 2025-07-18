@@ -42,6 +42,7 @@ export const safeImportWorkLog = async (
     if (backup?.backupPath) {
       const restore = await restoreFromBackup(backup.backupPath);
       if (restore.success) {
+        // 復元成功時の処理は不要
       } else {
         console.error('バックアップからの復元に失敗しました:', restore.error);
       }

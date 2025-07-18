@@ -2,6 +2,7 @@ import { render, screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Timer } from '../Timer';
 import { createMockProject } from '../../../__mocks__/electron';
+import { Project } from '../../../types';
 
 // タイマーのプロップスのモック型
 interface TimerProps {

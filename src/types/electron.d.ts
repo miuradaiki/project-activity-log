@@ -9,7 +9,7 @@ export interface ElectronAPI {
   loadSettings: () => Promise<AppSettings>;
   saveSettings: (settings: AppSettings) => Promise<void>;
   exportCSV: (entries: TimeEntry[], projects: Project[]) => Promise<void>;
-  importCSV: (filePath: string) => Promise<any[]>;
+  importCSV: (filePath: string) => Promise<Array<Record<string, string>>>;
   showOpenDialog: () => Promise<{ canceled: boolean; filePaths: string[] }>;
   showNotification: (title: string, body: string) => void;
   onTimerStop: (callback: () => void) => void;
@@ -22,7 +22,7 @@ export interface ElectronAPI {
   getUserDataPath: () => Promise<string>;
   createDirectory: (path: string) => Promise<boolean>;
   writeFile: (path: string, content: string) => Promise<boolean>;
-  readFile: (path: string, options?: { encoding: string }) => Promise<any>;
+  readFile: (path: string, options?: { encoding: string }) => Promise<string>;
   showOpenFileDialog: () => Promise<string | null>;
 
   // タイマー関連API

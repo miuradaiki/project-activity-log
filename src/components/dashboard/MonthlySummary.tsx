@@ -156,7 +156,7 @@ export const MonthlySummary: React.FC<MonthlySummaryProps> = ({
   ];
 
   // カスタムツールチップ（プロジェクト分布用）
-  const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ value: number; payload: { name: string; color: string } }> }) => {
+  const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ value: number; name: string; payload: { name: string; color: string; percentage: number } }> }) => {
     if (active && payload && payload.length) {
       return (
         <Box

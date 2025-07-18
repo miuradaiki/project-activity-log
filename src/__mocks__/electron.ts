@@ -71,7 +71,7 @@ export class MockElectronAPI {
 
   importCSV = jest
     .fn()
-    .mockImplementation(async (filePath: string): Promise<any[]> => {
+    .mockImplementation(async (_filePath: string): Promise<any[]> => {
       // デフォルトではCSVデータを返す
       return [
         {

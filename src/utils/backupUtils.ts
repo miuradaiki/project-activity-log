@@ -1,4 +1,5 @@
-import { Project, TimeEntry } from '../types';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { Project, TimeEntry } from '../types';
 
 export const createBackup = async () => {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');

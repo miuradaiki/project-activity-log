@@ -3,14 +3,12 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { Grid, Typography, Box } from '@mui/material';
 import {
   AccessTime as AccessTimeIcon,
-  Assignment as AssignmentIcon,
   Star as StarIcon,
   TrendingUp as TrendingUpIcon,
 } from '@mui/icons-material';
 import { Project, TimeEntry } from '../../types';
 import {
   getDailyWorkHours,
-  getMostActiveProject,
   getLongestWorkSession,
   getAverageWorkSession,
 } from '../../utils/analytics';
@@ -22,19 +20,15 @@ interface DailySummaryProps {
 }
 
 export const DailySummary: React.FC<DailySummaryProps> = ({
-  projects,
+  projects: _projects,
   timeEntries,
 }) => {
   const { t } = useLanguage();
   const today = new Date();
-  const todayStart = new Date(today.setHours(0, 0, 0, 0));
-  const todayEnd = new Date(today.setHours(23, 59, 59, 999));
-
+  
   // 昨日の日付を計算
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
-  const yesterdayStart = new Date(yesterday.setHours(0, 0, 0, 0));
-  const yesterdayEnd = new Date(yesterday.setHours(23, 59, 59, 999));
 
   // 本日と昨日の作業時間を計算
   const totalHoursToday = getDailyWorkHours(timeEntries, today);
