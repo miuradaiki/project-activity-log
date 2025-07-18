@@ -107,6 +107,25 @@ const App: React.FC = () => {
     if (!activeProject || !startTime) return;
 
     const endTime = new Date().toISOString();
+    const startTimeDate = new Date(startTime);
+    const endTimeDate = new Date(endTime);
+    const duration = endTimeDate.getTime() - startTimeDate.getTime();
+
+    // 1分未満（60000ミリ秒）の場合は保存しない
+    if (duration < 60000) {
+      // エラーメッセージを表示
+      alert('1分未満の時間エントリは保存できません。');
+      setIsTimerRunning(false);
+      setStartTime(null);
+      setActiveProject(null);
+      
+      // トレイにタイマー停止を通知
+      if (window.electronAPI?.timerStop) {
+        await window.electronAPI.timerStop();
+      }
+      return;
+    }
+
     const newTimeEntry: TimeEntry = {
       id: uuidv4(),
       projectId: activeProject.id,

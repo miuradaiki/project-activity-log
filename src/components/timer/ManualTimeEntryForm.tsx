@@ -75,6 +75,20 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
 
     const startDateTime = new Date(`${date}T${startTime}`);
     const endDateTime = new Date(`${date}T${endTime}`);
+    const duration = endDateTime.getTime() - startDateTime.getTime();
+
+    // 時間がマイナスまたは0の場合はエラー
+    if (duration <= 0) {
+      alert('終了時間は開始時間より後である必要があります。');
+      return;
+    }
+
+    // 1分未満（60000ミリ秒）の場合はエラー
+    if (duration < 60000) {
+      alert('1分未満の時間エントリは保存できません。');
+      return;
+    }
+
     const timestamp = new Date().toISOString();
 
     const newTimeEntry: TimeEntry = {
