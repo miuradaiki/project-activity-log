@@ -3,7 +3,7 @@ export const translations = {
   ja: {
     // 共通
     'app.name': 'プロジェクト活動ログ',
-    'language': '言語',
+    language: '言語',
     'language.japanese': '日本語',
     'language.english': '英語',
 
@@ -47,7 +47,8 @@ export const translations = {
     'projects.archive': 'アーカイブ',
     'projects.unarchive': 'アーカイブ解除',
     'projects.delete.confirm': 'プロジェクトを削除してもよろしいですか？',
-    'projects.delete.warning': 'この操作は取り消せません。関連するすべての作業記録も削除されます。',
+    'projects.delete.warning':
+      'この操作は取り消せません。関連するすべての作業記録も削除されます。',
     'projects.filter.all': 'すべて',
     'projects.filter.active': '進行中',
     'projects.filter.warning': '注意',
@@ -78,15 +79,18 @@ export const translations = {
     'timer.search': '検索...',
     'timer.no.entries': 'タイマーを開始してください',
     'timer.delete.confirm': '作業記録の削除',
-    'timer.delete.message': 'の作業記録を削除してもよろしいですか？\nこの操作は取り消せません。',
+    'timer.delete.message':
+      'の作業記録を削除してもよろしいですか？\nこの操作は取り消せません。',
     'timer.notification.maxtime': '作業時間が8時間を超過しました',
-    'timer.notification.maxtime.body': 'タイマーを自動停止しました。必要に応じて新しいセッションを開始してください。',
+    'timer.notification.maxtime.body':
+      'タイマーを自動停止しました。必要に応じて新しいセッションを開始してください。',
 
     // 設定
     'settings.title': '設定',
     'settings.subtitle': 'アプリケーション設定',
     'settings.monthly.hours': '月間基準時間',
-    'settings.monthly.hours.description': '月間の基準作業時間を設定します。プロジェクトの稼働率計算に使用されます。',
+    'settings.monthly.hours.description':
+      '月間の基準作業時間を設定します。プロジェクトの稼働率計算に使用されます。',
     'settings.hours': '時間',
     'settings.reset': 'デフォルトに戻す',
     'settings.save': '保存',
@@ -98,7 +102,8 @@ export const translations = {
     'settings.reset.success': '設定をデフォルトに戻しました',
     'settings.reset.error': 'リセットに失敗しました',
     'settings.language.changed': '言語設定を変更しました',
-    'settings.monthly.hours.example': 'に基づく月間目標時間（基準: {hours}時間/月）',
+    'settings.monthly.hours.example':
+      'に基づく月間目標時間（基準: {hours}時間/月）',
 
     // 共通アクション
     'actions.save': '保存',
@@ -130,7 +135,7 @@ export const translations = {
   en: {
     // Common
     'app.name': 'Project Activity Log',
-    'language': 'Language',
+    language: 'Language',
     'language.japanese': 'Japanese',
     'language.english': 'English',
 
@@ -143,7 +148,7 @@ export const translations = {
     // Dashboard
     'dashboard.title': 'Dashboard',
     'dashboard.subtitle': 'Overview and analysis of work activities',
-    'dashboard.daily.title': 'Today\'s Activity',
+    'dashboard.daily.title': "Today's Activity",
     'dashboard.daily.total': 'Total Time',
     'dashboard.daily.projects': 'Projects',
     'dashboard.daily.most': 'Most Worked Project',
@@ -154,7 +159,7 @@ export const translations = {
     'dashboard.weekly.byday': 'Working Hours by Day',
     'dashboard.weekly.byproject': 'Hours by Project',
     'dashboard.monthly.title': 'Monthly Summary',
-    'dashboard.monthly.subtitle': 'This month\'s activity totals',
+    'dashboard.monthly.subtitle': "This month's activity totals",
     'dashboard.monthly.total': 'Total Hours',
     'dashboard.progress.title': 'Project Progress',
     'dashboard.progress.subtitle': 'Progress against monthly targets',
@@ -174,7 +179,8 @@ export const translations = {
     'projects.archive': 'Archive',
     'projects.unarchive': 'Unarchive',
     'projects.delete.confirm': 'Are you sure you want to delete this project?',
-    'projects.delete.warning': 'This action cannot be undone. All related work records will also be deleted.',
+    'projects.delete.warning':
+      'This action cannot be undone. All related work records will also be deleted.',
     'projects.filter.all': 'All',
     'projects.filter.active': 'Active',
     'projects.filter.warning': 'Warning',
@@ -205,27 +211,32 @@ export const translations = {
     'timer.search': 'Search...',
     'timer.no.entries': 'No work records found',
     'timer.delete.confirm': 'Delete Work Record',
-    'timer.delete.message': 'Are you sure you want to delete this work record for? This action cannot be undone.',
+    'timer.delete.message':
+      'Are you sure you want to delete this work record for? This action cannot be undone.',
     'timer.notification.maxtime': 'Working time exceeded 8 hours',
-    'timer.notification.maxtime.body': 'Timer has been automatically stopped. Start a new session if needed.',
+    'timer.notification.maxtime.body':
+      'Timer has been automatically stopped. Start a new session if needed.',
 
     // Settings
     'settings.title': 'Settings',
     'settings.subtitle': 'Application Settings',
     'settings.monthly.hours': 'Monthly Base Hours',
-    'settings.monthly.hours.description': 'Set the standard working hours per month. This is used to calculate project utilization rates.',
+    'settings.monthly.hours.description':
+      'Set the standard working hours per month. This is used to calculate project utilization rates.',
     'settings.hours': 'hours',
     'settings.reset': 'Reset to Default',
     'settings.save': 'Save',
     'settings.language': 'Language Settings',
-    'settings.language.description': 'Select the display language for the application.',
+    'settings.language.description':
+      'Select the display language for the application.',
     'settings.loading': 'Loading settings...',
     'settings.monthly.hours.saved': 'Monthly base hours saved',
     'settings.save.error': 'Failed to save',
     'settings.reset.success': 'Settings reset to default',
     'settings.reset.error': 'Failed to reset settings',
     'settings.language.changed': 'Language changed',
-    'settings.monthly.hours.example': ' based monthly target (baseline: {hours} hours/month)',
+    'settings.monthly.hours.example':
+      ' based monthly target (baseline: {hours} hours/month)',
 
     // Common Actions
     'actions.save': 'Save',
@@ -253,5 +264,5 @@ export const translations = {
     'time.last.month': 'Last Month',
     'timer.export.success': 'Time entries exported successfully',
     'timer.export.error': 'Failed to export time entries',
-  }
+  },
 };

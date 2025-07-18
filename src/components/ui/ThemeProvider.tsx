@@ -1,4 +1,10 @@
-import React, { useState, useEffect, createContext, useContext, useMemo } from 'react';
+import React, {
+  useState,
+  useEffect,
+  createContext,
+  useContext,
+  useMemo,
+} from 'react';
 import { ThemeProvider as MuiThemeProvider, CssBaseline } from '@mui/material';
 import { responsiveTheme } from '../../styles/theme';
 
@@ -44,10 +50,13 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   // ダークモードまたはライトモードに基づいたテーマを生成
   const theme = useMemo(() => responsiveTheme(isDarkMode), [isDarkMode]);
 
-  const contextValue = useMemo(() => ({
-    isDarkMode,
-    toggleThemeMode,
-  }), [isDarkMode, toggleThemeMode]);
+  const contextValue = useMemo(
+    () => ({
+      isDarkMode,
+      toggleThemeMode,
+    }),
+    [isDarkMode, toggleThemeMode]
+  );
 
   return (
     <ThemeContext.Provider value={contextValue}>

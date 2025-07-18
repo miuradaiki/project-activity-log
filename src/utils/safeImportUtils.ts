@@ -9,7 +9,7 @@ export const safeImportWorkLog = async (
   onSuccess: (projects: Project[], timeEntries: TimeEntry[]) => void
 ) => {
   let backup: { success: boolean; backupPath?: string } | null = null;
-  
+
   try {
     // 1. バックアップを作成
     backup = await createBackup();
@@ -35,12 +35,11 @@ export const safeImportWorkLog = async (
     console.log('インポートが完了しました');
     return {
       success: true,
-      backupPath: backup.backupPath
+      backupPath: backup.backupPath,
     };
-
   } catch (error) {
     console.error('インポート中にエラーが発生しました:', error);
-    
+
     // エラーが発生した場合、バックアップから復元を試みる
     if (backup?.backupPath) {
       console.log('バックアップからの復元を試みます...');
@@ -54,7 +53,7 @@ export const safeImportWorkLog = async (
 
     return {
       success: false,
-      error
+      error,
     };
   }
 };

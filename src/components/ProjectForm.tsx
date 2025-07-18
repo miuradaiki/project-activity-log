@@ -19,7 +19,9 @@ interface ProjectFormProps {
   project?: Project;
   projects?: Project[];
   onClose: () => void;
-  onSave: (projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  onSave: (
+    projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>
+  ) => void;
 }
 
 const BASE_MONTHLY_HOURS = 140; // 基準となる月間時間
@@ -50,17 +52,22 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
     setWarning(null);
   }, [project, open]);
 
-  const calculateTotalCapacity = useCallback((capacity: number): number => {
-    const otherProjectsCapacity = projects
-      .filter(p => p.id !== project?.id && !p.isArchived) // アーカイブされたプロジェクトを除外
-      .reduce((sum, p) => sum + p.monthlyCapacity, 0);
-    return otherProjectsCapacity + capacity;
-  }, [projects, project]);
+  const calculateTotalCapacity = useCallback(
+    (capacity: number): number => {
+      const otherProjectsCapacity = projects
+        .filter((p) => p.id !== project?.id && !p.isArchived) // アーカイブされたプロジェクトを除外
+        .reduce((sum, p) => sum + p.monthlyCapacity, 0);
+      return otherProjectsCapacity + capacity;
+    },
+    [projects, project]
+  );
 
   useEffect(() => {
     const totalCapacity = calculateTotalCapacity(monthlyCapacity);
     if (totalCapacity > 1) {
-      setWarning(`${t('projects.utilization')}${(totalCapacity * 100).toFixed(1)}%。`);
+      setWarning(
+        `${t('projects.utilization')}${(totalCapacity * 100).toFixed(1)}%。`
+      );
     } else {
       setWarning(null);
     }
@@ -109,7 +116,11 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
             fullWidth
             required
             error={!name.trim() && warning !== null}
-            helperText={!name.trim() && warning !== null ? t('projects.name.required') : ''}
+            helperText={
+              !name.trim() && warning !== null
+                ? t('projects.name.required')
+                : ''
+            }
           />
 
           <TextField
@@ -142,7 +153,9 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
               valueLabelFormat={(value) => `${(value * 100).toFixed(1)}%`}
             />
             <Typography color="text.secondary" variant="body2" sx={{ mt: 1 }}>
-              {t('projects.monthly.target')}: {(monthlyCapacity * BASE_MONTHLY_HOURS).toFixed(1)} {t('units.hours')}/{t('time.this.month')}
+              {t('projects.monthly.target')}:{' '}
+              {(monthlyCapacity * BASE_MONTHLY_HOURS).toFixed(1)}{' '}
+              {t('units.hours')}/{t('time.this.month')}
             </Typography>
           </Box>
 

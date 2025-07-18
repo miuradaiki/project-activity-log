@@ -1,6 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { AppSettings, DEFAULT_SETTINGS } from '../types/settings';
-import { loadSettings, saveSettings, updateSettings } from '../utils/settingsUtils';
+import {
+  loadSettings,
+  saveSettings,
+  updateSettings,
+} from '../utils/settingsUtils';
 
 /**
  * 設定を管理するカスタムフック
@@ -19,7 +23,9 @@ export const useSettings = () => {
         setSettings(loadedSettings);
         setError(null);
       } catch (err) {
-        setError(err instanceof Error ? err : new Error('設定の読み込みに失敗しました'));
+        setError(
+          err instanceof Error ? err : new Error('設定の読み込みに失敗しました')
+        );
         console.error('設定の読み込みに失敗しました:', err);
       } finally {
         setIsLoading(false);
@@ -39,7 +45,9 @@ export const useSettings = () => {
         setError(null);
         return updatedSettings;
       } catch (err) {
-        setError(err instanceof Error ? err : new Error('設定の更新に失敗しました'));
+        setError(
+          err instanceof Error ? err : new Error('設定の更新に失敗しました')
+        );
         console.error('設定の更新に失敗しました:', err);
         throw err;
       } finally {
@@ -71,7 +79,9 @@ export const useSettings = () => {
       setSettings(DEFAULT_SETTINGS);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('設定のリセットに失敗しました'));
+      setError(
+        err instanceof Error ? err : new Error('設定のリセットに失敗しました')
+      );
       console.error('設定のリセットに失敗しました:', err);
     } finally {
       setIsLoading(false);

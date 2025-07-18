@@ -7,8 +7,8 @@ export class MockElectronAPI {
   private timeEntries: TimeEntry[] = [];
   private settings: AppSettings = {
     workHours: {
-      baseMonthlyHours: 140
-    }
+      baseMonthlyHours: 140,
+    },
   };
 
   static getInstance(): MockElectronAPI {
@@ -24,8 +24,8 @@ export class MockElectronAPI {
     this.timeEntries = [];
     this.settings = {
       workHours: {
-        baseMonthlyHours: 140
-      }
+        baseMonthlyHours: 140,
+      },
     };
   }
 
@@ -34,49 +34,65 @@ export class MockElectronAPI {
     return [...this.projects];
   });
 
-  saveProjects = jest.fn().mockImplementation(async (projects: Project[]): Promise<void> => {
-    this.projects = [...projects];
-  });
+  saveProjects = jest
+    .fn()
+    .mockImplementation(async (projects: Project[]): Promise<void> => {
+      this.projects = [...projects];
+    });
 
   // タイムエントリー関連のモック
-  loadTimeEntries = jest.fn().mockImplementation(async (): Promise<TimeEntry[]> => {
-    return [...this.timeEntries];
-  });
+  loadTimeEntries = jest
+    .fn()
+    .mockImplementation(async (): Promise<TimeEntry[]> => {
+      return [...this.timeEntries];
+    });
 
-  saveTimeEntries = jest.fn().mockImplementation(async (timeEntries: TimeEntry[]): Promise<void> => {
-    this.timeEntries = [...timeEntries];
-  });
+  saveTimeEntries = jest
+    .fn()
+    .mockImplementation(async (timeEntries: TimeEntry[]): Promise<void> => {
+      this.timeEntries = [...timeEntries];
+    });
 
   // 設定関連のモック
-  loadSettings = jest.fn().mockImplementation(async (): Promise<AppSettings> => {
-    return { ...this.settings };
-  });
+  loadSettings = jest
+    .fn()
+    .mockImplementation(async (): Promise<AppSettings> => {
+      return { ...this.settings };
+    });
 
-  saveSettings = jest.fn().mockImplementation(async (settings: AppSettings): Promise<void> => {
-    this.settings = { ...settings };
-  });
+  saveSettings = jest
+    .fn()
+    .mockImplementation(async (settings: AppSettings): Promise<void> => {
+      this.settings = { ...settings };
+    });
 
   // ファイル関連のモック
   exportCSV = jest.fn().mockResolvedValue(undefined);
-  
-  importCSV = jest.fn().mockImplementation(async (filePath: string): Promise<any[]> => {
-    // デフォルトではCSVデータを返す
-    return [
-      {
-        date: '2024-01-01',
-        start_time: '09:00:00',
-        end_time: '10:00:00',
-        duration_minutes: 60,
-        project_name: 'テストプロジェクト',
-        project_description: 'テスト用プロジェクト',
-        notes: 'テストメモ'
-      }
-    ];
-  });
 
-  showOpenDialog = jest.fn().mockImplementation(async (): Promise<{ canceled: boolean; filePaths: string[] }> => {
-    return { canceled: true, filePaths: [] };
-  });
+  importCSV = jest
+    .fn()
+    .mockImplementation(async (filePath: string): Promise<any[]> => {
+      // デフォルトではCSVデータを返す
+      return [
+        {
+          date: '2024-01-01',
+          start_time: '09:00:00',
+          end_time: '10:00:00',
+          duration_minutes: 60,
+          project_name: 'テストプロジェクト',
+          project_description: 'テスト用プロジェクト',
+          notes: 'テストメモ',
+        },
+      ];
+    });
+
+  showOpenDialog = jest
+    .fn()
+    .mockImplementation(
+      async (): Promise<{ canceled: boolean; filePaths: string[] }> => {
+        return { canceled: true, filePaths: [] };
+      }
+    );
 
   // タイマー関連のモック
   onTimerStop = jest.fn();
@@ -89,7 +105,9 @@ export class MockElectronAPI {
 }
 
 // テスト用のヘルパー関数
-export const createMockProject = (overrides: Partial<Project> = {}): Project => ({
+export const createMockProject = (
+  overrides: Partial<Project> = {}
+): Project => ({
   id: 'test-project-1',
   name: 'テストプロジェクト',
   description: 'テスト用のプロジェクトです',
@@ -100,7 +118,9 @@ export const createMockProject = (overrides: Partial<Project> = {}): Project => 
   ...overrides,
 });
 
-export const createMockTimeEntry = (overrides: Partial<TimeEntry> = {}): TimeEntry => ({
+export const createMockTimeEntry = (
+  overrides: Partial<TimeEntry> = {}
+): TimeEntry => ({
   id: 'test-time-entry-1',
   projectId: 'test-project-1',
   startTime: '2024-01-01T09:00:00.000Z',
@@ -111,7 +131,9 @@ export const createMockTimeEntry = (overrides: Partial<TimeEntry> = {}): TimeEnt
   ...overrides,
 });
 
-export const createMockSettings = (overrides: Partial<AppSettings> = {}): AppSettings => ({
+export const createMockSettings = (
+  overrides: Partial<AppSettings> = {}
+): AppSettings => ({
   workHours: {
     baseMonthlyHours: 140,
   },

@@ -33,17 +33,18 @@ export const Timer: React.FC<TimerProps> = ({
     if (isRunning && startTime) {
       // 初回計算
       setElapsed(calculateElapsed());
-      
+
       // 1秒ごとに更新
       intervalId = window.setInterval(() => {
-        const currentElapsed = new Date().getTime() - new Date(startTime).getTime();
-        
+        const currentElapsed =
+          new Date().getTime() - new Date(startTime).getTime();
+
         // 8時間（28800000ミリ秒）を超えた場合、タイマーを自動停止
         if (currentElapsed >= 8 * 60 * 60 * 1000) {
           onStop();
           // 通知を表示
           new Notification('作業時間が8時間を超過しました', {
-            body: 'タイマーを自動停止しました。必要に応じて新しいセッションを開始してください。'
+            body: 'タイマーを自動停止しました。必要に応じて新しいセッションを開始してください。',
           });
         } else {
           setElapsed(formatElapsedTime(currentElapsed));
@@ -71,7 +72,13 @@ export const Timer: React.FC<TimerProps> = ({
 
   return (
     <Paper elevation={2} sx={{ p: 2, mb: 2 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
         <Box>
           <Typography variant="subtitle1" color="primary" gutterBottom>
             Current Project

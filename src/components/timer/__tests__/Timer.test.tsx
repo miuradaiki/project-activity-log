@@ -14,7 +14,7 @@ interface TimerProps {
 
 describe('Timer コンポーネントの特性テスト', () => {
   const mockProject = createMockProject({ name: 'テストプロジェクト' });
-  
+
   const defaultProps: TimerProps = {
     project: mockProject,
     isRunning: false,
@@ -37,13 +37,13 @@ describe('Timer コンポーネントの特性テスト', () => {
   describe('タイマー停止時の表示', () => {
     test('プロジェクトが選択されていない場合、何も表示されない', () => {
       const { container } = render(<Timer {...defaultProps} project={null} />);
-      
+
       expect(container.firstChild).toBeNull();
     });
 
     test('プロジェクトが選択されている場合、開始ボタンが表示される', () => {
       render(<Timer {...defaultProps} />);
-      
+
       expect(screen.getByText('テストプロジェクト')).toBeInTheDocument();
       expect(screen.getByTestId('PlayArrowIcon')).toBeInTheDocument();
     });
@@ -51,10 +51,12 @@ describe('Timer コンポーネントの特性テスト', () => {
     test('開始ボタンをクリックするとonStartが呼ばれる', async () => {
       const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
       render(<Timer {...defaultProps} />);
-      
-      const startButton = screen.getByTestId('PlayArrowIcon').closest('button')!;
+
+      const startButton = screen
+        .getByTestId('PlayArrowIcon')
+        .closest('button')!;
       await user.click(startButton);
-      
+
       expect(defaultProps.onStart).toHaveBeenCalledTimes(1);
     });
   });
@@ -66,9 +68,9 @@ describe('Timer コンポーネントの特性テスト', () => {
         isRunning: true,
         startTime: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30分前に開始
       };
-      
+
       render(<Timer {...props} />);
-      
+
       expect(screen.getByText('テストプロジェクト')).toBeInTheDocument();
       expect(screen.getByText(/00:30:00/)).toBeInTheDocument(); // 30分の表示
       expect(screen.getByTestId('StopIcon')).toBeInTheDocument();
@@ -81,12 +83,12 @@ describe('Timer コンポーネントの特性テスト', () => {
         isRunning: true,
         startTime: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
       };
-      
+
       render(<Timer {...props} />);
-      
+
       const stopButton = screen.getByTestId('StopIcon').closest('button')!;
       await user.click(stopButton);
-      
+
       expect(defaultProps.onStop).toHaveBeenCalledTimes(1);
     });
 
@@ -104,10 +106,10 @@ describe('Timer コンポーネントの特性テスト', () => {
           isRunning: true,
           startTime: new Date(Date.now() - minutes * 60 * 1000).toISOString(),
         };
-        
+
         const { rerender } = render(<Timer {...props} />);
         expect(screen.getByText(expected)).toBeInTheDocument();
-        
+
         // 次のテストケースのために再レンダリング
         rerender(<div />);
       });
@@ -119,16 +121,18 @@ describe('Timer コンポーネントの特性テスト', () => {
       const props = {
         ...defaultProps,
         isRunning: true,
-        startTime: new Date(Date.now() - 8 * 60 * 60 * 1000 - 1000).toISOString(), // 8時間+1秒前に開始
+        startTime: new Date(
+          Date.now() - 8 * 60 * 60 * 1000 - 1000
+        ).toISOString(), // 8時間+1秒前に開始
       };
-      
+
       render(<Timer {...props} />);
-      
+
       // タイマーが動作して8時間制限をチェックするまで待機
       act(() => {
         jest.advanceTimersByTime(1000);
       });
-      
+
       // 自動停止が呼ばれることを確認
       expect(defaultProps.onStop).toHaveBeenCalledTimes(1);
     });
@@ -137,21 +141,23 @@ describe('Timer コンポーネントの特性テスト', () => {
       const props = {
         ...defaultProps,
         isRunning: true,
-        startTime: new Date(Date.now() - 8 * 60 * 60 * 1000 - 1000).toISOString(), // 8時間+1秒前に開始
+        startTime: new Date(
+          Date.now() - 8 * 60 * 60 * 1000 - 1000
+        ).toISOString(), // 8時間+1秒前に開始
       };
-      
+
       render(<Timer {...props} />);
-      
+
       // タイマーが動作して8時間制限をチェックするまで待機
       act(() => {
         jest.advanceTimersByTime(1000);
       });
-      
+
       // Notificationコンストラクタが呼ばれることを確認
       expect(window.Notification).toHaveBeenCalledWith(
         '作業時間が8時間を超過しました',
         {
-          body: 'タイマーを自動停止しました。必要に応じて新しいセッションを開始してください。'
+          body: 'タイマーを自動停止しました。必要に応じて新しいセッションを開始してください。',
         }
       );
     });
@@ -160,16 +166,18 @@ describe('Timer コンポーネントの特性テスト', () => {
       const props = {
         ...defaultProps,
         isRunning: true,
-        startTime: new Date(Date.now() - 7 * 60 * 60 * 1000 + 60 * 1000).toISOString(), // 6時間59分前に開始
+        startTime: new Date(
+          Date.now() - 7 * 60 * 60 * 1000 + 60 * 1000
+        ).toISOString(), // 6時間59分前に開始
       };
-      
+
       render(<Timer {...props} />);
-      
+
       // タイマーが動作するまで待機
       act(() => {
         jest.advanceTimersByTime(1000);
       });
-      
+
       // 自動停止が呼ばれないことを確認
       expect(defaultProps.onStop).not.toHaveBeenCalled();
     });
@@ -182,28 +190,28 @@ describe('Timer コンポーネントの特性テスト', () => {
         isRunning: true,
         startTime: new Date(Date.now() - 1000 * 60).toISOString(), // 1分前に開始
       };
-      
+
       render(<Timer {...props} />);
-      
+
       // 初期表示
       expect(screen.getByText('00:01:00')).toBeInTheDocument();
-      
+
       // 1秒経過
       act(() => {
         jest.advanceTimersByTime(1000);
       });
-      
+
       expect(screen.getByText('00:01:01')).toBeInTheDocument();
     });
 
     test('タイマー停止中は時間更新されない', () => {
       render(<Timer {...defaultProps} />);
-      
+
       // 時間が経過しても表示は変わらない
       act(() => {
         jest.advanceTimersByTime(5000);
       });
-      
+
       // 開始ボタンが表示されたまま
       expect(screen.getByTestId('PlayArrowIcon')).toBeInTheDocument();
     });

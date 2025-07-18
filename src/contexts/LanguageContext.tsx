@@ -1,4 +1,11 @@
-import React, { createContext, useState, useContext, useEffect, ReactNode, useCallback } from 'react';
+import React, {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+  ReactNode,
+  useCallback,
+} from 'react';
 
 type Language = 'ja' | 'en';
 
@@ -16,7 +23,9 @@ const defaultLanguageContext: LanguageContextType = {
 };
 
 // 言語コンテキストの作成
-export const LanguageContext = createContext<LanguageContextType>(defaultLanguageContext);
+export const LanguageContext = createContext<LanguageContextType>(
+  defaultLanguageContext
+);
 
 // 言語コンテキストへのアクセス用フック
 export const useLanguage = () => useContext(LanguageContext);
@@ -31,11 +40,18 @@ interface LanguageProviderProps {
 // 言語翻訳リソースをインポート
 import { translations } from '../i18n/translations';
 
-export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
+export const LanguageProvider: React.FC<LanguageProviderProps> = ({
+  children,
+}) => {
   // 初期言語設定（ローカルストレージから取得、なければブラウザの言語設定、それもなければ日本語）
   const getInitialLanguage = (): Language => {
-    const storedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY) as Language | null;
-    if (storedLanguage && (storedLanguage === 'ja' || storedLanguage === 'en')) {
+    const storedLanguage = localStorage.getItem(
+      LANGUAGE_STORAGE_KEY
+    ) as Language | null;
+    if (
+      storedLanguage &&
+      (storedLanguage === 'ja' || storedLanguage === 'en')
+    ) {
       return storedLanguage;
     }
 
@@ -57,29 +73,34 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
   }, []);
 
   // 翻訳関数
-  const t = useCallback((key: string, params?: Record<string, any>): string => {
-    // 言語が存在するかチェック
-    if (!translations[language]) {
-      console.warn(`Translation for language "${language}" not found.`);
-      return key;
-    }
+  const t = useCallback(
+    (key: string, params?: Record<string, any>): string => {
+      // 言語が存在するかチェック
+      if (!translations[language]) {
+        console.warn(`Translation for language "${language}" not found.`);
+        return key;
+      }
 
-    // キーが存在するかチェック
-    const translation = (translations as any)[language][key];
-    if (!translation) {
-      console.warn(`Translation key "${key}" not found for language "${language}".`);
-      return key;
-    }
+      // キーが存在するかチェック
+      const translation = (translations as any)[language][key];
+      if (!translation) {
+        console.warn(
+          `Translation key "${key}" not found for language "${language}".`
+        );
+        return key;
+      }
 
-    // パラメータ置換
-    if (params) {
-      return Object.keys(params).reduce((result, paramKey) => {
-        return result.replace(`{${paramKey}}`, params[paramKey]);
-      }, translation);
-    }
+      // パラメータ置換
+      if (params) {
+        return Object.keys(params).reduce((result, paramKey) => {
+          return result.replace(`{${paramKey}}`, params[paramKey]);
+        }, translation);
+      }
 
-    return translation;
-  }, [language]); // languageが変わるたびに関数も再生成される
+      return translation;
+    },
+    [language]
+  ); // languageが変わるたびに関数も再生成される
 
   // コンテキストの値
   const value = {

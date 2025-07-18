@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { 
-  Box, 
-  Typography, 
-  LinearProgress, 
-  Chip, 
-  Card, 
+import {
+  Box,
+  Typography,
+  LinearProgress,
+  Chip,
+  Card,
   CardContent,
   useTheme,
   IconButton,
@@ -23,7 +23,7 @@ import {
   Slider,
   InputAdornment,
 } from '@mui/material';
-import { 
+import {
   TimerOutlined as TimerIcon,
   MoreVert as MoreIcon,
   Edit as EditIcon,
@@ -67,8 +67,10 @@ export const ProjectProgressCard: React.FC<ProjectProgressCardProps> = ({
   const { settings } = useSettingsContext(); // 設定から基準時間を取得
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [targetDialogOpen, setTargetDialogOpen] = useState(false);
-  const [newMonthlyCapacity, setNewMonthlyCapacity] = useState(project.monthlyCapacity * 100);
-  
+  const [newMonthlyCapacity, setNewMonthlyCapacity] = useState(
+    project.monthlyCapacity * 100
+  );
+
   // メニューの開閉
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setMenuAnchorEl(event.currentTarget);
@@ -123,19 +125,20 @@ export const ProjectProgressCard: React.FC<ProjectProgressCardProps> = ({
     }
     handleMenuClose();
   };
-  
+
   // 進捗率の計算
-  const progressPercentage = targetHours > 0 
-    ? Math.min(Math.round((currentHours / targetHours) * 100), 100) 
-    : 0;
-  
+  const progressPercentage =
+    targetHours > 0
+      ? Math.min(Math.round((currentHours / targetHours) * 100), 100)
+      : 0;
+
   // 残り時間の計算
   const remainingHours = Math.max(targetHours - currentHours, 0);
-  
+
   // 進捗状況に基づいて色とステータスを設定
   let statusColor = theme.palette.info.main;
   let statusText = t('projects.filter.active');
-  
+
   if (progressPercentage >= 100) {
     statusColor = theme.palette.error.main;
     statusText = t('projects.filter.completed');
@@ -153,7 +156,11 @@ export const ProjectProgressCard: React.FC<ProjectProgressCardProps> = ({
 
   // 稼働率に基づく月間目標時間の計算
   const calculateMonthlyHours = (allocation: number) => {
-    return Math.round((allocation / 100) * settings.workHours.baseMonthlyHours * 10) / 10;
+    return (
+      Math.round(
+        (allocation / 100) * settings.workHours.baseMonthlyHours * 10
+      ) / 10
+    );
   };
 
   return (
@@ -176,28 +183,29 @@ export const ProjectProgressCard: React.FC<ProjectProgressCardProps> = ({
           {/* ヘッダー部分 */}
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <Chip 
+              <Chip
                 label={statusText}
                 size="small"
-                sx={{ 
-                  backgroundColor: `${statusColor}20`, 
+                sx={{
+                  backgroundColor: `${statusColor}20`,
                   color: statusColor,
                   fontWeight: 'medium',
                   mr: 1,
                 }}
               />
-              <Typography 
-                variant="body2" 
+              <Typography
+                variant="body2"
                 color="text.secondary"
                 sx={{ display: 'flex', alignItems: 'center' }}
               >
-                {t('projects.utilization')}: {(project.monthlyCapacity * 100).toFixed(0)}%
+                {t('projects.utilization')}:{' '}
+                {(project.monthlyCapacity * 100).toFixed(0)}%
               </Typography>
             </Box>
             <Box>
               <Tooltip title={t('timer.start')}>
-                <IconButton 
-                  size="small" 
+                <IconButton
+                  size="small"
                   color="primary"
                   onClick={() => onStartTimer(project.id)}
                 >
@@ -211,13 +219,13 @@ export const ProjectProgressCard: React.FC<ProjectProgressCardProps> = ({
               </Tooltip>
             </Box>
           </Box>
-          
+
           {/* プロジェクト名 */}
-          <Typography 
-            variant="h6" 
-            fontWeight="medium" 
+          <Typography
+            variant="h6"
+            fontWeight="medium"
             gutterBottom
-            sx={{ 
+            sx={{
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -225,13 +233,13 @@ export const ProjectProgressCard: React.FC<ProjectProgressCardProps> = ({
           >
             {project.name}
           </Typography>
-          
+
           {/* プロジェクト説明 */}
           {project.description && (
-            <Typography 
-              variant="body2" 
+            <Typography
+              variant="body2"
               color="text.secondary"
-              sx={{ 
+              sx={{
                 mb: 2,
                 display: '-webkit-box',
                 WebkitLineClamp: 2,
@@ -243,13 +251,13 @@ export const ProjectProgressCard: React.FC<ProjectProgressCardProps> = ({
               {project.description}
             </Typography>
           )}
-          
+
           {/* 進捗インジケーター */}
           <Box sx={{ mt: 2 }}>
-            <Box 
-              sx={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', 
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
                 alignItems: 'center',
                 mb: 0.5,
               }}
@@ -257,44 +265,47 @@ export const ProjectProgressCard: React.FC<ProjectProgressCardProps> = ({
               <Typography variant="body2" fontWeight="medium">
                 {t('dashboard.progress.title')}
               </Typography>
-              <Typography 
-                variant="body2" 
+              <Typography
+                variant="body2"
                 fontWeight="medium"
                 color={getProgressColor()}
               >
                 {progressPercentage}%
               </Typography>
             </Box>
-            
-            <LinearProgress 
-              variant="determinate" 
+
+            <LinearProgress
+              variant="determinate"
               value={Math.min(progressPercentage, 100)}
-              sx={{ 
-                height: 8, 
+              sx={{
+                height: 8,
                 borderRadius: 4,
                 mb: 1.5,
-                backgroundColor: theme.palette.mode === 'light' 
-                  ? theme.palette.grey[200] 
-                  : theme.palette.grey[700],
+                backgroundColor:
+                  theme.palette.mode === 'light'
+                    ? theme.palette.grey[200]
+                    : theme.palette.grey[700],
                 '& .MuiLinearProgress-bar': {
                   backgroundColor: getProgressColor(),
                   borderRadius: 4,
-                  transition: 'transform 0.4s linear'
-                }
+                  transition: 'transform 0.4s linear',
+                },
               }}
             />
-            
-            <Box 
-              sx={{ 
-                display: 'flex', 
+
+            <Box
+              sx={{
+                display: 'flex',
                 justifyContent: 'space-between',
               }}
             >
               <Typography variant="body2" color="text.secondary">
-                {currentHours.toFixed(1)} {t('units.hours')} / {targetHours.toFixed(1)} {t('units.hours')}
+                {currentHours.toFixed(1)} {t('units.hours')} /{' '}
+                {targetHours.toFixed(1)} {t('units.hours')}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                {t('projects.sort.remaining')} {remainingHours.toFixed(1)} {t('units.hours')}
+                {t('projects.sort.remaining')} {remainingHours.toFixed(1)}{' '}
+                {t('units.hours')}
               </Typography>
             </Box>
           </Box>
@@ -308,10 +319,10 @@ export const ProjectProgressCard: React.FC<ProjectProgressCardProps> = ({
         onClose={handleMenuClose}
         PaperProps={{
           elevation: 3,
-          sx: { 
+          sx: {
             minWidth: 200,
             borderRadius: '8px',
-          }
+          },
         }}
       >
         <MenuItem onClick={handleEdit} disabled={!onEditProject}>
@@ -320,21 +331,34 @@ export const ProjectProgressCard: React.FC<ProjectProgressCardProps> = ({
           </ListItemIcon>
           <ListItemText primary={t('projects.edit')} />
         </MenuItem>
-        
-        <MenuItem onClick={handleArchive} disabled={!onArchiveProject && !onUnarchiveProject}>
+
+        <MenuItem
+          onClick={handleArchive}
+          disabled={!onArchiveProject && !onUnarchiveProject}
+        >
           <ListItemIcon>
-            {project.isArchived ? <UnarchiveIcon fontSize="small" /> : <ArchiveIcon fontSize="small" />}
+            {project.isArchived ? (
+              <UnarchiveIcon fontSize="small" />
+            ) : (
+              <ArchiveIcon fontSize="small" />
+            )}
           </ListItemIcon>
-          <ListItemText primary={project.isArchived ? t('projects.unarchive') : t('projects.archive')} />
+          <ListItemText
+            primary={
+              project.isArchived
+                ? t('projects.unarchive')
+                : t('projects.archive')
+            }
+          />
         </MenuItem>
-        
+
         <MenuItem onClick={handleOpenTargetDialog} disabled={!onUpdateTarget}>
           <ListItemIcon>
             <AccessTimeIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText primary={t('projects.monthly.target')} />
         </MenuItem>
-        
+
         <MenuItem onClick={handleViewDetails} disabled={!onViewDetails}>
           <ListItemIcon>
             <InfoIcon fontSize="small" />
@@ -344,8 +368,8 @@ export const ProjectProgressCard: React.FC<ProjectProgressCardProps> = ({
       </Menu>
 
       {/* 月間目標時間調整ダイアログ */}
-      <Dialog 
-        open={targetDialogOpen} 
+      <Dialog
+        open={targetDialogOpen}
         onClose={handleCloseTargetDialog}
         maxWidth="sm"
         fullWidth
@@ -356,14 +380,16 @@ export const ProjectProgressCard: React.FC<ProjectProgressCardProps> = ({
             <Typography variant="body2" color="text.secondary" gutterBottom>
               {t('projects.name')}: {project.name}
             </Typography>
-            
+
             <Box sx={{ mt: 3 }}>
               <Typography id="monthly-capacity-slider" gutterBottom>
                 {t('projects.utilization')}: {newMonthlyCapacity.toFixed(0)}%
               </Typography>
               <Slider
                 value={newMonthlyCapacity}
-                onChange={(_event, newValue) => setNewMonthlyCapacity(newValue as number)}
+                onChange={(_event, newValue) =>
+                  setNewMonthlyCapacity(newValue as number)
+                }
                 aria-labelledby="monthly-capacity-slider"
                 valueLabelDisplay="auto"
                 step={5}
@@ -372,14 +398,18 @@ export const ProjectProgressCard: React.FC<ProjectProgressCardProps> = ({
                 max={100}
                 sx={{ mt: 2, mb: 4 }}
               />
-              
+
               <TextField
                 label={t('projects.monthly.target')}
                 type="number"
                 value={calculateMonthlyHours(newMonthlyCapacity)}
                 InputProps={{
                   readOnly: true,
-                  endAdornment: <InputAdornment position="end">{t('units.hours')}</InputAdornment>,
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      {t('units.hours')}
+                    </InputAdornment>
+                  ),
                 }}
                 variant="outlined"
                 fullWidth
@@ -390,8 +420,12 @@ export const ProjectProgressCard: React.FC<ProjectProgressCardProps> = ({
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseTargetDialog}>{t('projects.cancel')}</Button>
-          <Button onClick={handleUpdateTarget} variant="contained">{t('actions.save')}</Button>
+          <Button onClick={handleCloseTargetDialog}>
+            {t('projects.cancel')}
+          </Button>
+          <Button onClick={handleUpdateTarget} variant="contained">
+            {t('actions.save')}
+          </Button>
         </DialogActions>
       </Dialog>
     </>

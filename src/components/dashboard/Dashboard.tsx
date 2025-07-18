@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { Box, Grid, Paper, Typography, useTheme, useMediaQuery } from '@mui/material';
+import {
+  Box,
+  Grid,
+  Paper,
+  Typography,
+  useTheme,
+  useMediaQuery,
+} from '@mui/material';
 import { Project, TimeEntry } from '../../types';
 import { DailySummary } from './DailySummary';
 import { WeeklySummary } from './WeeklySummary';
@@ -17,13 +24,13 @@ interface DashboardProps {
   onUnarchiveProject?: (project: Project) => void;
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ 
-  projects, 
-  timeEntries, 
+export const Dashboard: React.FC<DashboardProps> = ({
+  projects,
+  timeEntries,
   onStartTimer,
   onEditProject,
   onArchiveProject,
-  onUnarchiveProject, 
+  onUnarchiveProject,
 }) => {
   const theme = useTheme();
   const { t } = useLanguage();
@@ -41,13 +48,16 @@ export const Dashboard: React.FC<DashboardProps> = ({
   }
 
   return (
-    <Box sx={{ 
-      flexGrow: 1, 
-      p: { xs: 2, md: 3 },
-      backgroundColor: theme.palette.mode === 'light' 
-        ? theme.palette.grey[50] 
-        : theme.palette.background.default
-    }}>
+    <Box
+      sx={{
+        flexGrow: 1,
+        p: { xs: 2, md: 3 },
+        backgroundColor:
+          theme.palette.mode === 'light'
+            ? theme.palette.grey[50]
+            : theme.palette.background.default,
+      }}
+    >
       {/* ヘッダー */}
       <Box sx={{ mb: 3 }}>
         <Typography variant="h5" fontWeight="medium">
@@ -67,16 +77,16 @@ export const Dashboard: React.FC<DashboardProps> = ({
       <Grid container spacing={3}>
         {/* 週次サマリー */}
         <Grid item xs={12} md={6}>
-          <Paper 
-            elevation={1} 
-            sx={{ 
-              p: 3, 
+          <Paper
+            elevation={1}
+            sx={{
+              p: 3,
               height: '100%',
               transition: 'transform 0.2s, box-shadow 0.2s',
               '&:hover': {
                 transform: 'translateY(-4px)',
                 boxShadow: theme.shadows[4],
-              }
+              },
             }}
           >
             <WeeklySummary projects={projects} timeEntries={timeEntries} />
@@ -85,16 +95,16 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
         {/* 月次サマリー */}
         <Grid item xs={12} md={6}>
-          <Paper 
-            elevation={1} 
-            sx={{ 
-              p: 3, 
+          <Paper
+            elevation={1}
+            sx={{
+              p: 3,
               height: '100%',
               transition: 'transform 0.2s, box-shadow 0.2s',
               '&:hover': {
                 transform: 'translateY(-4px)',
                 boxShadow: theme.shadows[4],
-              }
+              },
             }}
           >
             <MonthlySummary projects={projects} timeEntries={timeEntries} />
@@ -103,18 +113,18 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
         {/* プロジェクト進捗カード */}
         <Grid item xs={12} lg={12}>
-          <Paper 
-            elevation={1} 
-            sx={{ 
+          <Paper
+            elevation={1}
+            sx={{
               p: 3,
               transition: 'box-shadow 0.2s',
               '&:hover': {
                 boxShadow: theme.shadows[4],
-              }
+              },
             }}
           >
-            <ProjectProgressView 
-              projects={projects} 
+            <ProjectProgressView
+              projects={projects}
               timeEntries={timeEntries}
               onStartTimer={onStartTimer}
               onEditProject={onEditProject}
@@ -125,9 +135,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 const updatedProject = {
                   ...project,
                   monthlyCapacity: newMonthlyCapacity,
-                  updatedAt: new Date().toISOString()
+                  updatedAt: new Date().toISOString(),
                 };
-                const updatedProjects = projects.map(p => 
+                const updatedProjects = projects.map((p) =>
                   p.id === project.id ? updatedProject : p
                 );
                 // App.tsxのsetProjectsを直接使えないため、onEditProjectを使用

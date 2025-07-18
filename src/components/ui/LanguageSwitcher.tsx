@@ -10,7 +10,10 @@ import {
   ListItemIcon,
   ListItemText,
 } from '@mui/material';
-import { Language as LanguageIcon, Check as CheckIcon } from '@mui/icons-material';
+import {
+  Language as LanguageIcon,
+  Check as CheckIcon,
+} from '@mui/icons-material';
 import { useLanguage } from '../../contexts/LanguageContext';
 
 interface LanguageSwitcherProps {
@@ -28,8 +31,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
   const open = Boolean(anchorEl);
 
   // 現在の言語をログ出力
-  useEffect(() => {
-  }, [language]);
+  useEffect(() => {}, [language]);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);

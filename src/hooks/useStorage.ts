@@ -12,7 +12,7 @@ export const useStorage = () => {
   const [timeEntries, setTimeEntries] = useState<TimeEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
-  
+
   // テストモードの状態管理
   const [isTestMode, setIsTestModeState] = useState(() => {
     // 環境変数とローカルストレージの両方をチェック
@@ -29,7 +29,7 @@ export const useStorage = () => {
     }
     return [];
   });
-  
+
   const [testTimeEntries, setTestTimeEntries] = useState<TimeEntry[]>(() => {
     if (isTestMode) {
       const saved = localStorage.getItem(TEST_TIME_ENTRIES_KEY);
@@ -39,16 +39,19 @@ export const useStorage = () => {
   });
 
   // テストデータをローカルストレージに保存
-  const saveTestData = useCallback((projects: Project[], timeEntries: TimeEntry[]) => {
-    localStorage.setItem(TEST_PROJECTS_KEY, JSON.stringify(projects));
-    localStorage.setItem(TEST_TIME_ENTRIES_KEY, JSON.stringify(timeEntries));
-  }, []);
+  const saveTestData = useCallback(
+    (projects: Project[], timeEntries: TimeEntry[]) => {
+      localStorage.setItem(TEST_PROJECTS_KEY, JSON.stringify(projects));
+      localStorage.setItem(TEST_TIME_ENTRIES_KEY, JSON.stringify(timeEntries));
+    },
+    []
+  );
 
   const loadData = useCallback(async () => {
     try {
       const [loadedProjects, loadedTimeEntries] = await Promise.all([
         window.electronAPI.loadProjects(),
-        window.electronAPI.loadTimeEntries()
+        window.electronAPI.loadTimeEntries(),
       ]);
 
       if (Array.isArray(loadedProjects) && loadedProjects.length > 0) {
@@ -83,8 +86,10 @@ export const useStorage = () => {
       }
 
       // プロジェクトとタイムエントリの整合性チェック
-      const projectIds = new Set(projects.map(p => p.id));
-      const validTimeEntries = timeEntries.filter(entry => projectIds.has(entry.projectId));
+      const projectIds = new Set(projects.map((p) => p.id));
+      const validTimeEntries = timeEntries.filter((entry) =>
+        projectIds.has(entry.projectId)
+      );
 
       if (validTimeEntries.length !== timeEntries.length) {
         console.warn('Some time entries reference non-existent projects');
@@ -92,7 +97,7 @@ export const useStorage = () => {
       }
       await Promise.all([
         window.electronAPI.saveProjects(projects),
-        window.electronAPI.saveTimeEntries(validTimeEntries)
+        window.electronAPI.saveTimeEntries(validTimeEntries),
       ]);
     } catch (error) {
       console.error('Error saving data:', error);
@@ -107,8 +112,11 @@ export const useStorage = () => {
         // テストモードで起動した場合
         if (testProjects.length === 0 || testTimeEntries.length === 0) {
           // テストデータが空の場合は生成
-          const { generateTestData } = await import('../utils/testDataGenerator');
-          const { projects: newTestProjects, timeEntries: newTestTimeEntries } = generateTestData([], []);
+          const { generateTestData } = await import(
+            '../utils/testDataGenerator'
+          );
+          const { projects: newTestProjects, timeEntries: newTestTimeEntries } =
+            generateTestData([], []);
           setTestProjects(newTestProjects);
           setTestTimeEntries(newTestTimeEntries);
           saveTestData(newTestProjects, newTestTimeEntries);
@@ -119,7 +127,7 @@ export const useStorage = () => {
         await loadData();
       }
     };
-    
+
     initialize();
   }, []); // 依存配列を空にして初回のみ実行
 
@@ -142,60 +150,71 @@ export const useStorage = () => {
   }, [isTestMode, testProjects, testTimeEntries, saveTestData]);
 
   // テストモードの切り替え
-  const toggleTestMode = useCallback(async (enabled: boolean) => {
-    const isTestEnv = isTestDataEnabled();
-    if (!isTestEnv) {
-      console.warn('Test mode is not enabled in environment');
-      return;
-    }
-
-    setIsTestModeState(enabled);
-    localStorage.setItem(TEST_MODE_KEY, enabled.toString());
-    
-    // カスタムイベントを発火して他のコンポーネントに通知
-    window.dispatchEvent(new Event('testModeChanged'));
-
-    if (enabled) {
-      // テストモードを有効にする場合
-      let newTestProjects = testProjects;
-      let newTestTimeEntries = testTimeEntries;
-      
-      // 保存されたテストデータがない場合は生成
-      if (testProjects.length === 0 || testTimeEntries.length === 0) {
-        const { generateTestData } = await import('../utils/testDataGenerator');
-        const generated = generateTestData([], []);
-        newTestProjects = generated.projects;
-        newTestTimeEntries = generated.timeEntries;
-        setTestProjects(newTestProjects);
-        setTestTimeEntries(newTestTimeEntries);
-        saveTestData(newTestProjects, newTestTimeEntries);
+  const toggleTestMode = useCallback(
+    async (enabled: boolean) => {
+      const isTestEnv = isTestDataEnabled();
+      if (!isTestEnv) {
+        console.warn('Test mode is not enabled in environment');
+        return;
       }
-    } else {
-      // 通常モードに戻る場合は、実データを再読み込み
-      await loadData();
-    }
-  }, [loadData, testProjects, testTimeEntries, saveTestData]);
+
+      setIsTestModeState(enabled);
+      localStorage.setItem(TEST_MODE_KEY, enabled.toString());
+
+      // カスタムイベントを発火して他のコンポーネントに通知
+      window.dispatchEvent(new Event('testModeChanged'));
+
+      if (enabled) {
+        // テストモードを有効にする場合
+        let newTestProjects = testProjects;
+        let newTestTimeEntries = testTimeEntries;
+
+        // 保存されたテストデータがない場合は生成
+        if (testProjects.length === 0 || testTimeEntries.length === 0) {
+          const { generateTestData } = await import(
+            '../utils/testDataGenerator'
+          );
+          const generated = generateTestData([], []);
+          newTestProjects = generated.projects;
+          newTestTimeEntries = generated.timeEntries;
+          setTestProjects(newTestProjects);
+          setTestTimeEntries(newTestTimeEntries);
+          saveTestData(newTestProjects, newTestTimeEntries);
+        }
+      } else {
+        // 通常モードに戻る場合は、実データを再読み込み
+        await loadData();
+      }
+    },
+    [loadData, testProjects, testTimeEntries, saveTestData]
+  );
 
   // 現在のモードに応じたデータを返す
   const currentProjects = isTestMode ? testProjects : projects;
   const currentTimeEntries = isTestMode ? testTimeEntries : timeEntries;
 
   // テストモード用のセッター
-  const setCurrentProjects = useCallback((newProjects: Project[] | ((prev: Project[]) => Project[])) => {
-    if (isTestMode) {
-      setTestProjects(newProjects);
-    } else {
-      setProjects(newProjects);
-    }
-  }, [isTestMode]);
+  const setCurrentProjects = useCallback(
+    (newProjects: Project[] | ((prev: Project[]) => Project[])) => {
+      if (isTestMode) {
+        setTestProjects(newProjects);
+      } else {
+        setProjects(newProjects);
+      }
+    },
+    [isTestMode]
+  );
 
-  const setCurrentTimeEntries = useCallback((newTimeEntries: TimeEntry[] | ((prev: TimeEntry[]) => TimeEntry[])) => {
-    if (isTestMode) {
-      setTestTimeEntries(newTimeEntries);
-    } else {
-      setTimeEntries(newTimeEntries);
-    }
-  }, [isTestMode]);
+  const setCurrentTimeEntries = useCallback(
+    (newTimeEntries: TimeEntry[] | ((prev: TimeEntry[]) => TimeEntry[])) => {
+      if (isTestMode) {
+        setTestTimeEntries(newTimeEntries);
+      } else {
+        setTimeEntries(newTimeEntries);
+      }
+    },
+    [isTestMode]
+  );
 
   return {
     projects: currentProjects,
@@ -211,6 +230,6 @@ export const useStorage = () => {
     testDataStats: {
       projectCount: testProjects.length,
       timeEntryCount: testTimeEntries.length,
-    }
+    },
   };
 };

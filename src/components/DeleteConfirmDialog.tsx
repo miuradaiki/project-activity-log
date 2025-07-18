@@ -5,7 +5,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
-  Button
+  Button,
 } from '@mui/material';
 
 interface DeleteConfirmDialogProps {
@@ -21,7 +21,7 @@ export const DeleteConfirmDialog: React.FC<DeleteConfirmDialogProps> = ({
   title,
   message,
   onConfirm,
-  onCancel
+  onCancel,
 }) => {
   return (
     <Dialog

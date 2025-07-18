@@ -6,5 +6,5 @@ interface Window {
       endTime: string;
       duration: number;
     }) => Promise<void>;
-  }
+  };
 }

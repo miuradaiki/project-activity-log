@@ -51,5 +51,5 @@ module.exports = {
   saveProjects,
   loadProjects,
   saveTimeEntries,
-  loadTimeEntries
+  loadTimeEntries,
 };

@@ -23,13 +23,13 @@ export const TimeTracker: React.FC<TimeTrackerProps> = ({
       const start = new Date(startTime);
       const now = new Date();
       const duration = intervalToDuration({ start, end: now });
-      
+
       const formatted = formatDuration(duration, {
         format: ['hours', 'minutes', 'seconds'],
         zero: true,
         delimiter: ':',
       });
-      
+
       setDuration(formatted);
     }, 1000);
 

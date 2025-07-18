@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
-import { 
-  List, 
-  ListItem, 
-  IconButton, 
+import {
+  List,
+  ListItem,
+  IconButton,
   Typography,
   Tabs,
   Tab,
@@ -13,8 +13,8 @@ import {
   MenuItem,
   LinearProgress,
 } from '@mui/material';
-import { 
-  Edit as EditIcon, 
+import {
+  Edit as EditIcon,
   Delete as DeleteIcon,
   MoreVert as MoreVertIcon,
   Archive as ArchiveIcon,
@@ -44,16 +44,8 @@ interface TabPanelProps {
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
   return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          {children}
-        </Box>
-      )}
+    <div role="tabpanel" hidden={value !== index} {...other}>
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
   );
 }
@@ -74,14 +66,17 @@ export const ProjectList: React.FC<ProjectListProps> = ({
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
-  const activeProjects = projects.filter(p => !p.isArchived);
-  const archivedProjects = projects.filter(p => p.isArchived);
+  const activeProjects = projects.filter((p) => !p.isArchived);
+  const archivedProjects = projects.filter((p) => p.isArchived);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
 
-  const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>, project: Project) => {
+  const handleMenuClick = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    project: Project
+  ) => {
     setAnchorEl(event.currentTarget);
     setSelectedProject(project);
   };
@@ -108,17 +103,20 @@ export const ProjectList: React.FC<ProjectListProps> = ({
   const calculateMonthlyTime = (projectId: string): number => {
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    
-    return timeEntries
-      .filter(entry => {
-        const entryDate = new Date(entry.startTime);
-        return entry.projectId === projectId && entryDate >= startOfMonth;
-      })
-      .reduce((total, entry) => {
-        const start = new Date(entry.startTime);
-        const end = new Date(entry.endTime);
-        return total + (end.getTime() - start.getTime());
-      }, 0) / (1000 * 60 * 60); // Convert to hours
+
+    return (
+      timeEntries
+        .filter((entry) => {
+          const entryDate = new Date(entry.startTime);
+          return entry.projectId === projectId && entryDate >= startOfMonth;
+        })
+        .reduce((total, entry) => {
+          const start = new Date(entry.startTime);
+          const end = new Date(entry.endTime);
+          return total + (end.getTime() - start.getTime());
+        }, 0) /
+      (1000 * 60 * 60)
+    ); // Convert to hours
   };
 
   const renderProjectList = (projects: Project[]) => (
@@ -150,21 +148,28 @@ export const ProjectList: React.FC<ProjectListProps> = ({
               p: 2,
             }}
           >
-            <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box
+              sx={{
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
               <Typography variant="h6">{project.name}</Typography>
               <Box>
                 {!project.isArchived && (
                   <IconButton
                     edge="end"
-                    aria-label={isActive ? "stop timer" : "start timer"}
+                    aria-label={isActive ? 'stop timer' : 'start timer'}
                     onClick={() => onStartTimer(project)}
-                    color={isActive ? "secondary" : "primary"}
+                    color={isActive ? 'secondary' : 'primary'}
                   >
                     {isActive ? <StopIcon /> : <PlayArrowIcon />}
                   </IconButton>
                 )}
-                <IconButton 
-                  edge="end" 
+                <IconButton
+                  edge="end"
                   aria-label="more"
                   onClick={(e) => handleMenuClick(e, project)}
                 >
@@ -172,24 +177,31 @@ export const ProjectList: React.FC<ProjectListProps> = ({
                 </IconButton>
               </Box>
             </Box>
-            
+
             <Typography variant="body2" color="text.secondary">
               {project.description}
             </Typography>
-            
+
             <Box sx={{ width: '100%' }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+              <Box
+                sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}
+              >
                 <Typography variant="body2" color="text.secondary">
-                  {t('projects.utilization')}: {(project.monthlyCapacity * 100).toFixed(1)}%
+                  {t('projects.utilization')}:{' '}
+                  {(project.monthlyCapacity * 100).toFixed(1)}%
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {monthlyTime.toFixed(1)} {t('units.hours')} / {monthlyTarget.toFixed(1)} {t('units.hours')} ({progress.toFixed(1)}%)
+                  {monthlyTime.toFixed(1)} {t('units.hours')} /{' '}
+                  {monthlyTarget.toFixed(1)} {t('units.hours')} (
+                  {progress.toFixed(1)}%)
                 </Typography>
               </Box>
-              <LinearProgress 
-                variant="determinate" 
-                value={Math.min(progress, 100)} 
-                color={progressColor as 'primary' | 'secondary' | 'error' | 'warning'}
+              <LinearProgress
+                variant="determinate"
+                value={Math.min(progress, 100)}
+                color={
+                  progressColor as 'primary' | 'secondary' | 'error' | 'warning'
+                }
                 sx={{ height: 8, borderRadius: 1 }}
               />
             </Box>
@@ -203,11 +215,15 @@ export const ProjectList: React.FC<ProjectListProps> = ({
     <Box sx={{ width: '100%' }}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={tabValue} onChange={handleTabChange}>
-          <Tab label={`${t('projects.filter.active')} (${activeProjects.length})`} />
-          <Tab label={`${t('projects.archive')} (${archivedProjects.length})`} />
+          <Tab
+            label={`${t('projects.filter.active')} (${activeProjects.length})`}
+          />
+          <Tab
+            label={`${t('projects.archive')} (${archivedProjects.length})`}
+          />
         </Tabs>
       </Box>
-      
+
       <TabPanel value={tabValue} index={0}>
         {renderProjectList(activeProjects)}
       </TabPanel>
@@ -220,10 +236,12 @@ export const ProjectList: React.FC<ProjectListProps> = ({
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
       >
-        <MenuItem onClick={() => {
-          if (selectedProject) onEditProject(selectedProject);
-          handleMenuClose();
-        }}>
+        <MenuItem
+          onClick={() => {
+            if (selectedProject) onEditProject(selectedProject);
+            handleMenuClose();
+          }}
+        >
           <EditIcon sx={{ mr: 1 }} /> {t('actions.edit')}
         </MenuItem>
         {!selectedProject?.isArchived ? (
@@ -235,10 +253,10 @@ export const ProjectList: React.FC<ProjectListProps> = ({
             <UnarchiveIcon sx={{ mr: 1 }} /> {t('projects.unarchive')}
           </MenuItem>
         )}
-        <MenuItem 
+        <MenuItem
           onClick={() => {
             setDeleteConfirmOpen(true);
-          }} 
+          }}
           sx={{ color: 'error.main' }}
         >
           <DeleteIcon sx={{ mr: 1 }} /> {t('projects.delete')}

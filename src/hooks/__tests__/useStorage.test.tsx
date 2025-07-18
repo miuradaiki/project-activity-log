@@ -1,6 +1,10 @@
 import { renderHook, act } from '@testing-library/react';
 import { useStorage } from '../useStorage';
-import { MockElectronAPI, createMockProject, createMockTimeEntry } from '../../__mocks__/electron';
+import {
+  MockElectronAPI,
+  createMockProject,
+  createMockTimeEntry,
+} from '../../__mocks__/electron';
 
 describe('useStorage フックの特性テスト', () => {
   let mockAPI: MockElectronAPI;
@@ -14,7 +18,7 @@ describe('useStorage フックの特性テスト', () => {
       removeItem: jest.fn(),
       clear: jest.fn(),
     };
-    
+
     Object.defineProperty(window, 'localStorage', {
       value: localStorageMock,
       writable: true,
@@ -32,7 +36,7 @@ describe('useStorage フックの特性テスト', () => {
 
       // データロード完了まで待機
       await act(async () => {
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
       });
 
       expect(result.current.isLoading).toBe(false);
@@ -50,7 +54,7 @@ describe('useStorage フックの特性テスト', () => {
 
       // データロード完了まで待機
       await act(async () => {
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
       });
 
       expect(result.current.projects).toEqual([mockProject]);
@@ -62,9 +66,9 @@ describe('useStorage フックの特性テスト', () => {
   describe('プロジェクト操作', () => {
     test('プロジェクトのsetProjectsが正常に動作する', async () => {
       const { result } = renderHook(() => useStorage());
-      
+
       await act(async () => {
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
       });
 
       const newProject = createMockProject({ name: '新しいプロジェクト' });
@@ -72,7 +76,7 @@ describe('useStorage フックの特性テスト', () => {
       await act(async () => {
         result.current.setProjects([newProject]);
         // デバウンス処理のため少し待機
-        await new Promise(resolve => setTimeout(resolve, 1100));
+        await new Promise((resolve) => setTimeout(resolve, 1100));
       });
 
       expect(result.current.projects).toContainEqual(newProject);
@@ -85,12 +89,15 @@ describe('useStorage フックの特性テスト', () => {
       await mockAPI.saveProjects([originalProject]);
 
       const { result } = renderHook(() => useStorage());
-      
+
       await act(async () => {
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
       });
 
-      const updatedProject = { ...originalProject, name: '更新されたプロジェクト' };
+      const updatedProject = {
+        ...originalProject,
+        name: '更新されたプロジェクト',
+      };
 
       await act(async () => {
         result.current.setProjects([updatedProject]);
@@ -105,9 +112,9 @@ describe('useStorage フックの特性テスト', () => {
       await mockAPI.saveProjects([project]);
 
       const { result } = renderHook(() => useStorage());
-      
+
       await act(async () => {
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
       });
 
       await act(async () => {
@@ -122,9 +129,9 @@ describe('useStorage フックの特性テスト', () => {
   describe('タイムエントリー操作', () => {
     test('タイムエントリーのsetTimeEntriesが正常に動作する', async () => {
       const { result } = renderHook(() => useStorage());
-      
+
       await act(async () => {
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
       });
 
       const newTimeEntry = createMockTimeEntry();
@@ -135,7 +142,7 @@ describe('useStorage フックの特性テスト', () => {
         result.current.setProjects([relatedProject]);
         result.current.setTimeEntries([newTimeEntry]);
         // デバウンス処理のため少し待機
-        await new Promise(resolve => setTimeout(resolve, 1100));
+        await new Promise((resolve) => setTimeout(resolve, 1100));
       });
 
       expect(result.current.timeEntries).toContainEqual(newTimeEntry);
@@ -149,12 +156,15 @@ describe('useStorage フックの特性テスト', () => {
       await mockAPI.saveTimeEntries([originalTimeEntry]);
 
       const { result } = renderHook(() => useStorage());
-      
+
       await act(async () => {
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
       });
 
-      const updatedTimeEntry = { ...originalTimeEntry, description: '更新された作業' };
+      const updatedTimeEntry = {
+        ...originalTimeEntry,
+        description: '更新された作業',
+      };
 
       await act(async () => {
         result.current.setTimeEntries([updatedTimeEntry]);
@@ -169,9 +179,9 @@ describe('useStorage フックの特性テスト', () => {
       await mockAPI.saveTimeEntries([timeEntry]);
 
       const { result } = renderHook(() => useStorage());
-      
+
       await act(async () => {
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
       });
 
       await act(async () => {
@@ -187,22 +197,24 @@ describe('useStorage フックの特性テスト', () => {
     test('存在しないプロジェクトに関連するタイムエントリーが削除される', async () => {
       // 有効なプロジェクトと無効なタイムエントリーを作成
       const validProject = createMockProject({ id: 'valid-project' });
-      const orphanTimeEntry = createMockTimeEntry({ projectId: 'non-existent-project' });
-      
+      const orphanTimeEntry = createMockTimeEntry({
+        projectId: 'non-existent-project',
+      });
+
       await mockAPI.saveProjects([validProject]);
       await mockAPI.saveTimeEntries([orphanTimeEntry]);
 
       const { result } = renderHook(() => useStorage());
-      
+
       await act(async () => {
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
       });
 
       // プロジェクトが存在することでデータ操作が発生し、整合性チェックが動作する
       await act(async () => {
         result.current.setProjects([validProject]);
         // デバウンス処理とsaveを待機
-        await new Promise(resolve => setTimeout(resolve, 1100));
+        await new Promise((resolve) => setTimeout(resolve, 1100));
       });
 
       // 孤立したタイムエントリーが削除されていることを確認
@@ -212,9 +224,9 @@ describe('useStorage フックの特性テスト', () => {
 
     test('テストモードの切り替えが正常に動作する', async () => {
       const { result } = renderHook(() => useStorage());
-      
+
       await act(async () => {
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
       });
 
       // テストモード関連の状態確認

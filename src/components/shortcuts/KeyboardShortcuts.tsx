@@ -19,8 +19,8 @@ import {
 
 // ショートカットの型定義
 interface Shortcut {
-  key: string;           // キーの組み合わせ
-  description: string;   // 説明
+  key: string; // キーの組み合わせ
+  description: string; // 説明
   category: ShortcutCategory; // カテゴリ
 }
 
@@ -44,33 +44,53 @@ export const KeyboardShortcutsDialog: React.FC<KeyboardShortcutsProps> = ({
   // ショートカットリスト
   const shortcuts: Shortcut[] = [
     // ナビゲーション
-    { key: 'Ctrl+1', description: 'ダッシュボード表示', category: 'navigation' },
-    { key: 'Ctrl+2', description: 'プロジェクト一覧表示', category: 'navigation' },
+    {
+      key: 'Ctrl+1',
+      description: 'ダッシュボード表示',
+      category: 'navigation',
+    },
+    {
+      key: 'Ctrl+2',
+      description: 'プロジェクト一覧表示',
+      category: 'navigation',
+    },
     { key: 'Ctrl+3', description: 'タイマー画面表示', category: 'navigation' },
     { key: 'Ctrl+4', description: '作業履歴表示', category: 'navigation' },
     { key: 'Ctrl+,', description: '設定画面表示', category: 'navigation' },
-    
+
     // タイマー操作
     { key: 'Space', description: 'タイマー開始/停止', category: 'timer' },
     { key: 'Esc', description: 'タイマー停止', category: 'timer' },
     { key: 'Ctrl+Enter', description: '作業記録の保存', category: 'timer' },
     { key: 'Ctrl+Alt+N', description: '手動入力モード切替', category: 'timer' },
-    
+
     // プロジェクト操作
     { key: 'Ctrl+N', description: '新規プロジェクト作成', category: 'project' },
-    { key: 'Ctrl+E', description: '選択したプロジェクトを編集', category: 'project' },
-    { key: 'Ctrl+D', description: '選択したプロジェクトを削除', category: 'project' },
-    
+    {
+      key: 'Ctrl+E',
+      description: '選択したプロジェクトを編集',
+      category: 'project',
+    },
+    {
+      key: 'Ctrl+D',
+      description: '選択したプロジェクトを削除',
+      category: 'project',
+    },
+
     // 一般操作
     { key: '?', description: 'ショートカット一覧表示', category: 'general' },
-    { key: 'Ctrl+/', description: 'ショートカット一覧表示', category: 'general' },
+    {
+      key: 'Ctrl+/',
+      description: 'ショートカット一覧表示',
+      category: 'general',
+    },
     { key: 'Ctrl+H', description: 'ヘルプ表示', category: 'general' },
     { key: 'Alt+L', description: 'ダークモード切替', category: 'general' },
   ];
 
   // カテゴリーごとにショートカットをフィルタリング
   const getShortcutsByCategory = (category: ShortcutCategory) => {
-    return shortcuts.filter(shortcut => shortcut.category === category);
+    return shortcuts.filter((shortcut) => shortcut.category === category);
   };
 
   // カテゴリ名のマッピング
@@ -93,7 +113,12 @@ export const KeyboardShortcutsDialog: React.FC<KeyboardShortcutsProps> = ({
   // ダイアログ内でのキーボードショートカットを無効化
   useEffect(() => {
     const preventDefaultForShortcuts = (e: KeyboardEvent) => {
-      if (open && ((e.ctrlKey && ['1', '2', '3', '4', 'n', 'e', 'd', 'h', '/'].includes(e.key)) || e.key === '?')) {
+      if (
+        open &&
+        ((e.ctrlKey &&
+          ['1', '2', '3', '4', 'n', 'e', 'd', 'h', '/'].includes(e.key)) ||
+          e.key === '?')
+      ) {
         e.preventDefault();
       }
     };
@@ -107,7 +132,7 @@ export const KeyboardShortcutsDialog: React.FC<KeyboardShortcutsProps> = ({
   // ショートカットカードコンポーネント
   const ShortcutCard = ({ category }: { category: ShortcutCategory }) => {
     const categoryShortcuts = getShortcutsByCategory(category);
-    
+
     return (
       <Paper
         elevation={1}
@@ -118,30 +143,31 @@ export const KeyboardShortcutsDialog: React.FC<KeyboardShortcutsProps> = ({
           '&:hover': {
             transform: 'translateY(-4px)',
             boxShadow: theme.shadows[4],
-          }
+          },
         }}
       >
         <Typography variant="subtitle1" fontWeight="medium" sx={{ mb: 2 }}>
           {categoryNames[category]}
         </Typography>
         <Divider sx={{ mb: 2 }} />
-        
+
         {categoryShortcuts.map((shortcut, index) => (
-          <Box 
-            key={shortcut.key} 
-            sx={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              mb: index < categoryShortcuts.length - 1 ? 1.5 : 0 
+          <Box
+            key={shortcut.key}
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              mb: index < categoryShortcuts.length - 1 ? 1.5 : 0,
             }}
           >
-            <Typography variant="body2">
-              {shortcut.description}
-            </Typography>
-            <Typography 
-              variant="body2" 
-              sx={{ 
-                backgroundColor: theme.palette.mode === 'light' ? theme.palette.grey[200] : theme.palette.grey[800],
+            <Typography variant="body2">{shortcut.description}</Typography>
+            <Typography
+              variant="body2"
+              sx={{
+                backgroundColor:
+                  theme.palette.mode === 'light'
+                    ? theme.palette.grey[200]
+                    : theme.palette.grey[800],
                 px: 1,
                 py: 0.5,
                 borderRadius: 1,
@@ -169,7 +195,7 @@ export const KeyboardShortcutsDialog: React.FC<KeyboardShortcutsProps> = ({
         sx: {
           borderRadius: 2,
           position: 'relative',
-        }
+        },
       }}
     >
       {/* ヘッダー */}
@@ -188,36 +214,32 @@ export const KeyboardShortcutsDialog: React.FC<KeyboardShortcutsProps> = ({
           </IconButton>
         </Box>
       </DialogTitle>
-      
+
       <DialogContent sx={{ pt: 0 }}>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
           以下のキーボードショートカットを使用して、より効率的に作業できます。
         </Typography>
-        
+
         <Grid container spacing={3}>
           <Grid item xs={12} md={6}>
             <ShortcutCard category="navigation" />
           </Grid>
-          
+
           <Grid item xs={12} md={6}>
             <ShortcutCard category="timer" />
           </Grid>
-          
+
           <Grid item xs={12} md={6}>
             <ShortcutCard category="project" />
           </Grid>
-          
+
           <Grid item xs={12} md={6}>
             <ShortcutCard category="general" />
           </Grid>
         </Grid>
-        
+
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-          <Button 
-            variant="outlined" 
-            onClick={onClose}
-            sx={{ minWidth: 120 }}
-          >
+          <Button variant="outlined" onClick={onClose} sx={{ minWidth: 120 }}>
             閉じる
           </Button>
         </Box>
@@ -229,7 +251,9 @@ export const KeyboardShortcutsDialog: React.FC<KeyboardShortcutsProps> = ({
 /**
  * アプリケーション全体のキーボードショートカットを管理するコンポーネント
  */
-export const KeyboardShortcutsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const KeyboardShortcutsProvider: React.FC<{
+  children: React.ReactNode;
+}> = ({ children }) => {
   const [showShortcutsDialog, setShowShortcutsDialog] = useState(false);
 
   // キーボードイベントのリスナー
@@ -237,16 +261,16 @@ export const KeyboardShortcutsProvider: React.FC<{ children: React.ReactNode }> 
     const handleKeyDown = (e: KeyboardEvent) => {
       // ダイアログが開いているときは何もしない
       if (showShortcutsDialog) return;
-      
+
       // ショートカット一覧表示: ? または Ctrl+/
       if (e.key === '?' || (e.ctrlKey && e.key === '/')) {
         e.preventDefault();
         setShowShortcutsDialog(true);
       }
-      
+
       // 他のショートカットはApp.tsxで処理
     };
-    
+
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
@@ -270,15 +294,15 @@ export const KeyboardShortcutsProvider: React.FC<{ children: React.ReactNode }> 
  */
 export const useKeyboardShortcuts = () => {
   const [showShortcutsDialog, setShowShortcutsDialog] = useState(false);
-  
+
   const openShortcutsDialog = () => {
     setShowShortcutsDialog(true);
   };
-  
+
   const closeShortcutsDialog = () => {
     setShowShortcutsDialog(false);
   };
-  
+
   return {
     showShortcutsDialog,
     openShortcutsDialog,

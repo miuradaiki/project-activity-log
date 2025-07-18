@@ -32,7 +32,9 @@ const mockAlert = jest.fn();
 global.alert = mockAlert;
 
 // ManualTimeEntryFormをラップするためのヘルパー
-const renderManualTimeEntryForm = (props: Partial<Parameters<typeof ManualTimeEntryForm>[0]> = {}) => {
+const renderManualTimeEntryForm = (
+  props: Partial<Parameters<typeof ManualTimeEntryForm>[0]> = {}
+) => {
   const defaultProps = {
     open: true,
     onClose: jest.fn(),
@@ -76,7 +78,9 @@ describe('ManualTimeEntryForm', () => {
       await userEvent.click(saveButton);
 
       // アラートが表示されることを確認
-      expect(mockAlert).toHaveBeenCalledWith('終了時間は開始時間より後である必要があります。');
+      expect(mockAlert).toHaveBeenCalledWith(
+        '終了時間は開始時間より後である必要があります。'
+      );
       expect(onSave).not.toHaveBeenCalled();
     });
 
@@ -102,7 +106,9 @@ describe('ManualTimeEntryForm', () => {
       await userEvent.click(saveButton);
 
       // アラートが表示されることを確認（duration <= 0の場合のメッセージ）
-      expect(mockAlert).toHaveBeenCalledWith('終了時間は開始時間より後である必要があります。');
+      expect(mockAlert).toHaveBeenCalledWith(
+        '終了時間は開始時間より後である必要があります。'
+      );
       expect(onSave).not.toHaveBeenCalled();
     });
 
@@ -116,7 +122,7 @@ describe('ManualTimeEntryForm', () => {
 
       // 実際のコンポーネント内のバリデーションロジックを模擬
       const startDateTime = new Date(`${testDate}T${startTime}:30`); // 10:00:30
-      const endDateTime = new Date(`${testDate}T${endTime}:59`);     // 10:00:59
+      const endDateTime = new Date(`${testDate}T${endTime}:59`); // 10:00:59
       const duration = endDateTime.getTime() - startDateTime.getTime(); // 29秒
 
       // 1分未満（60000ミリ秒）であることを確認
@@ -143,7 +149,9 @@ describe('ManualTimeEntryForm', () => {
       await userEvent.click(saveButton);
 
       // 同じ時間の場合は duration <= 0 のチェックに引っかかる
-      expect(mockAlert).toHaveBeenCalledWith('終了時間は開始時間より後である必要があります。');
+      expect(mockAlert).toHaveBeenCalledWith(
+        '終了時間は開始時間より後である必要があります。'
+      );
       expect(onSave).not.toHaveBeenCalled();
     });
 
@@ -174,10 +182,12 @@ describe('ManualTimeEntryForm', () => {
       await userEvent.click(saveButton);
 
       // onSaveが正しい引数で呼ばれることを確認
-      expect(onSave).toHaveBeenCalledWith(expect.objectContaining({
-        projectId: 'project-1',
-        description: 'Test description',
-      }));
+      expect(onSave).toHaveBeenCalledWith(
+        expect.objectContaining({
+          projectId: 'project-1',
+          description: 'Test description',
+        })
+      );
 
       expect(onClose).toHaveBeenCalled();
       expect(mockAlert).not.toHaveBeenCalled();

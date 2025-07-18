@@ -1,5 +1,12 @@
 import React from 'react';
-import { Box, Card, CardContent, Typography, SvgIconProps, useTheme } from '@mui/material';
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  SvgIconProps,
+  useTheme,
+} from '@mui/material';
 import { TrendingUp, TrendingDown, TrendingFlat } from '@mui/icons-material';
 
 interface KPICardProps {
@@ -29,31 +36,47 @@ export const KPICard: React.FC<KPICardProps> = ({
   // トレンドアイコンと色を決定
   const getTrendIcon = () => {
     if (!trend) return null;
-    
+
     if (trend.value > 0) {
-      return <TrendingUp fontSize="small" sx={{ color: theme.palette.success.main }} />;
+      return (
+        <TrendingUp
+          fontSize="small"
+          sx={{ color: theme.palette.success.main }}
+        />
+      );
     } else if (trend.value < 0) {
-      return <TrendingDown fontSize="small" sx={{ color: theme.palette.error.main }} />;
+      return (
+        <TrendingDown
+          fontSize="small"
+          sx={{ color: theme.palette.error.main }}
+        />
+      );
     } else {
-      return <TrendingFlat fontSize="small" sx={{ color: theme.palette.text.secondary }} />;
+      return (
+        <TrendingFlat
+          fontSize="small"
+          sx={{ color: theme.palette.text.secondary }}
+        />
+      );
     }
   };
 
   const trendIcon = getTrendIcon();
-  const trendColor = trend && trend.value > 0 
-    ? theme.palette.success.main 
-    : trend && trend.value < 0 
-      ? theme.palette.error.main 
-      : theme.palette.text.secondary;
+  const trendColor =
+    trend && trend.value > 0
+      ? theme.palette.success.main
+      : trend && trend.value < 0
+        ? theme.palette.error.main
+        : theme.palette.text.secondary;
 
   // NaN値を表示しないようにする
   const displayTrendValue = trend && !isNaN(trend.value) ? trend.value : 0;
 
   return (
-    <Card 
+    <Card
       sx={{
-        height: '100%', 
-        display: 'flex', 
+        height: '100%',
+        display: 'flex',
         flexDirection: 'column',
         transition: 'transform 0.3s, box-shadow 0.3s',
         '&:hover': {
@@ -70,22 +93,24 @@ export const KPICard: React.FC<KPICardProps> = ({
           width: '100%',
           height: '4px',
           backgroundColor: iconColor,
-        }
+        },
       }}
     >
-      <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-        <Box 
-          sx={{ 
-            display: 'flex', 
-            alignItems: 'center', 
+      <CardContent
+        sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
             mb: 2,
           }}
         >
-          <Box 
-            sx={{ 
-              mr: 1.5, 
-              display: 'flex', 
-              alignItems: 'center', 
+          <Box
+            sx={{
+              mr: 1.5,
+              display: 'flex',
+              alignItems: 'center',
               justifyContent: 'center',
               backgroundColor: `${iconColor}22`,
               borderRadius: '50%',
@@ -99,19 +124,24 @@ export const KPICard: React.FC<KPICardProps> = ({
             {title}
           </Typography>
         </Box>
-        
-        <Typography variant="h4" component="div" sx={{ mb: 1, fontWeight: 'medium' }}>
+
+        <Typography
+          variant="h4"
+          component="div"
+          sx={{ mb: 1, fontWeight: 'medium' }}
+        >
           {value}
         </Typography>
-        
+
         {trend && (
           <Box sx={{ display: 'flex', alignItems: 'center', mt: 'auto' }}>
             {trendIcon}
-            <Typography 
-              variant="body2" 
+            <Typography
+              variant="body2"
               sx={{ ml: 0.5, color: trendColor, fontWeight: 'medium' }}
             >
-              {displayTrendValue > 0 ? '+' : ''}{displayTrendValue}%
+              {displayTrendValue > 0 ? '+' : ''}
+              {displayTrendValue}%
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
               {trend.label}

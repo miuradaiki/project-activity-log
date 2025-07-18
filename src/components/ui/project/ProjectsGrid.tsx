@@ -41,7 +41,7 @@ interface TabPanelProps {
 // タブパネルコンポーネント
 const TabPanel = (props: TabPanelProps) => {
   const { children, value, index, ...other } = props;
-  
+
   return (
     <div
       role="tabpanel"
@@ -50,14 +50,10 @@ const TabPanel = (props: TabPanelProps) => {
       aria-labelledby={`projects-tab-${index}`}
       {...other}
     >
-      {value === index && (
-        <Box sx={{ pt: 3 }}>
-          {children}
-        </Box>
-      )}
+      {value === index && <Box sx={{ pt: 3 }}>{children}</Box>}
     </div>
   );
-}
+};
 
 type FilterType = 'all' | 'active' | 'archived';
 type SortType = 'name' | 'progress' | 'capacity' | 'recent';
@@ -76,7 +72,7 @@ export const ProjectsGrid: React.FC<ProjectsGridProps> = ({
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortType>('name');
-  
+
   // タブの変更ハンドラー
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -90,23 +86,24 @@ export const ProjectsGrid: React.FC<ProjectsGridProps> = ({
   // フィルタータイプに基づいてプロジェクトをフィルタリング
   const getFilteredProjects = (filterType: FilterType) => {
     let filteredProjects = [...projects];
-    
+
     // アクティブ/アーカイブで絞り込み
     if (filterType === 'active') {
-      filteredProjects = filteredProjects.filter(p => !p.isArchived);
+      filteredProjects = filteredProjects.filter((p) => !p.isArchived);
     } else if (filterType === 'archived') {
-      filteredProjects = filteredProjects.filter(p => p.isArchived);
+      filteredProjects = filteredProjects.filter((p) => p.isArchived);
     }
-    
+
     // 検索クエリで絞り込み
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filteredProjects = filteredProjects.filter(
-        p => p.name.toLowerCase().includes(query) || 
-             (p.description && p.description.toLowerCase().includes(query))
+        (p) =>
+          p.name.toLowerCase().includes(query) ||
+          (p.description && p.description.toLowerCase().includes(query))
       );
     }
-    
+
     return filteredProjects;
   };
 
@@ -114,17 +111,20 @@ export const ProjectsGrid: React.FC<ProjectsGridProps> = ({
   const calculateMonthlyTime = (projectId: string): number => {
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    
-    return timeEntries
-      .filter(entry => {
-        const entryDate = new Date(entry.startTime);
-        return entry.projectId === projectId && entryDate >= startOfMonth;
-      })
-      .reduce((total, entry) => {
-        const start = new Date(entry.startTime);
-        const end = new Date(entry.endTime);
-        return total + (end.getTime() - start.getTime());
-      }, 0) / (1000 * 60 * 60); // Convert to hours
+
+    return (
+      timeEntries
+        .filter((entry) => {
+          const entryDate = new Date(entry.startTime);
+          return entry.projectId === projectId && entryDate >= startOfMonth;
+        })
+        .reduce((total, entry) => {
+          const start = new Date(entry.startTime);
+          const end = new Date(entry.endTime);
+          return total + (end.getTime() - start.getTime());
+        }, 0) /
+      (1000 * 60 * 60)
+    ); // Convert to hours
   };
 
   // 月間目標時間を計算
@@ -139,13 +139,17 @@ export const ProjectsGrid: React.FC<ProjectsGridProps> = ({
         return [...projects].sort((a, b) => a.name.localeCompare(b.name));
       case 'progress': {
         return [...projects].sort((a, b) => {
-          const progressA = calculateMonthlyTime(a.id) / calculateMonthlyTarget(a);
-          const progressB = calculateMonthlyTime(b.id) / calculateMonthlyTarget(b);
+          const progressA =
+            calculateMonthlyTime(a.id) / calculateMonthlyTarget(a);
+          const progressB =
+            calculateMonthlyTime(b.id) / calculateMonthlyTarget(b);
           return progressB - progressA;
         });
       }
       case 'capacity':
-        return [...projects].sort((a, b) => b.monthlyCapacity - a.monthlyCapacity);
+        return [...projects].sort(
+          (a, b) => b.monthlyCapacity - a.monthlyCapacity
+        );
       case 'recent': {
         return [...projects].sort((a, b) => {
           // 最終更新日で並べ替え
@@ -165,8 +169,8 @@ export const ProjectsGrid: React.FC<ProjectsGridProps> = ({
   };
 
   // アクティブとアーカイブ済みプロジェクトの数を取得
-  const activeProjects = projects.filter(p => !p.isArchived);
-  const archivedProjects = projects.filter(p => p.isArchived);
+  const activeProjects = projects.filter((p) => !p.isArchived);
+  const archivedProjects = projects.filter((p) => p.isArchived);
 
   // 各タブ用のプロジェクトリスト
   const allProjects = getFilteredAndSortedProjects('all');
@@ -174,23 +178,26 @@ export const ProjectsGrid: React.FC<ProjectsGridProps> = ({
   const filteredArchivedProjects = getFilteredAndSortedProjects('archived');
 
   // 現在表示中のプロジェクトリスト
-  const currentProjects = tabValue === 0 
-    ? allProjects 
-    : tabValue === 1 
-      ? filteredActiveProjects 
-      : filteredArchivedProjects;
+  const currentProjects =
+    tabValue === 0
+      ? allProjects
+      : tabValue === 1
+        ? filteredActiveProjects
+        : filteredArchivedProjects;
 
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
       {/* フィルターとソート */}
-      <Box sx={{ 
-        display: 'flex', 
-        flexDirection: { xs: 'column', sm: 'row' }, 
-        justifyContent: 'space-between',
-        alignItems: { xs: 'stretch', sm: 'center' },
-        mb: 3, 
-        gap: 2 
-      }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row' },
+          justifyContent: 'space-between',
+          alignItems: { xs: 'stretch', sm: 'center' },
+          mb: 3,
+          gap: 2,
+        }}
+      >
         <TextField
           placeholder={t('projects.search')}
           size="small"
@@ -205,7 +212,7 @@ export const ProjectsGrid: React.FC<ProjectsGridProps> = ({
             ),
           }}
         />
-        
+
         <FormControl size="small" sx={{ minWidth: 150 }}>
           <InputLabel id="sort-select-label">{t('actions.search')}</InputLabel>
           <Select
@@ -224,24 +231,24 @@ export const ProjectsGrid: React.FC<ProjectsGridProps> = ({
 
       {/* タブ */}
       <Paper sx={{ borderRadius: 2, mb: 3 }}>
-        <Tabs 
-          value={tabValue} 
+        <Tabs
+          value={tabValue}
           onChange={handleTabChange}
           variant="fullWidth"
           sx={{ borderBottom: 1, borderColor: 'divider' }}
         >
-          <Tab 
-            label={`${t('projects.filter.all')} (${allProjects.length})`} 
+          <Tab
+            label={`${t('projects.filter.all')} (${allProjects.length})`}
             id="projects-tab-0"
             aria-controls="projects-tabpanel-0"
           />
-          <Tab 
-            label={`${t('projects.filter.active')} (${activeProjects.length})`} 
+          <Tab
+            label={`${t('projects.filter.active')} (${activeProjects.length})`}
             id="projects-tab-1"
             aria-controls="projects-tabpanel-1"
           />
-          <Tab 
-            label={`${t('projects.archive')} (${archivedProjects.length})`} 
+          <Tab
+            label={`${t('projects.archive')} (${archivedProjects.length})`}
             id="projects-tab-2"
             aria-controls="projects-tabpanel-2"
           />

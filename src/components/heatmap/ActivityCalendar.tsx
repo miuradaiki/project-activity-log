@@ -1,10 +1,10 @@
 import React, { useState, useMemo } from 'react';
-import { 
-  Box, 
-  Typography, 
-  Paper, 
-  Grid, 
-  useTheme, 
+import {
+  Box,
+  Typography,
+  Paper,
+  Grid,
+  useTheme,
   IconButton,
   Tooltip,
   Select,
@@ -30,10 +30,13 @@ interface ActivityCalendarProps {
  * ヒートマップカレンダーコンポーネント
  * 月ごとの作業活動を視覚的に表示する
  */
-export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({ timeEntries, projects }) => {
+export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
+  timeEntries,
+  projects,
+}) => {
   const theme = useTheme();
   const currentDate = new Date();
-  
+
   // 表示する年月を管理
   const [year, setYear] = useState(currentDate.getFullYear());
   const [month, setMonth] = useState(currentDate.getMonth());
@@ -60,12 +63,20 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({ timeEntries,
 
   // 現在の日付が表示月と同じか確認（今日の日付をハイライトするため）
   const isCurrentMonth = useMemo(() => {
-    return currentDate.getFullYear() === year && currentDate.getMonth() === month;
+    return (
+      currentDate.getFullYear() === year && currentDate.getMonth() === month
+    );
   }, [currentDate, year, month]);
 
   // 月の日数と開始曜日を計算
-  const daysInMonth = useMemo(() => new Date(year, month + 1, 0).getDate(), [year, month]);
-  const firstDayOfMonth = useMemo(() => new Date(year, month, 1).getDay(), [year, month]);
+  const daysInMonth = useMemo(
+    () => new Date(year, month + 1, 0).getDate(),
+    [year, month]
+  );
+  const firstDayOfMonth = useMemo(
+    () => new Date(year, month, 1).getDay(),
+    [year, month]
+  );
 
   // 月名を取得
   const monthName = useMemo(() => {
@@ -90,29 +101,37 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({ timeEntries,
         } else {
           const date = new Date(year, month, day);
           const isToday = isCurrentMonth && day === currentDate.getDate();
-          
+
           // その日の作業時間を計算
           const hoursWorked = getDailyWorkHours(timeEntries, date);
-          
+
           week.push({
             day,
             date,
             isToday,
-            hoursWorked
+            hoursWorked,
           });
           day++;
         }
       }
       data.push(week);
     }
-    
+
     return data;
-  }, [year, month, daysInMonth, firstDayOfMonth, timeEntries, isCurrentMonth, currentDate]);
+  }, [
+    year,
+    month,
+    daysInMonth,
+    firstDayOfMonth,
+    timeEntries,
+    isCurrentMonth,
+    currentDate,
+  ]);
 
   // 時間に応じた色の濃さを決定
   const getColorIntensity = (hours: number) => {
     if (hours === 0) return 0;
-    
+
     // 最大8時間で最高濃度になるよう設定（調整可能）
     const maxHours = 8;
     const intensity = Math.min(1, hours / maxHours);
@@ -121,10 +140,13 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({ timeEntries,
 
   // ヒートマップの色を生成
   const getHeatMapColor = (hours: number) => {
-    if (hours === 0) return theme.palette.mode === 'light' ? theme.palette.grey[100] : theme.palette.grey[900];
-    
+    if (hours === 0)
+      return theme.palette.mode === 'light'
+        ? theme.palette.grey[100]
+        : theme.palette.grey[900];
+
     const intensity = getColorIntensity(hours);
-    
+
     // テーマに応じて色を変更（ダークモード対応）
     if (theme.palette.mode === 'light') {
       // 青のグラデーション（ライトモード）
@@ -138,7 +160,13 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({ timeEntries,
   // 年の選択肢を生成（現在の年を中心に前後2年）
   const yearOptions = useMemo(() => {
     const currentYear = new Date().getFullYear();
-    return [currentYear - 2, currentYear - 1, currentYear, currentYear + 1, currentYear + 2];
+    return [
+      currentYear - 2,
+      currentYear - 1,
+      currentYear,
+      currentYear + 1,
+      currentYear + 2,
+    ];
   }, []);
 
   // 月の選択肢
@@ -160,15 +188,17 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({ timeEntries,
   const totalHoursInMonth = useMemo(() => {
     const startOfMonth = new Date(year, month, 1);
     const endOfMonth = new Date(year, month + 1, 0, 23, 59, 59);
-    
+
     return timeEntries
-      .filter(entry => {
+      .filter((entry) => {
         const entryDate = new Date(entry.startTime);
         return entryDate >= startOfMonth && entryDate <= endOfMonth;
       })
       .reduce((total, entry) => {
         const startTime = new Date(entry.startTime).getTime();
-        const endTime = entry.endTime ? new Date(entry.endTime).getTime() : new Date().getTime();
+        const endTime = entry.endTime
+          ? new Date(entry.endTime).getTime()
+          : new Date().getTime();
         return total + (endTime - startTime) / (1000 * 60 * 60);
       }, 0);
   }, [timeEntries, year, month]);
@@ -181,7 +211,7 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({ timeEntries,
         transition: 'box-shadow 0.2s',
         '&:hover': {
           boxShadow: theme.shadows[4],
-        }
+        },
       }}
     >
       <Box sx={{ mb: 3 }}>
@@ -192,36 +222,47 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({ timeEntries,
           作業時間の分布を視覚化
         </Typography>
       </Box>
-      
+
       {/* カレンダーヘッダー */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 2,
+        }}
+      >
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <IconButton onClick={goToPreviousMonth} size="small">
             <ChevronLeftIcon />
           </IconButton>
-          
+
           <Box sx={{ display: 'flex', mx: 1, alignItems: 'center' }}>
-            <FormControl variant="outlined" size="small" sx={{ minWidth: 80, mr: 1 }}>
+            <FormControl
+              variant="outlined"
+              size="small"
+              sx={{ minWidth: 80, mr: 1 }}
+            >
               <Select
                 value={year}
                 onChange={handleYearChange as any}
                 displayEmpty
               >
-                {yearOptions.map(yearOption => (
+                {yearOptions.map((yearOption) => (
                   <MenuItem key={yearOption} value={yearOption}>
                     {yearOption}年
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
-            
+
             <FormControl variant="outlined" size="small" sx={{ minWidth: 80 }}>
               <Select
                 value={month}
                 onChange={handleMonthChange as any}
                 displayEmpty
               >
-                {monthOptions.map(monthOption => (
+                {monthOptions.map((monthOption) => (
                   <MenuItem key={monthOption} value={monthOption}>
                     {monthOption + 1}月
                   </MenuItem>
@@ -229,44 +270,45 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({ timeEntries,
               </Select>
             </FormControl>
           </Box>
-          
+
           <IconButton onClick={goToNextMonth} size="small">
             <ChevronRightIcon />
           </IconButton>
         </Box>
-        
+
         <Typography variant="body2" fontWeight="medium">
           合計: {totalHoursInMonth.toFixed(1)}時間
         </Typography>
       </Box>
-      
+
       {/* カレンダーグリッド */}
       <Box>
         {/* 曜日ヘッダー */}
         <Grid container spacing={1}>
           {weekdays.map((day, index) => (
-            <Grid item xs={12/7} key={index}>
-              <Box 
-                sx={{ 
+            <Grid item xs={12 / 7} key={index}>
+              <Box
+                sx={{
                   textAlign: 'center',
                   fontWeight: 'medium',
-                  color: index === 0 || index === 6 ? theme.palette.error.main : 'inherit',
-                  mb: 1
+                  color:
+                    index === 0 || index === 6
+                      ? theme.palette.error.main
+                      : 'inherit',
+                  mb: 1,
                 }}
               >
-                <Typography variant="caption">
-                  {day}
-                </Typography>
+                <Typography variant="caption">{day}</Typography>
               </Box>
             </Grid>
           ))}
         </Grid>
-        
+
         {/* カレンダー本体 */}
         {calendarData.map((week, rowIndex) => (
           <Grid container spacing={1} key={`week-${rowIndex}`}>
             {week.map((day, colIndex) => (
-              <Grid item xs={12/7} key={`day-${rowIndex}-${colIndex}`}>
+              <Grid item xs={12 / 7} key={`day-${rowIndex}-${colIndex}`}>
                 {day ? (
                   <Tooltip
                     title={`${year}年${month + 1}月${day.day}日: ${day.hoursWorked.toFixed(1)}時間`}
@@ -281,24 +323,26 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({ timeEntries,
                         alignItems: 'center',
                         backgroundColor: getHeatMapColor(day.hoursWorked),
                         borderRadius: '4px',
-                        border: day.isToday 
-                          ? `2px solid ${theme.palette.primary.main}` 
+                        border: day.isToday
+                          ? `2px solid ${theme.palette.primary.main}`
                           : '1px solid transparent',
                         position: 'relative',
                         transition: 'transform 0.1s',
                         '&:hover': {
                           transform: 'scale(1.05)',
-                          boxShadow: theme.shadows[2]
-                        }
+                          boxShadow: theme.shadows[2],
+                        },
                       }}
                     >
-                      <Typography 
-                        variant="caption" 
+                      <Typography
+                        variant="caption"
                         fontWeight={day.isToday ? 'bold' : 'regular'}
                         sx={{
-                          color: day.hoursWorked > 4 && theme.palette.mode === 'light' 
-                            ? 'white' 
-                            : 'inherit'
+                          color:
+                            day.hoursWorked > 4 &&
+                            theme.palette.mode === 'light'
+                              ? 'white'
+                              : 'inherit',
                         }}
                       >
                         {day.day}
@@ -306,10 +350,10 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({ timeEntries,
                     </Box>
                   </Tooltip>
                 ) : (
-                  <Box 
-                    sx={{ 
-                      height: 36, 
-                      backgroundColor: 'transparent'
+                  <Box
+                    sx={{
+                      height: 36,
+                      backgroundColor: 'transparent',
                     }}
                   />
                 )}
@@ -318,9 +362,16 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({ timeEntries,
           </Grid>
         ))}
       </Box>
-      
+
       {/* 凡例 */}
-      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3, alignItems: 'center' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          mt: 3,
+          alignItems: 'center',
+        }}
+      >
         <Typography variant="caption" sx={{ mr: 1 }}>
           活動レベル:
         </Typography>
@@ -333,7 +384,7 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({ timeEntries,
                 backgroundColor: getHeatMapColor(hour),
                 borderRadius: '4px',
                 mx: 0.5,
-                border: `1px solid ${theme.palette.divider}`
+                border: `1px solid ${theme.palette.divider}`,
               }}
             />
           </Tooltip>

@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLanguage } from '../../../contexts/LanguageContext';
-import { 
-  Box, 
-  Typography, 
-  IconButton, 
+import {
+  Box,
+  Typography,
+  IconButton,
   TextField,
-  useTheme, 
-  Fade, 
+  useTheme,
+  Fade,
   Tooltip,
   Card,
   CardContent,
@@ -14,11 +14,11 @@ import {
   Button,
   Stack,
 } from '@mui/material';
-import { 
-  PlayArrow, 
-  Stop, 
-  Pause, 
-  Check, 
+import {
+  PlayArrow,
+  Stop,
+  Pause,
+  Check,
   Close,
   Edit as EditIcon,
   TimerOutlined,
@@ -57,9 +57,9 @@ export const TimerFocus: React.FC<TimerFocusProps> = ({
   const calculateElapsed = useCallback(() => {
     if (!startTime) return { text: '00:00:00', ms: 0 };
     const diff = new Date().getTime() - new Date(startTime).getTime();
-    return { 
+    return {
       text: formatElapsedTime(diff),
-      ms: diff
+      ms: diff,
     };
   }, [startTime]);
 
@@ -71,17 +71,18 @@ export const TimerFocus: React.FC<TimerFocusProps> = ({
       const { text, ms } = calculateElapsed();
       setElapsed(text);
       setElapsedMs(ms);
-      
+
       // 1秒ごとに更新
       intervalId = window.setInterval(() => {
-        const currentElapsed = new Date().getTime() - new Date(startTime).getTime();
-        
+        const currentElapsed =
+          new Date().getTime() - new Date(startTime).getTime();
+
         // 8時間（28800000ミリ秒）を超えた場合、タイマーを自動停止
         if (currentElapsed >= 8 * 60 * 60 * 1000) {
           onStop();
           // 通知を表示
           new Notification(t('timer.notification.maxtime'), {
-            body: t('timer.notification.maxtime.body')
+            body: t('timer.notification.maxtime.body'),
           });
         } else {
           setElapsed(formatElapsedTime(currentElapsed));
@@ -110,7 +111,7 @@ export const TimerFocus: React.FC<TimerFocusProps> = ({
   const getTimerColor = () => {
     const maxDuration = 8 * 60 * 60 * 1000; // 8時間（ミリ秒）
     const progress = Math.min((elapsedMs / maxDuration) * 100, 100);
-    
+
     if (progress >= 90) return theme.palette.error.main;
     if (progress >= 75) return theme.palette.warning.main;
     return theme.palette.primary.main;
@@ -118,11 +119,11 @@ export const TimerFocus: React.FC<TimerFocusProps> = ({
 
   if (!project) {
     return (
-      <Card 
+      <Card
         elevation={2}
-        sx={{ 
-          p: 4, 
-          mb: 4, 
+        sx={{
+          p: 4,
+          mb: 4,
           textAlign: 'center',
           display: 'flex',
           flexDirection: 'column',
@@ -147,10 +148,10 @@ export const TimerFocus: React.FC<TimerFocusProps> = ({
   const timerColor = getTimerColor();
 
   return (
-    <Card 
-      elevation={3} 
-      sx={{ 
-        mb: 4, 
+    <Card
+      elevation={3}
+      sx={{
+        mb: 4,
         borderRadius: theme.shape.borderRadius,
         position: 'relative',
         overflow: 'hidden',
@@ -159,8 +160,8 @@ export const TimerFocus: React.FC<TimerFocusProps> = ({
         maxWidth: { xs: '100%', sm: 600, md: 700 },
         transition: 'all 0.3s ease-in-out',
         border: isRunning ? `1px solid ${alpha(timerColor, 0.3)}` : 'none',
-        boxShadow: isRunning 
-          ? `0 0 20px ${alpha(timerColor, 0.2)}` 
+        boxShadow: isRunning
+          ? `0 0 20px ${alpha(timerColor, 0.2)}`
           : '0 8px 16px rgba(0, 0, 0, 0.05)',
       }}
     >
@@ -185,14 +186,12 @@ export const TimerFocus: React.FC<TimerFocusProps> = ({
               bgcolor: isRunning ? timerColor : 'grey.400',
               mr: 1.5,
               boxShadow: isRunning ? `0 0 10px ${timerColor}` : 'none',
-              animation: isRunning 
-                ? 'pulse 1.5s infinite ease-in-out' 
-                : 'none',
+              animation: isRunning ? 'pulse 1.5s infinite ease-in-out' : 'none',
               '@keyframes pulse': {
                 '0%': { opacity: 0.5, transform: 'scale(0.8)' },
                 '50%': { opacity: 1, transform: 'scale(1.2)' },
                 '100%': { opacity: 0.5, transform: 'scale(0.8)' },
-              }
+              },
             }}
           />
           <Typography variant="h6" fontWeight="medium">
@@ -202,7 +201,7 @@ export const TimerFocus: React.FC<TimerFocusProps> = ({
 
         {onAddNote && (
           <Tooltip title={t('timer.description')}>
-            <IconButton 
+            <IconButton
               onClick={() => setIsEditing(true)}
               color="primary"
               size="small"
@@ -215,14 +214,14 @@ export const TimerFocus: React.FC<TimerFocusProps> = ({
       </Box>
 
       {/* タイマーディスプレイ */}
-      <Box 
-        sx={{ 
+      <Box
+        sx={{
           p: 4,
-          display: 'flex', 
+          display: 'flex',
           flexDirection: 'column',
-          alignItems: 'center', 
+          alignItems: 'center',
           position: 'relative',
-          background: isRunning 
+          background: isRunning
             ? `linear-gradient(to bottom, ${alpha(timerColor, 0.03)}, transparent)`
             : 'none',
         }}
@@ -234,22 +233,22 @@ export const TimerFocus: React.FC<TimerFocusProps> = ({
             mb: 3,
           }}
         >
-          <TimerOutlined 
-            sx={{ 
-              fontSize: 32, 
-              mr: 2, 
+          <TimerOutlined
+            sx={{
+              fontSize: 32,
+              mr: 2,
               color: isRunning ? timerColor : 'text.secondary',
-            }} 
+            }}
           />
-          <Typography 
-            variant="h2" 
-            component="div" 
-            sx={{ 
+          <Typography
+            variant="h2"
+            component="div"
+            sx={{
               fontWeight: 'bold',
               fontFamily: 'monospace',
               letterSpacing: 2,
               color: isRunning ? timerColor : 'text.primary',
-              transition: 'color 0.3s ease'
+              transition: 'color 0.3s ease',
             }}
           >
             {elapsed}
@@ -257,9 +256,9 @@ export const TimerFocus: React.FC<TimerFocusProps> = ({
         </Box>
 
         {/* タイマーコントロール */}
-        <Stack 
-          direction="row" 
-          spacing={2} 
+        <Stack
+          direction="row"
+          spacing={2}
           sx={{ mt: 2 }}
           justifyContent="center"
         >
@@ -277,8 +276,8 @@ export const TimerFocus: React.FC<TimerFocusProps> = ({
                 transition: 'transform 0.3s ease, box-shadow 0.3s ease',
                 '&:hover': {
                   transform: 'translateY(-2px)',
-                  boxShadow: `0 8px 16px ${alpha(theme.palette.primary.main, 0.4)}`
-                }
+                  boxShadow: `0 8px 16px ${alpha(theme.palette.primary.main, 0.4)}`,
+                },
               }}
             >
               {t('timer.start')}
@@ -290,54 +289,54 @@ export const TimerFocus: React.FC<TimerFocusProps> = ({
                 startIcon={<Check />}
                 onClick={onStop}
                 color="success"
-                sx={{ 
-                  px: 3, 
+                sx={{
+                  px: 3,
                   borderRadius: 8,
                   transition: 'transform 0.2s ease',
                   '&:hover': {
                     transform: 'translateY(-2px)',
-                  }
+                  },
                 }}
               >
-              {t('timer.stop')}
+                {t('timer.stop')}
               </Button>
-              
+
               {onPause && (
                 <Button
                   variant="outlined"
                   startIcon={<Pause />}
                   onClick={onPause}
                   color="primary"
-                  sx={{ 
-                    px: 3, 
+                  sx={{
+                    px: 3,
                     borderRadius: 8,
                     borderWidth: 2,
                     transition: 'transform 0.2s ease',
                     '&:hover': {
                       borderWidth: 2,
                       transform: 'translateY(-2px)',
-                    }
+                    },
                   }}
                 >
-                {t('timer.manual.title')}
+                  {t('timer.manual.title')}
                 </Button>
               )}
-              
+
               {onCancel && (
                 <Button
                   variant="text"
                   startIcon={<Close />}
                   onClick={onCancel}
                   color="inherit"
-                  sx={{ 
-                    px: 3, 
+                  sx={{
+                    px: 3,
                     borderRadius: 8,
                     '&:hover': {
-                      bgcolor: alpha(theme.palette.error.main, 0.1)
-                    }
+                      bgcolor: alpha(theme.palette.error.main, 0.1),
+                    },
                   }}
                 >
-                {t('projects.cancel')}
+                  {t('projects.cancel')}
                 </Button>
               )}
             </>
@@ -361,20 +360,20 @@ export const TimerFocus: React.FC<TimerFocusProps> = ({
               sx={{ mb: 1 }}
             />
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-              <Button 
-                variant="text" 
-                size="small" 
+              <Button
+                variant="text"
+                size="small"
                 onClick={() => {
                   setIsEditing(false);
                   setNote('');
                 }}
                 startIcon={<Close fontSize="small" />}
               >
-              {t('projects.cancel')}
+                {t('projects.cancel')}
               </Button>
-              <Button 
-                variant="contained" 
-                size="small" 
+              <Button
+                variant="contained"
+                size="small"
                 color="primary"
                 onClick={() => {
                   if (note.trim()) {
@@ -385,7 +384,7 @@ export const TimerFocus: React.FC<TimerFocusProps> = ({
                 }}
                 startIcon={<Check fontSize="small" />}
               >
-              {t('actions.save')}
+                {t('actions.save')}
               </Button>
             </Box>
           </Box>

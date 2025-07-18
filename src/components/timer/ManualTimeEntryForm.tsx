@@ -38,7 +38,9 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
 }) => {
   const { t } = useLanguage();
   const [projectId, setProjectId] = useState<string>('');
-  const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState<string>(
+    new Date().toISOString().split('T')[0]
+  );
   const [startTime, setStartTime] = useState<string>('09:00');
   const [endTime, setEndTime] = useState<string>('17:00');
   const [description, setDescription] = useState<string>('');
@@ -219,11 +221,7 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
 
         <DialogActions>
           <Button onClick={handleClose}>{t('projects.cancel')}</Button>
-          <Button
-            type="submit"
-            variant="contained"
-            disabled={!isFormValid}
-          >
+          <Button type="submit" variant="contained" disabled={!isFormValid}>
             {timeEntry ? t('actions.update') : t('actions.save')}
           </Button>
         </DialogActions>

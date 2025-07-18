@@ -2,11 +2,11 @@ export interface Project {
   id: string;
   name: string;
   description: string;
-  monthlyCapacity: number;  // 月の稼働率（0.0-1.0）
+  monthlyCapacity: number; // 月の稼働率（0.0-1.0）
   createdAt: string;
   updatedAt: string;
-  isArchived: boolean;      // アーカイブ状態
-  archivedAt?: string;      // アーカイブした日時
+  isArchived: boolean; // アーカイブ状態
+  archivedAt?: string; // アーカイブした日時
 }
 
 export interface TimeEntry {

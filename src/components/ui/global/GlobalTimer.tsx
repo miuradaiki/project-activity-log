@@ -1,24 +1,23 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLanguage } from '../../../contexts/LanguageContext';
-import { 
-  Box, 
-  Typography, 
-  IconButton, 
-  useTheme, 
+import {
+  Box,
+  Typography,
+  IconButton,
+  useTheme,
   Tooltip,
   Paper,
   alpha,
   Fade,
   Chip,
 } from '@mui/material';
-import { 
-  Stop, 
+import {
+  Stop,
   TimerOutlined,
   ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
 import { Project } from '../../../types';
 import { formatElapsedTime } from '../../../utils/time';
-import { useNavigate } from 'react-router-dom';
 
 interface GlobalTimerProps {
   project: Project | null;
@@ -44,9 +43,9 @@ export const GlobalTimer: React.FC<GlobalTimerProps> = ({
   const calculateElapsed = useCallback(() => {
     if (!startTime) return { text: '00:00:00', ms: 0 };
     const diff = new Date().getTime() - new Date(startTime).getTime();
-    return { 
+    return {
       text: formatElapsedTime(diff),
-      ms: diff
+      ms: diff,
     };
   }, [startTime]);
 
@@ -59,17 +58,18 @@ export const GlobalTimer: React.FC<GlobalTimerProps> = ({
       const { text, ms } = calculateElapsed();
       setElapsed(text);
       setElapsedMs(ms);
-      
+
       // 1秒ごとに更新
       intervalId = window.setInterval(() => {
-        const currentElapsed = new Date().getTime() - new Date(startTime).getTime();
-        
+        const currentElapsed =
+          new Date().getTime() - new Date(startTime).getTime();
+
         // 8時間（28800000ミリ秒）を超えた場合、タイマーを自動停止
         if (currentElapsed >= 8 * 60 * 60 * 1000) {
           onStop();
           // 通知を表示
           new Notification(t('timer.notification.maxtime'), {
-            body: t('timer.notification.maxtime.body')
+            body: t('timer.notification.maxtime.body'),
           });
         } else {
           setElapsed(formatElapsedTime(currentElapsed));
@@ -105,7 +105,7 @@ export const GlobalTimer: React.FC<GlobalTimerProps> = ({
   const getTimerColor = () => {
     const maxDuration = 8 * 60 * 60 * 1000; // 8時間（ミリ秒）
     const progress = Math.min((elapsedMs / maxDuration) * 100, 100);
-    
+
     if (progress >= 90) return theme.palette.error.main;
     if (progress >= 75) return theme.palette.warning.main;
     return theme.palette.primary.main;
@@ -166,32 +166,32 @@ export const GlobalTimer: React.FC<GlobalTimerProps> = ({
                   '0%': { opacity: 0.5, transform: 'scale(0.8)' },
                   '50%': { opacity: 1, transform: 'scale(1.2)' },
                   '100%': { opacity: 0.5, transform: 'scale(0.8)' },
-                }
+                },
               }}
             />
             <Box>
-              <Typography 
-                variant="subtitle2" 
-                component="div" 
+              <Typography
+                variant="subtitle2"
+                component="div"
                 noWrap
-                sx={{ 
-                  maxWidth: 150, 
-                  fontWeight: 'bold' 
+                sx={{
+                  maxWidth: 150,
+                  fontWeight: 'bold',
                 }}
               >
                 {project.name}
               </Typography>
-              <Typography 
-                variant="caption" 
-                color="text.secondary" 
-                sx={{ 
-                  display: 'flex', 
-                  alignItems: 'center' 
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
                 }}
               >
-                <TimerOutlined 
-                  fontSize="inherit" 
-                  sx={{ mr: 0.5, color: timerColor }} 
+                <TimerOutlined
+                  fontSize="inherit"
+                  sx={{ mr: 0.5, color: timerColor }}
                 />
                 {elapsed}
               </Typography>
@@ -211,7 +211,7 @@ export const GlobalTimer: React.FC<GlobalTimerProps> = ({
                 bgcolor: alpha(theme.palette.error.main, 0.1),
                 '&:hover': {
                   bgcolor: alpha(theme.palette.error.main, 0.2),
-                }
+                },
               }}
             >
               <Stop fontSize="small" />

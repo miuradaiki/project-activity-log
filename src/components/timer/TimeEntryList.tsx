@@ -47,7 +47,7 @@ export const TimeEntryList: React.FC<TimeEntryListProps> = ({
   const theme = useTheme();
   const { t } = useLanguage();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  
+
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [entryToDelete, setEntryToDelete] = useState<TimeEntry | null>(null);
   const [page, setPage] = useState(1);
@@ -74,20 +74,22 @@ export const TimeEntryList: React.FC<TimeEntryListProps> = ({
   };
 
   // フィルタリングとページネーション
-  const handlePageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
+  const handlePageChange = (
+    _event: React.ChangeEvent<unknown>,
+    value: number
+  ) => {
     setPage(value);
   };
-
 
   const handleProjectFilterChange = (event: SelectChangeEvent<string[]>) => {
     const value = event.target.value;
     setFilterProject(typeof value === 'string' ? value.split(',') : value);
-    setPage(1);  // フィルター変更時にページを1に戻す
+    setPage(1); // フィルター変更時にページを1に戻す
   };
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
-    setPage(1);  // 検索語句変更時にページを1に戻す
+    setPage(1); // 検索語句変更時にページを1に戻す
   };
 
   const clearSearch = () => {
@@ -95,16 +97,20 @@ export const TimeEntryList: React.FC<TimeEntryListProps> = ({
   };
 
   // エントリーのフィルタリング
-  const filteredEntries = timeEntries.filter(entry => {
+  const filteredEntries = timeEntries.filter((entry) => {
     // プロジェクトフィルター
-    const projectFilterPass = filterProject.length === 0 || filterProject.includes(entry.projectId);
-    
+    const projectFilterPass =
+      filterProject.length === 0 || filterProject.includes(entry.projectId);
+
     // 検索フィルター
-    const project = projects.find(p => p.id === entry.projectId);
-    const searchFilterPass = searchTerm === '' || 
-      (project && project.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (entry.description && entry.description.toLowerCase().includes(searchTerm.toLowerCase()));
-    
+    const project = projects.find((p) => p.id === entry.projectId);
+    const searchFilterPass =
+      searchTerm === '' ||
+      (project &&
+        project.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (entry.description &&
+        entry.description.toLowerCase().includes(searchTerm.toLowerCase()));
+
     return projectFilterPass && searchFilterPass;
   });
 
@@ -121,17 +127,24 @@ export const TimeEntryList: React.FC<TimeEntryListProps> = ({
   );
 
   const getProjectName = (projectId: string) => {
-    const project = projects.find(p => p.id === projectId);
+    const project = projects.find((p) => p.id === projectId);
     return project ? project.name : 'Unknown Project';
   };
 
   return (
     <Paper elevation={2} sx={{ p: { xs: 2, md: 3 } }}>
       {/* ヘッダー部分 */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
-        <Typography variant="h6">
-          {t('timer.history')}
-        </Typography>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 3,
+          flexWrap: 'wrap',
+          gap: 2,
+        }}
+      >
+        <Typography variant="h6">{t('timer.history')}</Typography>
         <Box sx={{ display: 'flex', gap: 1 }}>
           <ExportButton />
         </Box>
@@ -139,12 +152,14 @@ export const TimeEntryList: React.FC<TimeEntryListProps> = ({
 
       {/* フィルターとビュー切替 */}
       <Box sx={{ mb: 3 }}>
-        <Box sx={{ 
-          display: 'flex', 
-          flexDirection: { xs: 'column', md: 'row' }, 
-          gap: 2,
-          mb: 2
-        }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', md: 'row' },
+            gap: 2,
+            mb: 2,
+          }}
+        >
           {/* 検索フィールド */}
           <OutlinedInput
             value={searchTerm}
@@ -160,11 +175,7 @@ export const TimeEntryList: React.FC<TimeEntryListProps> = ({
             endAdornment={
               searchTerm && (
                 <InputAdornment position="end">
-                  <IconButton
-                    size="small"
-                    onClick={clearSearch}
-                    edge="end"
-                  >
+                  <IconButton size="small" onClick={clearSearch} edge="end">
                     <CloseIcon fontSize="small" />
                   </IconButton>
                 </InputAdornment>
@@ -175,7 +186,9 @@ export const TimeEntryList: React.FC<TimeEntryListProps> = ({
 
           {/* プロジェクトフィルター */}
           <FormControl size="small" sx={{ minWidth: 200 }}>
-            <InputLabel id="project-filter-label">{t('timer.project')}</InputLabel>
+            <InputLabel id="project-filter-label">
+              {t('timer.project')}
+            </InputLabel>
             <Select
               labelId="project-filter-label"
               multiple
@@ -185,10 +198,10 @@ export const TimeEntryList: React.FC<TimeEntryListProps> = ({
               renderValue={(selected) => (
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                   {(selected as string[]).map((value) => (
-                    <Chip 
-                      key={value} 
-                      label={getProjectName(value)} 
-                      size="small" 
+                    <Chip
+                      key={value}
+                      label={getProjectName(value)}
+                      size="small"
                     />
                   ))}
                 </Box>
@@ -206,7 +219,17 @@ export const TimeEntryList: React.FC<TimeEntryListProps> = ({
         </Box>
 
         {/* タイトル */}
-        <Box sx={{ borderBottom: 1, borderColor: 'divider', p: 1, pl: 2, mb: 2, display: 'flex', alignItems: 'center' }}>
+        <Box
+          sx={{
+            borderBottom: 1,
+            borderColor: 'divider',
+            p: 1,
+            pl: 2,
+            mb: 2,
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
           <CalendarIcon fontSize="small" sx={{ mr: 1 }} />
           <Typography variant="subtitle1" fontWeight="medium">
             {t('timer.history.timeline')}
@@ -224,12 +247,14 @@ export const TimeEntryList: React.FC<TimeEntryListProps> = ({
             onDelete={handleDeleteClick}
           />
         ) : (
-          <Box sx={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'center', 
-            height: 200 
-          }}>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: 200,
+            }}
+          >
             <Typography variant="body1" color="text.secondary">
               {t('timer.no.entries')}
             </Typography>
@@ -245,7 +270,7 @@ export const TimeEntryList: React.FC<TimeEntryListProps> = ({
             page={page}
             onChange={handlePageChange}
             color="primary"
-            size={isMobile ? "small" : "medium"}
+            size={isMobile ? 'small' : 'medium'}
           />
         </Box>
       )}

@@ -17,7 +17,9 @@ export const loadProjects = async (): Promise<Project[]> => {
 };
 
 // 時間記録データの保存
-export const saveTimeEntries = async (timeEntries: TimeEntry[]): Promise<void> => {
+export const saveTimeEntries = async (
+  timeEntries: TimeEntry[]
+): Promise<void> => {
   await window.electronAPI.saveTimeEntries(timeEntries);
 };
 

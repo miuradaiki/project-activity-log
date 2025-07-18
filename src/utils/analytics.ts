@@ -1,7 +1,11 @@
 import { TimeEntry, Project } from '../types';
 
 // 日付の範囲内かどうかをチェック
-export const isWithinDateRange = (date: Date, startDate: Date, endDate: Date): boolean => {
+export const isWithinDateRange = (
+  date: Date,
+  startDate: Date,
+  endDate: Date
+): boolean => {
   const normalizedDate = new Date(date.getTime());
   normalizedDate.setHours(0, 0, 0, 0);
   const normalizedStart = new Date(startDate.getTime());
@@ -12,7 +16,10 @@ export const isWithinDateRange = (date: Date, startDate: Date, endDate: Date): b
 };
 
 // 作業時間を計算（ミリ秒）
-const calculateDuration = (startTime: string, endTime: string | null): number => {
+const calculateDuration = (
+  startTime: string,
+  endTime: string | null
+): number => {
   const start = new Date(startTime).getTime();
   const end = endTime ? new Date(endTime).getTime() : new Date().getTime();
   return end - start;
@@ -30,29 +37,30 @@ export const getDailyProjectHours = (
   endOfDay.setHours(23, 59, 59, 999);
 
   const projectHours: { [key: string]: number } = {};
-  
+
   // アーカイブされていないプロジェクトのみを初期化
   projects
-    .filter(project => !project.isArchived)
-    .forEach(project => {
+    .filter((project) => !project.isArchived)
+    .forEach((project) => {
       projectHours[project.name] = 0;
     });
 
   timeEntries
-    .filter(entry => {
+    .filter((entry) => {
       const entryDate = new Date(entry.startTime);
       return isWithinDateRange(entryDate, startOfDay, endOfDay);
     })
-    .forEach(entry => {
-      const project = projects.find(p => p.id === entry.projectId);
+    .forEach((entry) => {
+      const project = projects.find((p) => p.id === entry.projectId);
       if (project && !project.isArchived) {
-        const hours = calculateDuration(entry.startTime, entry.endTime) / (1000 * 60 * 60);
+        const hours =
+          calculateDuration(entry.startTime, entry.endTime) / (1000 * 60 * 60);
         projectHours[project.name] = (projectHours[project.name] || 0) + hours;
       }
     });
 
   // 小数点第一位まで丸める
-  Object.keys(projectHours).forEach(key => {
+  Object.keys(projectHours).forEach((key) => {
     projectHours[key] = Number(projectHours[key].toFixed(1));
   });
 
@@ -70,7 +78,7 @@ export const getDailyWorkHours = (
   endOfDay.setHours(23, 59, 59, 999);
 
   const totalMilliseconds = timeEntries
-    .filter(entry => {
+    .filter((entry) => {
       const entryDate = new Date(entry.startTime);
       return isWithinDateRange(entryDate, startOfDay, endOfDay);
     })
@@ -88,7 +96,7 @@ export const getProjectDistribution = (
   startDate: Date,
   endDate: Date
 ): { projectName: string; hours: number }[] => {
-  const filteredEntries = timeEntries.filter(entry => {
+  const filteredEntries = timeEntries.filter((entry) => {
     const entryStartDate = new Date(entry.startTime);
     const entryEndDate = entry.endTime ? new Date(entry.endTime) : new Date();
     return (
@@ -99,7 +107,7 @@ export const getProjectDistribution = (
 
   const projectHours = new Map<string, number>();
 
-  filteredEntries.forEach(entry => {
+  filteredEntries.forEach((entry) => {
     const duration = calculateDuration(entry.startTime, entry.endTime);
     const hours = duration / (1000 * 60 * 60);
     const currentHours = projectHours.get(entry.projectId) || 0;
@@ -108,14 +116,15 @@ export const getProjectDistribution = (
 
   return Array.from(projectHours.entries())
     .map(([projectId, hours]) => {
-      const project = projects.find(p => p.id === projectId);
+      const project = projects.find((p) => p.id === projectId);
       return {
         projectName: project && !project.isArchived ? project.name : null,
-        hours: Number(hours.toFixed(1))
+        hours: Number(hours.toFixed(1)),
       };
     })
-    .filter((item): item is { projectName: string; hours: number } => 
-      item.projectName !== null && item.hours > 0
+    .filter(
+      (item): item is { projectName: string; hours: number } =>
+        item.projectName !== null && item.hours > 0
     )
     .sort((a, b) => b.hours - a.hours);
 };
@@ -131,15 +140,19 @@ export const getWeeklyDistribution = (
   const engDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   const days = isEnglish ? engDays : japDays;
   const result = [];
-  
+
   for (let i = 0; i < 7; i++) {
     const currentDate = new Date(startOfWeek);
     currentDate.setDate(startOfWeek.getDate() + i);
-    
-    const projectHours = getDailyProjectHours(timeEntries, projects, currentDate);
+
+    const projectHours = getDailyProjectHours(
+      timeEntries,
+      projects,
+      currentDate
+    );
     result.push({
       date: days[i],
-      ...projectHours
+      ...projectHours,
     });
   }
 
@@ -163,10 +176,18 @@ const getWeeksInMonth = (year: number, month: number): number => {
 };
 
 // 週の日付範囲を取得
-const getWeekDateRange = (year: number, month: number, weekNumber: number): { start: Date; end: Date } => {
+const getWeekDateRange = (
+  year: number,
+  month: number,
+  weekNumber: number
+): { start: Date; end: Date } => {
   const firstDayOfMonth = new Date(year, month, 1);
   const firstWeekday = firstDayOfMonth.getDay();
-  const startDate = new Date(year, month, 1 + (weekNumber - 1) * 7 - firstWeekday);
+  const startDate = new Date(
+    year,
+    month,
+    1 + (weekNumber - 1) * 7 - firstWeekday
+  );
   const endDate = new Date(startDate);
   endDate.setDate(startDate.getDate() + 6);
   return { start: startDate, end: endDate };
@@ -183,19 +204,21 @@ export const getMonthlyDistribution = (
 
   for (let weekNumber = 1; weekNumber <= weeksInMonth; weekNumber++) {
     const { start, end } = getWeekDateRange(year, month, weekNumber);
-    
-    const weeklyHours = timeEntries
-      .filter(entry => {
-        const entryDate = new Date(entry.startTime);
-        return isWithinDateRange(entryDate, start, end);
-      })
-      .reduce((total, entry) => {
-        return total + calculateDuration(entry.startTime, entry.endTime);
-      }, 0) / (1000 * 60 * 60);
+
+    const weeklyHours =
+      timeEntries
+        .filter((entry) => {
+          const entryDate = new Date(entry.startTime);
+          return isWithinDateRange(entryDate, start, end);
+        })
+        .reduce((total, entry) => {
+          return total + calculateDuration(entry.startTime, entry.endTime);
+        }, 0) /
+      (1000 * 60 * 60);
 
     result.push({
       week: weekNumber,
-      hours: Number(weeklyHours.toFixed(1))
+      hours: Number(weeklyHours.toFixed(1)),
     });
   }
 
@@ -209,10 +232,16 @@ export const getMostActiveProject = (
   startDate: Date,
   endDate: Date
 ): { projectName: string; hours: number } => {
-  const distribution = getProjectDistribution(timeEntries, projects, startDate, endDate);
-  return distribution.reduce((max, current) => 
-    current.hours > max.hours ? current : max
-  , { projectName: '', hours: 0 });
+  const distribution = getProjectDistribution(
+    timeEntries,
+    projects,
+    startDate,
+    endDate
+  );
+  return distribution.reduce(
+    (max, current) => (current.hours > max.hours ? current : max),
+    { projectName: '', hours: 0 }
+  );
 };
 
 // 月間の進捗状況を計算
@@ -222,26 +251,45 @@ export const calculateMonthlyProgress = (
   monthlyTarget: number
 ): { monthlyHours: number; monthlyPercentage: number } => {
   const now = new Date();
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
-  const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+  const startOfMonth = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    1,
+    0,
+    0,
+    0,
+    0
+  );
+  const endOfMonth = new Date(
+    now.getFullYear(),
+    now.getMonth() + 1,
+    0,
+    23,
+    59,
+    59,
+    999
+  );
 
-  const monthlyHours = timeEntries
-    .filter(entry => {
-      const entryDate = new Date(entry.startTime);
-      return (
-        entry.projectId === projectId &&
-        isWithinDateRange(entryDate, startOfMonth, endOfMonth)
-      );
-    })
-    .reduce((total, entry) => {
-      return total + calculateDuration(entry.startTime, entry.endTime);
-    }, 0) / (1000 * 60 * 60);
+  const monthlyHours =
+    timeEntries
+      .filter((entry) => {
+        const entryDate = new Date(entry.startTime);
+        return (
+          entry.projectId === projectId &&
+          isWithinDateRange(entryDate, startOfMonth, endOfMonth)
+        );
+      })
+      .reduce((total, entry) => {
+        return total + calculateDuration(entry.startTime, entry.endTime);
+      }, 0) /
+    (1000 * 60 * 60);
 
-  const monthlyPercentage = monthlyTarget > 0 ? (monthlyHours / monthlyTarget) * 100 : 0;
+  const monthlyPercentage =
+    monthlyTarget > 0 ? (monthlyHours / monthlyTarget) * 100 : 0;
 
   return {
     monthlyHours: Number(monthlyHours.toFixed(1)),
-    monthlyPercentage: Number(monthlyPercentage.toFixed(1))
+    monthlyPercentage: Number(monthlyPercentage.toFixed(1)),
   };
 };
 
@@ -254,18 +302,20 @@ export const calculateProjectHours = (
   startDate: Date,
   endDate: Date
 ): number => {
-  const filteredEntries = timeEntries.filter(entry => {
+  const filteredEntries = timeEntries.filter((entry) => {
     const entryDate = new Date(entry.startTime);
     return (
       entry.projectId === projectId &&
-      entryDate >= startDate && 
+      entryDate >= startDate &&
       entryDate <= endDate
     );
   });
 
-  const totalHours = filteredEntries.reduce((total, entry) => {
-    return total + calculateDuration(entry.startTime, entry.endTime);
-  }, 0) / (1000 * 60 * 60);
+  const totalHours =
+    filteredEntries.reduce((total, entry) => {
+      return total + calculateDuration(entry.startTime, entry.endTime);
+    }, 0) /
+    (1000 * 60 * 60);
 
   return Number(totalHours.toFixed(1));
 };
@@ -300,10 +350,10 @@ export const predictCompletionDate = (
 
   const remainingHours = targetHours - currentHours;
   const daysNeeded = Math.ceil(remainingHours / dailyAverageHours);
-  
+
   const completionDate = new Date();
   completionDate.setDate(completionDate.getDate() + daysNeeded);
-  
+
   return completionDate;
 };
 
@@ -316,16 +366,20 @@ export const calculateRecommendedDailyHours = (
 ): number => {
   const now = new Date();
   const currentDay = now.getDate();
-  const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  const lastDayOfMonth = new Date(
+    now.getFullYear(),
+    now.getMonth() + 1,
+    0
+  ).getDate();
   const remainingDays = lastDayOfMonth - currentDay + 1;
-  
+
   if (remainingDays <= 0 || currentHours >= targetHours) {
     return 0;
   }
-  
+
   const remainingHours = targetHours - currentHours;
   const recommendedHours = remainingHours / remainingDays;
-  
+
   return Number(recommendedHours.toFixed(1));
 };
 
@@ -338,29 +392,34 @@ export const calculateDailyAverageHours = (
 ): number => {
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-  
+
   // プロジェクトの今月の作業記録
-  const filteredEntries = timeEntries.filter(entry => {
+  const filteredEntries = timeEntries.filter((entry) => {
     const entryDate = new Date(entry.startTime);
     return entry.projectId === projectId && entryDate >= startOfMonth;
   });
-  
+
   if (filteredEntries.length === 0) return 0;
-  
+
   // 作業があった日を収集
   const workDays = new Set<string>();
-  filteredEntries.forEach(entry => {
+  filteredEntries.forEach((entry) => {
     const date = new Date(entry.startTime);
     workDays.add(`${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`);
   });
-  
+
   // 合計作業時間
   const totalHours = filteredEntries.reduce((total, entry) => {
-    return total + calculateDuration(entry.startTime, entry.endTime) / (1000 * 60 * 60);
+    return (
+      total +
+      calculateDuration(entry.startTime, entry.endTime) / (1000 * 60 * 60)
+    );
   }, 0);
-  
+
   // 作業日数で割って平均を計算
-  return workDays.size > 0 ? Number((totalHours / workDays.size).toFixed(1)) : 0;
+  return workDays.size > 0
+    ? Number((totalHours / workDays.size).toFixed(1))
+    : 0;
 };
 
 /**
@@ -375,7 +434,7 @@ export const getLongestWorkSession = (
   const endOfDay = new Date(targetDate);
   endOfDay.setHours(23, 59, 59, 999);
 
-  const todayEntries = timeEntries.filter(entry => {
+  const todayEntries = timeEntries.filter((entry) => {
     const entryDate = new Date(entry.startTime);
     return isWithinDateRange(entryDate, startOfDay, endOfDay);
   });
@@ -384,7 +443,8 @@ export const getLongestWorkSession = (
 
   // 各エントリーの作業時間を計算し、最も長いものを取得（分単位）
   const longestSession = todayEntries.reduce((longest, entry) => {
-    const duration = calculateDuration(entry.startTime, entry.endTime) / (1000 * 60); // ミリ秒から分に変換
+    const duration =
+      calculateDuration(entry.startTime, entry.endTime) / (1000 * 60); // ミリ秒から分に変換
     return duration > longest ? duration : longest;
   }, 0);
 
@@ -403,7 +463,7 @@ export const getAverageWorkSession = (
   const endOfDay = new Date(targetDate);
   endOfDay.setHours(23, 59, 59, 999);
 
-  const todayEntries = timeEntries.filter(entry => {
+  const todayEntries = timeEntries.filter((entry) => {
     const entryDate = new Date(entry.startTime);
     return isWithinDateRange(entryDate, startOfDay, endOfDay);
   });
@@ -412,7 +472,8 @@ export const getAverageWorkSession = (
 
   // 各エントリーの作業時間の合計を計算（分単位）
   const totalDuration = todayEntries.reduce((total, entry) => {
-    const duration = calculateDuration(entry.startTime, entry.endTime) / (1000 * 60); // ミリ秒から分に変換
+    const duration =
+      calculateDuration(entry.startTime, entry.endTime) / (1000 * 60); // ミリ秒から分に変換
     return total + duration;
   }, 0);
 
@@ -429,9 +490,30 @@ export const getPreviousMonthProjectDistribution = (
 ): { projectName: string; hours: number }[] => {
   const now = new Date();
   // 前月の開始日と終了日を計算
-  const startOfPrevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1, 0, 0, 0, 0);
-  const endOfPrevMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
-  
+  const startOfPrevMonth = new Date(
+    now.getFullYear(),
+    now.getMonth() - 1,
+    1,
+    0,
+    0,
+    0,
+    0
+  );
+  const endOfPrevMonth = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    0,
+    23,
+    59,
+    59,
+    999
+  );
+
   // 前月のプロジェクト分布を取得
-  return getProjectDistribution(timeEntries, projects, startOfPrevMonth, endOfPrevMonth);
+  return getProjectDistribution(
+    timeEntries,
+    projects,
+    startOfPrevMonth,
+    endOfPrevMonth
+  );
 };

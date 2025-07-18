@@ -18,13 +18,13 @@ export interface ElectronAPI {
   clearTrayTimer: () => void;
   removeFile: (path: string) => Promise<boolean>;
   deleteData: (dataType: string) => Promise<void>;
-  
+
   getUserDataPath: () => Promise<string>;
   createDirectory: (path: string) => Promise<boolean>;
   writeFile: (path: string, content: string) => Promise<boolean>;
   readFile: (path: string, options?: { encoding: string }) => Promise<any>;
   showOpenFileDialog: () => Promise<string | null>;
-  
+
   // タイマー関連API
   timerStart: (projectName: string) => Promise<boolean>;
   timerStop: () => Promise<boolean>;

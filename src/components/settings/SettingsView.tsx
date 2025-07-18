@@ -45,16 +45,24 @@ export const SettingsView: React.FC = () => {
   const theme = useTheme();
   const { settings, isLoading, updateBaseMonthlyHours } = useSettingsContext();
   const { language, setLanguage, t } = useLanguage();
-  const { projects, timeEntries, setProjects, setTimeEntries, isTestMode, toggleTestMode, testDataStats } = useStorage();
-  
+  const {
+    projects,
+    timeEntries,
+    setProjects,
+    setTimeEntries,
+    isTestMode,
+    toggleTestMode,
+    testDataStats,
+  } = useStorage();
+
   // テストデータ機能の有効化フラグ（環境変数から取得）
   const testDataFeatureEnabled = isTestDataEnabled();
-  
+
   // 月間基準時間の編集用ステート
   const [baseMonthlyHours, setBaseMonthlyHours] = useState<number>(
     settings?.workHours?.baseMonthlyHours || 140
   );
-  
+
   // 通知用ステート
   const [notification, setNotification] = useState<{
     open: boolean;
@@ -75,13 +83,12 @@ export const SettingsView: React.FC = () => {
       showNotification(t('settings.save.error'), 'error');
     }
   };
-  
+
   // 言語設定の変更
   const handleLanguageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setLanguage(event.target.value as 'ja' | 'en');
     showNotification(t('settings.language.changed'), 'success');
   };
-  
 
   // デフォルト設定にリセット
   const handleResetSettings = async () => {
@@ -95,7 +102,10 @@ export const SettingsView: React.FC = () => {
   };
 
   // 通知表示
-  const showNotification = (message: string, severity: 'success' | 'error' | 'info') => {
+  const showNotification = (
+    message: string,
+    severity: 'success' | 'error' | 'info'
+  ) => {
     setNotification({
       open: true,
       message,
@@ -124,17 +134,24 @@ export const SettingsView: React.FC = () => {
   // テストデータを再生成する関数（テストモード時のみ）
   const handleRegenerateTestData = useCallback(async () => {
     try {
-      const { generateTestData } = await import('../../utils/testDataGenerator');
-      const { projects: newProjects, timeEntries: newTimeEntries } = generateTestData([], []);
-      
+      const { generateTestData } = await import(
+        '../../utils/testDataGenerator'
+      );
+      const { projects: newProjects, timeEntries: newTimeEntries } =
+        generateTestData([], []);
+
       setProjects(newProjects);
       setTimeEntries(newTimeEntries);
-      
+
       showNotification('テストデータを再生成しました', 'success');
     } catch (error) {
       console.error('テストデータ生成エラー:', error);
-      const errorMessage = error instanceof Error ? error.message : '不明なエラー';
-      showNotification(`テストデータの生成に失敗しました: ${errorMessage}`, 'error');
+      const errorMessage =
+        error instanceof Error ? error.message : '不明なエラー';
+      showNotification(
+        `テストデータの生成に失敗しました: ${errorMessage}`,
+        'error'
+      );
     }
   }, [setProjects, setTimeEntries]);
 
@@ -153,11 +170,11 @@ export const SettingsView: React.FC = () => {
       <Typography variant="h5" fontWeight="medium" sx={{ mb: 3 }}>
         {t('settings.title')}
       </Typography>
-      
+
       <Grid container spacing={3}>
         {/* 稼働時間設定カード */}
         <Grid item xs={12}>
-          <Card 
+          <Card
             elevation={1}
             sx={{
               transition: 'transform 0.2s, box-shadow 0.2s',
@@ -170,10 +187,12 @@ export const SettingsView: React.FC = () => {
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                 <AccessTimeIcon color="primary" sx={{ mr: 1 }} />
-                <Typography variant="h6">{t('settings.monthly.hours')}</Typography>
+                <Typography variant="h6">
+                  {t('settings.monthly.hours')}
+                </Typography>
               </Box>
               <Divider sx={{ mb: 3 }} />
-              
+
               <Box sx={{ mb: 4 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                   <Typography id="monthly-hours-slider" gutterBottom>
@@ -185,12 +204,14 @@ export const SettingsView: React.FC = () => {
                     </IconButton>
                   </Tooltip>
                 </Box>
-                
+
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs={12} md={8}>
                     <Slider
                       value={baseMonthlyHours}
-                      onChange={(_, newValue) => setBaseMonthlyHours(newValue as number)}
+                      onChange={(_, newValue) =>
+                        setBaseMonthlyHours(newValue as number)
+                      }
                       aria-labelledby="monthly-hours-slider"
                       valueLabelDisplay="auto"
                       step={5}
@@ -215,7 +236,11 @@ export const SettingsView: React.FC = () => {
                         }
                       }}
                       InputProps={{
-                        endAdornment: <InputAdornment position="end">{t('units.hours')}</InputAdornment>,
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            {t('units.hours')}
+                          </InputAdornment>
+                        ),
                       }}
                       variant="outlined"
                       size="small"
@@ -223,12 +248,18 @@ export const SettingsView: React.FC = () => {
                     />
                   </Grid>
                 </Grid>
-                
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-                  {t('settings.monthly.hours.example', { hours: (baseMonthlyHours * 0.5).toFixed(1) })}
+
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mt: 2 }}
+                >
+                  {t('settings.monthly.hours.example', {
+                    hours: (baseMonthlyHours * 0.5).toFixed(1),
+                  })}
                 </Typography>
               </Box>
-              
+
               <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
                 <Button
                   variant="outlined"
@@ -248,10 +279,10 @@ export const SettingsView: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        
+
         {/* 言語設定カード */}
         <Grid item xs={12}>
-          <Card 
+          <Card
             elevation={1}
             sx={{
               transition: 'transform 0.2s, box-shadow 0.2s',
@@ -267,12 +298,16 @@ export const SettingsView: React.FC = () => {
                 <Typography variant="h6">{t('settings.language')}</Typography>
               </Box>
               <Divider sx={{ mb: 3 }} />
-              
+
               <Box sx={{ mb: 4 }}>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 2 }}
+                >
                   {t('settings.language.description')}
                 </Typography>
-                
+
                 <FormControl component="fieldset">
                   <RadioGroup
                     aria-label="language"
@@ -280,15 +315,15 @@ export const SettingsView: React.FC = () => {
                     value={language}
                     onChange={handleLanguageChange}
                   >
-                    <FormControlLabel 
-                      value="ja" 
-                      control={<Radio />} 
-                      label={t('language.japanese')} 
+                    <FormControlLabel
+                      value="ja"
+                      control={<Radio />}
+                      label={t('language.japanese')}
                     />
-                    <FormControlLabel 
-                      value="en" 
-                      control={<Radio />} 
-                      label={t('language.english')} 
+                    <FormControlLabel
+                      value="en"
+                      control={<Radio />}
+                      label={t('language.english')}
                     />
                   </RadioGroup>
                 </FormControl>
@@ -296,17 +331,18 @@ export const SettingsView: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        
+
         {/* テストデータカード（開発環境のみ） */}
         {testDataFeatureEnabled && (
           <Grid item xs={12}>
-            <Card 
+            <Card
               elevation={1}
               sx={{
                 transition: 'transform 0.2s, box-shadow 0.2s',
-                backgroundColor: theme.palette.mode === 'dark' 
-                  ? 'rgba(255, 152, 0, 0.08)' 
-                  : 'rgba(255, 152, 0, 0.04)',
+                backgroundColor:
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255, 152, 0, 0.08)'
+                    : 'rgba(255, 152, 0, 0.04)',
                 borderColor: theme.palette.warning.main,
                 borderWidth: 1,
                 borderStyle: 'solid',
@@ -318,43 +354,55 @@ export const SettingsView: React.FC = () => {
             >
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <ScienceIcon sx={{ mr: 1, color: theme.palette.warning.main }} />
+                  <ScienceIcon
+                    sx={{ mr: 1, color: theme.palette.warning.main }}
+                  />
                   <Typography variant="h6">テストモード（開発用）</Typography>
                   <Box sx={{ ml: 'auto' }}>
-                    <IconButton 
+                    <IconButton
                       onClick={handleToggleTestMode}
-                      color={isTestMode ? "warning" : "default"}
+                      color={isTestMode ? 'warning' : 'default'}
                       size="large"
                     >
-                      {isTestMode ? <ToggleOnIcon fontSize="large" /> : <ToggleOffIcon fontSize="large" />}
+                      {isTestMode ? (
+                        <ToggleOnIcon fontSize="large" />
+                      ) : (
+                        <ToggleOffIcon fontSize="large" />
+                      )}
                     </IconButton>
                   </Box>
                 </Box>
                 <Divider sx={{ mb: 3 }} />
-                
-                <Alert severity={isTestMode ? "warning" : "info"} sx={{ mb: 3 }}>
+
+                <Alert
+                  severity={isTestMode ? 'warning' : 'info'}
+                  sx={{ mb: 3 }}
+                >
                   <Typography variant="body2">
-                    {
-                      isTestMode 
-                        ? '現在テストモードで動作中です。実データは表示されず、変更も保存されません。'
-                        : 'テストモードを有効にすると、実データとは完全に分離されたテスト環境で動作します。'
-                    }
+                    {isTestMode
+                      ? '現在テストモードで動作中です。実データは表示されず、変更も保存されません。'
+                      : 'テストモードを有効にすると、実データとは完全に分離されたテスト環境で動作します。'}
                   </Typography>
                 </Alert>
-                
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 3 }}
+                >
                   {isTestMode ? (
                     <>
                       テストモードで動作中です。
                       <Box component="span" sx={{ display: 'block', mt: 1 }}>
-                        プロジェクト数: {testDataStats.projectCount} / 作業履歴: {testDataStats.timeEntryCount}
+                        プロジェクト数: {testDataStats.projectCount} / 作業履歴:{' '}
+                        {testDataStats.timeEntryCount}
                       </Box>
                     </>
                   ) : (
                     'テストモードを有効にすると、デモ用のサンプルデータでアプリケーションを操作できます。'
                   )}
                 </Typography>
-                
+
                 {isTestMode && (
                   <Box sx={{ display: 'flex', gap: 2 }}>
                     <Button
@@ -372,7 +420,7 @@ export const SettingsView: React.FC = () => {
           </Grid>
         )}
       </Grid>
-      
+
       {/* 通知 */}
       <Snackbar
         open={notification.open}
@@ -380,8 +428,8 @@ export const SettingsView: React.FC = () => {
         onClose={handleCloseNotification}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert 
-          onClose={handleCloseNotification} 
+        <Alert
+          onClose={handleCloseNotification}
           severity={notification.severity}
           variant="filled"
           elevation={6}

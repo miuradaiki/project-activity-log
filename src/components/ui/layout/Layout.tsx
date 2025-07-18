@@ -70,8 +70,7 @@ export const Layout: React.FC<LayoutProps> = ({
   const { isTestMode } = useStorage(); // テストモードの状態を取得
 
   // 現在の言語をログ出力
-  useEffect(() => {
-  }, [language]);
+  useEffect(() => {}, [language]);
 
   // タイマー画面に遷移するハンドラー
   const handleTimerClick = () => {
@@ -99,7 +98,7 @@ export const Layout: React.FC<LayoutProps> = ({
           flexGrow: 1,
           p: 0,
           width: { sm: `calc(100% - ${currentDrawerWidth}px)` },
-          ml: { xs: 0, md: 0 }  // サイドバーの幅に応じたマージンは必要ない（Drawerが固定のため）
+          ml: { xs: 0, md: 0 }, // サイドバーの幅に応じたマージンは必要ない（Drawerが固定のため）
         }}
       >
         {/* ヘッダー */}
@@ -121,13 +120,17 @@ export const Layout: React.FC<LayoutProps> = ({
           }}
         >
           <Toolbar>
-            <Typography variant="h6" component="div" sx={{
-              flexGrow: 1,
-              ml: { xs: isMobile ? 5 : 0, md: 0 }, // モバイル表示時に左余白を追加
-              display: 'flex',
-              alignItems: 'center',
-              gap: 2,
-            }}>
+            <Typography
+              variant="h6"
+              component="div"
+              sx={{
+                flexGrow: 1,
+                ml: { xs: isMobile ? 5 : 0, md: 0 }, // モバイル表示時に左余白を追加
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2,
+              }}
+            >
               {title}
               {isTestMode && isTestDataEnabled() && (
                 <Chip
@@ -135,7 +138,7 @@ export const Layout: React.FC<LayoutProps> = ({
                   label="テストモード"
                   color="warning"
                   size="small"
-                  sx={{ 
+                  sx={{
                     animation: 'pulse 2s ease-in-out infinite',
                     '@keyframes pulse': {
                       '0%': { opacity: 0.7 },

@@ -24,17 +24,24 @@ export const saveSettings = async (settings: AppSettings): Promise<void> => {
 export const loadSettings = async (): Promise<AppSettings> => {
   try {
     try {
-      const settingsData = await window.electronAPI.readFile(SETTINGS_FILE_PATH);
+      const settingsData =
+        await window.electronAPI.readFile(SETTINGS_FILE_PATH);
       // JSONパースを試みる
       try {
         return JSON.parse(settingsData);
       } catch (parseError) {
-        console.error('JSONパースエラーが発生しました。設定ファイルをリセットします。', parseError);
+        console.error(
+          'JSONパースエラーが発生しました。設定ファイルをリセットします。',
+          parseError
+        );
         // 設定ファイルが破損している場合は削除して、デフォルト設定を保存して返す
         try {
           await window.electronAPI.removeFile(SETTINGS_FILE_PATH);
         } catch (removeError) {
-          console.error('破損した設定ファイルの削除に失敗しました:', removeError);
+          console.error(
+            '破損した設定ファイルの削除に失敗しました:',
+            removeError
+          );
         }
         await saveSettings(DEFAULT_SETTINGS);
         return DEFAULT_SETTINGS;

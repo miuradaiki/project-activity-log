@@ -8,7 +8,10 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
-import { Add as AddIcon, CloudUpload as CloudUploadIcon } from '@mui/icons-material';
+import {
+  Add as AddIcon,
+  CloudUpload as CloudUploadIcon,
+} from '@mui/icons-material';
 import { Project, TimeEntry } from './types';
 
 import { v4 as uuidv4 } from 'uuid';
@@ -46,11 +49,7 @@ const TabPanel = (props: TabPanelProps) => {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && (
-        <Box sx={{ py: 3 }}>
-          {children}
-        </Box>
-      )}
+      {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
     </div>
   );
 };
@@ -62,7 +61,7 @@ const App: React.FC = () => {
   const { isDarkMode, toggleThemeMode } = useThemeMode();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  
+
   // アクティブページの初期値をローカルストレージから取得
   const getInitialActivePage = (): string => {
     const storedPage = localStorage.getItem(ACTIVE_PAGE_STORAGE_KEY);
@@ -75,20 +74,25 @@ const App: React.FC = () => {
   const [showShortcutsDialog, setShowShortcutsDialog] = useState(false);
   const [isProjectFormOpen, setIsProjectFormOpen] = useState(false);
   const [isManualEntryFormOpen, setIsManualEntryFormOpen] = useState(false);
-  const [editingTimeEntry, setEditingTimeEntry] = useState<TimeEntry | undefined>(undefined);
-  const [editingProject, setEditingProject] = useState<Project | undefined>(undefined);
+  const [editingTimeEntry, setEditingTimeEntry] = useState<
+    TimeEntry | undefined
+  >(undefined);
+  const [editingProject, setEditingProject] = useState<Project | undefined>(
+    undefined
+  );
   const [activeProject, setActiveProject] = useState<Project | null>(null);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [startTime, setStartTime] = useState<string | null>(null);
 
   // データの読み込み
-  const { projects, setProjects, timeEntries, setTimeEntries, isLoading } = useStorage();
+  const { projects, setProjects, timeEntries, setTimeEntries, isLoading } =
+    useStorage();
 
   // コールバック関数
   const openShortcutsDialog = useCallback(() => {
     setShowShortcutsDialog(true);
   }, []);
-  
+
   const closeShortcutsDialog = useCallback(() => {
     setShowShortcutsDialog(false);
   }, []);
@@ -118,7 +122,7 @@ const App: React.FC = () => {
       setIsTimerRunning(false);
       setStartTime(null);
       setActiveProject(null);
-      
+
       // トレイにタイマー停止を通知
       if (window.electronAPI?.timerStop) {
         await window.electronAPI.timerStop();
@@ -136,105 +140,148 @@ const App: React.FC = () => {
       updatedAt: endTime,
     };
 
-    setTimeEntries(prev => [...prev, newTimeEntry]);
+    setTimeEntries((prev) => [...prev, newTimeEntry]);
     setIsTimerRunning(false);
     setStartTime(null);
     setActiveProject(null);
-    
+
     // トレイにタイマー停止を通知
     if (window.electronAPI?.timerStop) {
       await window.electronAPI.timerStop();
     }
   }, [activeProject, startTime, setTimeEntries]);
 
-  const handleStartTimer = useCallback(async (project: Project) => {
-    if (isTimerRunning) {
-      handleStopTimer();
-    }
+  const handleStartTimer = useCallback(
+    async (project: Project) => {
+      if (isTimerRunning) {
+        handleStopTimer();
+      }
 
-    const startTime = new Date().toISOString();
-    setStartTime(startTime);
-    setIsTimerRunning(true);
-    setActiveProject(project);
-    
-    // トレイにタイマー開始を通知
-    if (window.electronAPI?.timerStart) {
-      await window.electronAPI.timerStart(project.name);
-    }
-  }, [isTimerRunning, handleStopTimer]);
+      const startTime = new Date().toISOString();
+      setStartTime(startTime);
+      setIsTimerRunning(true);
+      setActiveProject(project);
 
-  const handleCreateProject = useCallback((projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt' | 'isArchived'>) => {
-    const timestamp = new Date().toISOString();
-    const newProject: Project = {
-      ...projectData,
-      id: uuidv4(),
-      createdAt: timestamp,
-      updatedAt: timestamp,
-      isArchived: false,
-    };
-    setProjects(prev => [...prev, newProject]);
-  }, [setProjects]);
+      // トレイにタイマー開始を通知
+      if (window.electronAPI?.timerStart) {
+        await window.electronAPI.timerStart(project.name);
+      }
+    },
+    [isTimerRunning, handleStopTimer]
+  );
 
-  const handleEditProject = useCallback((projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>) => {
-    if (!editingProject) return;
+  const handleCreateProject = useCallback(
+    (
+      projectData: Omit<
+        Project,
+        'id' | 'createdAt' | 'updatedAt' | 'isArchived'
+      >
+    ) => {
+      const timestamp = new Date().toISOString();
+      const newProject: Project = {
+        ...projectData,
+        id: uuidv4(),
+        createdAt: timestamp,
+        updatedAt: timestamp,
+        isArchived: false,
+      };
+      setProjects((prev) => [...prev, newProject]);
+    },
+    [setProjects]
+  );
 
-    const updatedProject: Project = {
-      ...editingProject,
-      ...projectData,
-      updatedAt: new Date().toISOString(),
-    };
+  const handleEditProject = useCallback(
+    (projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>) => {
+      if (!editingProject) return;
 
-    setProjects(prev => prev.map((p) => (p.id === editingProject.id ? updatedProject : p)));
-    setEditingProject(undefined);
-  }, [editingProject, setProjects]);
+      const updatedProject: Project = {
+        ...editingProject,
+        ...projectData,
+        updatedAt: new Date().toISOString(),
+      };
 
-  const handleArchiveProject = useCallback((project: Project) => {
-    const updatedProject: Project = {
-      ...project,
-      isArchived: true,
-      archivedAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+      setProjects((prev) =>
+        prev.map((p) => (p.id === editingProject.id ? updatedProject : p))
+      );
+      setEditingProject(undefined);
+    },
+    [editingProject, setProjects]
+  );
 
-    // アクティブなプロジェクトがアーカイブされる場合、タイマーを停止
-    if (activeProject?.id === project.id && isTimerRunning) {
-      handleStopTimer();
-    }
+  const handleArchiveProject = useCallback(
+    (project: Project) => {
+      const updatedProject: Project = {
+        ...project,
+        isArchived: true,
+        archivedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
 
-    setProjects(prev => prev.map(p => p.id === project.id ? updatedProject : p));
-  }, [activeProject, isTimerRunning, handleStopTimer, setProjects]);
+      // アクティブなプロジェクトがアーカイブされる場合、タイマーを停止
+      if (activeProject?.id === project.id && isTimerRunning) {
+        handleStopTimer();
+      }
 
-  const handleUnarchiveProject = useCallback((project: Project) => {
-    const updatedProject: Project = {
-      ...project,
-      isArchived: false,
-      archivedAt: undefined,
-      updatedAt: new Date().toISOString(),
-    };
+      setProjects((prev) =>
+        prev.map((p) => (p.id === project.id ? updatedProject : p))
+      );
+    },
+    [activeProject, isTimerRunning, handleStopTimer, setProjects]
+  );
 
-    setProjects(prev => prev.map(p => p.id === project.id ? updatedProject : p));
-  }, [setProjects]);
+  const handleUnarchiveProject = useCallback(
+    (project: Project) => {
+      const updatedProject: Project = {
+        ...project,
+        isArchived: false,
+        archivedAt: undefined,
+        updatedAt: new Date().toISOString(),
+      };
 
-  const handleDeleteProject = useCallback((project: Project) => {
-    if (activeProject?.id === project.id && isTimerRunning) {
-      handleStopTimer();
-    }
-    setProjects(prev => prev.filter((p) => p.id !== project.id));
-    setTimeEntries(prev => prev.filter((t) => t.projectId !== project.id));
-  }, [activeProject, isTimerRunning, handleStopTimer, setProjects, setTimeEntries]);
+      setProjects((prev) =>
+        prev.map((p) => (p.id === project.id ? updatedProject : p))
+      );
+    },
+    [setProjects]
+  );
 
-  const handleDeleteTimeEntry = useCallback((timeEntryId: string) => {
-    setTimeEntries(prev => prev.filter((t) => t.id !== timeEntryId));
-  }, [setTimeEntries]);
+  const handleDeleteProject = useCallback(
+    (project: Project) => {
+      if (activeProject?.id === project.id && isTimerRunning) {
+        handleStopTimer();
+      }
+      setProjects((prev) => prev.filter((p) => p.id !== project.id));
+      setTimeEntries((prev) => prev.filter((t) => t.projectId !== project.id));
+    },
+    [
+      activeProject,
+      isTimerRunning,
+      handleStopTimer,
+      setProjects,
+      setTimeEntries,
+    ]
+  );
 
-  const handleSaveTimeEntry = useCallback((timeEntry: TimeEntry) => {
-    if (editingTimeEntry) {
-      setTimeEntries(prev => prev.map(t => t.id === timeEntry.id ? timeEntry : t));
-      setEditingTimeEntry(undefined);
-    } else {
-      setTimeEntries(prev => [...prev, timeEntry]);
-    }
-  }, [editingTimeEntry, setTimeEntries]);
+  const handleDeleteTimeEntry = useCallback(
+    (timeEntryId: string) => {
+      setTimeEntries((prev) => prev.filter((t) => t.id !== timeEntryId));
+    },
+    [setTimeEntries]
+  );
+
+  const handleSaveTimeEntry = useCallback(
+    (timeEntry: TimeEntry) => {
+      if (editingTimeEntry) {
+        setTimeEntries((prev) =>
+          prev.map((t) => (t.id === timeEntry.id ? timeEntry : t))
+        );
+        setEditingTimeEntry(undefined);
+      } else {
+        setTimeEntries((prev) => [...prev, timeEntry]);
+      }
+    },
+    [editingTimeEntry, setTimeEntries]
+  );
 
   // CSV インポート関数
   const handleImportCSV = useCallback(async () => {
@@ -254,7 +301,10 @@ const App: React.FC = () => {
       );
 
       if (result.success) {
-        console.log('インポートが成功しました。バックアップ:', result.backupPath);
+        console.log(
+          'インポートが成功しました。バックアップ:',
+          result.backupPath
+        );
       } else {
         console.error('インポートに失敗しました:', result.error);
       }
@@ -315,7 +365,8 @@ const App: React.FC = () => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // モーダルが開いているときは処理しない
-      if (isProjectFormOpen || isManualEntryFormOpen || showShortcutsDialog) return;
+      if (isProjectFormOpen || isManualEntryFormOpen || showShortcutsDialog)
+        return;
 
       // ナビゲーション関連
       if (e.ctrlKey) {
@@ -329,7 +380,6 @@ const App: React.FC = () => {
         } else if (e.key === '3') {
           e.preventDefault();
           handleNavigate('timer');
-        
         } else if (e.key === ',') {
           e.preventDefault();
           handleNavigate('settings');
@@ -388,7 +438,7 @@ const App: React.FC = () => {
     activeProject,
     handleStartTimer,
     handleStopTimer,
-    t
+    t,
   ]);
 
   // トレイからのタイマー停止イベントの処理
@@ -405,11 +455,11 @@ const App: React.FC = () => {
     switch (activePage) {
       case 'dashboard':
         return (
-          <Dashboard 
-            projects={projects} 
-            timeEntries={timeEntries} 
+          <Dashboard
+            projects={projects}
+            timeEntries={timeEntries}
             onStartTimer={(projectId) => {
-              const project = projects.find(p => p.id === projectId);
+              const project = projects.find((p) => p.id === projectId);
               if (project) handleStartTimer(project);
             }}
             onEditProject={handleOpenProjectForm}
@@ -434,7 +484,14 @@ const App: React.FC = () => {
       case 'timer':
         return (
           <Box sx={{ width: '100%', maxWidth: 1200, mx: 'auto' }}>
-            <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box
+              sx={{
+                mb: 4,
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
               <Typography variant="h5" component="h1" fontWeight="bold">
                 {t('timer.title')}
               </Typography>
@@ -479,9 +536,7 @@ const App: React.FC = () => {
         );
 
       case 'settings':
-        return (
-          <SettingsView />
-        );
+        return <SettingsView />;
       default:
         return null;
     }
@@ -500,13 +555,20 @@ const App: React.FC = () => {
     handleStopTimer,
     handleDeleteTimeEntry,
     handleImportCSV,
-    t
+    t,
   ]);
 
   // ローディング表示
   if (isLoading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+        }}
+      >
         <CircularProgress />
       </Box>
     );

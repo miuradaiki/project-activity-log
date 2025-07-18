@@ -58,30 +58,37 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
       {/* ヘッダー */}
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        mb: 4,
-      }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 4,
+        }}
+      >
         <Box>
-          <Typography variant="h5" component="h1" fontWeight="bold" gutterBottom>
+          <Typography
+            variant="h5"
+            component="h1"
+            fontWeight="bold"
+            gutterBottom
+          >
             {t('projects.title')}
           </Typography>
           <Typography variant="body1" color="text.secondary">
             {t('dashboard.progress.subtitle')}
           </Typography>
         </Box>
-        
+
         <Button
           variant="contained"
           startIcon={<AddIcon />}
           onClick={onAddProject}
-          sx={{ 
+          sx={{
             px: 3,
             py: 1,
             borderRadius: 2,
-            boxShadow: 2
+            boxShadow: 2,
           }}
         >
           {t('projects.new')}

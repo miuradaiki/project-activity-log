@@ -61,7 +61,7 @@ Object.defineProperty(window, 'ResizeObserver', {
 
 // matchMedia APIのモック（MUIで使用される）
 Object.defineProperty(window, 'matchMedia', {
-  value: jest.fn().mockImplementation(query => ({
+  value: jest.fn().mockImplementation((query) => ({
     matches: false,
     media: query,
     onchange: null,

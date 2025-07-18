@@ -20,17 +20,19 @@ describe('テスト環境のセットアップ', () => {
 
   test('MockElectronAPIのリセット機能が動作する', async () => {
     const mockAPI = MockElectronAPI.getInstance();
-    
+
     // テストデータを設定
-    await mockAPI.saveProjects([{
-      id: 'test-1',
-      name: 'テストプロジェクト',
-      description: 'テスト',
-      monthlyCapacity: 0.5,
-      createdAt: '2024-01-01T00:00:00.000Z',
-      updatedAt: '2024-01-01T00:00:00.000Z',
-      isArchived: false,
-    }]);
+    await mockAPI.saveProjects([
+      {
+        id: 'test-1',
+        name: 'テストプロジェクト',
+        description: 'テスト',
+        monthlyCapacity: 0.5,
+        createdAt: '2024-01-01T00:00:00.000Z',
+        updatedAt: '2024-01-01T00:00:00.000Z',
+        isArchived: false,
+      },
+    ]);
 
     // データが保存されていることを確認
     const projects = await mockAPI.loadProjects();

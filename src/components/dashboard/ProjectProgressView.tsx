@@ -1,10 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { 
-  Box, 
-  Typography, 
-  Grid, 
-  Tabs, 
+import {
+  Box,
+  Typography,
+  Grid,
+  Tabs,
   Tab,
   TextField,
   InputAdornment,
@@ -19,7 +19,10 @@ import {
 import { Search as SearchIcon } from '@mui/icons-material';
 import { Project, TimeEntry } from '../../types';
 import { ProjectProgressCard } from '../ui/ProjectProgressCard';
-import { calculateProjectHours, calculateMonthlyTargetHours } from '../../utils/analytics';
+import {
+  calculateProjectHours,
+  calculateMonthlyTargetHours,
+} from '../../utils/analytics';
 import { useSettingsContext } from '../../contexts/SettingsContext';
 
 interface ProjectProgressViewProps {
@@ -54,7 +57,7 @@ export const ProjectProgressView: React.FC<ProjectProgressViewProps> = ({
   const { t } = useLanguage();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { settings } = useSettingsContext(); // 設定から基準時間を取得
-  
+
   const [filterType, setFilterType] = useState<FilterType>('all');
   const [sortType, setSortType] = useState<SortType>('progress');
   const [searchTerm, setSearchTerm] = useState('');
@@ -72,13 +75,13 @@ export const ProjectProgressView: React.FC<ProjectProgressViewProps> = ({
 
   // 各プロジェクトの進捗データを計算
   const projectProgressData = useMemo(() => {
-    return projects.map(project => {
+    return projects.map((project) => {
       // 月間の目標時間を計算
       const targetHours = calculateMonthlyTargetHours(
         project.monthlyCapacity * 100 || 0,
         settings.workHours.baseMonthlyHours // 設定から基準時間を取得
       );
-      
+
       // 今月の実績時間を計算
       const currentHours = calculateProjectHours(
         timeEntries,
@@ -86,11 +89,12 @@ export const ProjectProgressView: React.FC<ProjectProgressViewProps> = ({
         firstDay,
         lastDay
       );
-      
+
       // 進捗率を計算
-      const progressPercentage = targetHours > 0 
-        ? Math.min(Math.round((currentHours / targetHours) * 100), 100)
-        : 0;
+      const progressPercentage =
+        targetHours > 0
+          ? Math.min(Math.round((currentHours / targetHours) * 100), 100)
+          : 0;
 
       // 進捗状況のステータスを判定
       let status: FilterType = 'active';
@@ -108,29 +112,37 @@ export const ProjectProgressView: React.FC<ProjectProgressViewProps> = ({
         status,
       };
     });
-  }, [projects, timeEntries, firstDay, lastDay, settings.workHours.baseMonthlyHours]);
+  }, [
+    projects,
+    timeEntries,
+    firstDay,
+    lastDay,
+    settings.workHours.baseMonthlyHours,
+  ]);
 
   // フィルタリング
   const filteredProjects = useMemo(() => {
-    return projectProgressData.filter(item => {
+    return projectProgressData.filter((item) => {
       // アーカイブされたプロジェクトは非表示にする
       if (item.project.isArchived) {
         return false;
       }
 
       // フィルターに基づいてプロジェクトをフィルタリング
-      const filterMatch = 
-        filterType === 'all' || 
+      const filterMatch =
+        filterType === 'all' ||
         item.status === filterType ||
         (filterType === 'active' && item.status !== 'completed');
-      
+
       // 検索語に基づいてプロジェクトをフィルタリング
-      const searchMatch = 
-        searchTerm === '' || 
+      const searchMatch =
+        searchTerm === '' ||
         item.project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (item.project.description && 
-          item.project.description.toLowerCase().includes(searchTerm.toLowerCase()));
-      
+        (item.project.description &&
+          item.project.description
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()));
+
       return filterMatch && searchMatch;
     });
   }, [projectProgressData, filterType, searchTerm]);
@@ -151,7 +163,10 @@ export const ProjectProgressView: React.FC<ProjectProgressViewProps> = ({
     });
   }, [filteredProjects, sortType]);
 
-  const handleFilterChange = (_event: React.SyntheticEvent, newValue: FilterType) => {
+  const handleFilterChange = (
+    _event: React.SyntheticEvent,
+    newValue: FilterType
+  ) => {
     setFilterType(newValue);
   };
 
@@ -167,9 +182,7 @@ export const ProjectProgressView: React.FC<ProjectProgressViewProps> = ({
     <Box>
       {/* ヘッダー */}
       <Box sx={{ mb: 3 }}>
-        <Typography variant="h6">
-          {t('dashboard.progress.title')}
-        </Typography>
+        <Typography variant="h6">{t('dashboard.progress.title')}</Typography>
         <Typography variant="body2" color="text.secondary">
           {t('dashboard.progress.subtitle')}
         </Typography>
@@ -177,14 +190,16 @@ export const ProjectProgressView: React.FC<ProjectProgressViewProps> = ({
 
       {/* フィルターとツールバー */}
       <Box sx={{ mb: 3 }}>
-        <Box sx={{ 
-          display: 'flex', 
-          flexDirection: { xs: 'column', sm: 'row' }, 
-          justifyContent: 'space-between',
-          alignItems: { xs: 'stretch', sm: 'center' },
-          gap: 2,
-          mb: 2
-        }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            justifyContent: 'space-between',
+            alignItems: { xs: 'stretch', sm: 'center' },
+            gap: 2,
+            mb: 2,
+          }}
+        >
           {/* 検索フィールド */}
           <TextField
             placeholder={t('projects.search')}
@@ -204,7 +219,9 @@ export const ProjectProgressView: React.FC<ProjectProgressViewProps> = ({
 
           {/* ソート選択 */}
           <FormControl size="small" sx={{ minWidth: 150 }}>
-            <InputLabel id="sort-select-label">{t('actions.search')}</InputLabel>
+            <InputLabel id="sort-select-label">
+              {t('actions.search')}
+            </InputLabel>
             <Select
               labelId="sort-select-label"
               value={sortType}
@@ -212,8 +229,12 @@ export const ProjectProgressView: React.FC<ProjectProgressViewProps> = ({
               onChange={handleSortChange}
             >
               <MenuItem value="name">{t('projects.name')}</MenuItem>
-              <MenuItem value="progress">{t('projects.sort.progress')}</MenuItem>
-              <MenuItem value="remaining">{t('projects.sort.remaining')}</MenuItem>
+              <MenuItem value="progress">
+                {t('projects.sort.progress')}
+              </MenuItem>
+              <MenuItem value="remaining">
+                {t('projects.sort.remaining')}
+              </MenuItem>
             </Select>
           </FormControl>
         </Box>
@@ -223,8 +244,8 @@ export const ProjectProgressView: React.FC<ProjectProgressViewProps> = ({
           value={filterType}
           onChange={handleFilterChange}
           sx={{ borderBottom: 1, borderColor: 'divider' }}
-          variant={isMobile ? "scrollable" : "standard"}
-          scrollButtons={isMobile ? "auto" : false}
+          variant={isMobile ? 'scrollable' : 'standard'}
+          scrollButtons={isMobile ? 'auto' : false}
         >
           <Tab label={t('projects.filter.all')} value="all" />
           <Tab label={t('projects.filter.active')} value="active" />
@@ -253,12 +274,12 @@ export const ProjectProgressView: React.FC<ProjectProgressViewProps> = ({
           ))}
         </Grid>
       ) : (
-        <Box 
-          sx={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'center', 
-            height: 200 
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: 200,
           }}
         >
           <Typography color="text.secondary">

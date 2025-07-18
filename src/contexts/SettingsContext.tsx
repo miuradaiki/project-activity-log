@@ -1,4 +1,10 @@
-import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react';
+import React, {
+  createContext,
+  useContext,
+  ReactNode,
+  useState,
+  useEffect,
+} from 'react';
 import { AppSettings, DEFAULT_SETTINGS } from '../types/settings';
 import { loadSettings, updateSettings } from '../utils/settingsUtils';
 import { useStorage } from '../hooks/useStorage';
@@ -29,11 +35,13 @@ interface SettingsProviderProps {
 // テストモードの設定キー
 const TEST_SETTINGS_KEY = 'project_activity_log_test_settings';
 
-export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) => {
+export const SettingsProvider: React.FC<SettingsProviderProps> = ({
+  children,
+}) => {
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
   const [isLoading, setIsLoading] = useState(true);
   const [isTestMode, setIsTestMode] = useState(false);
-  
+
   // テストモード用の設定
   const [testSettings, setTestSettings] = useState<AppSettings>(() => {
     const saved = localStorage.getItem(TEST_SETTINGS_KEY);
@@ -43,27 +51,28 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
   // テストモードの状態を監視
   useEffect(() => {
     const checkTestMode = () => {
-      const testModeEnabled = localStorage.getItem('project_activity_log_test_mode') === 'true' && 
-                             isTestDataEnabled();
+      const testModeEnabled =
+        localStorage.getItem('project_activity_log_test_mode') === 'true' &&
+        isTestDataEnabled();
       setIsTestMode(testModeEnabled);
     };
-    
+
     // 初回チェック
     checkTestMode();
-    
+
     // localStorageの変更を監視
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'project_activity_log_test_mode') {
         checkTestMode();
       }
     };
-    
+
     window.addEventListener('storage', handleStorageChange);
-    
+
     // カスタムイベントでも監視（同一タブでの変更検知用）
     const handleTestModeChange = () => checkTestMode();
     window.addEventListener('testModeChanged', handleTestModeChange);
-    
+
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('testModeChanged', handleTestModeChange);
@@ -100,7 +109,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
   const updateBaseMonthlyHours = async (hours: number) => {
     try {
       setIsLoading(true);
-      
+
       if (isTestMode) {
         // テストモードの場合はローカルステートのみ更新
         const updatedSettings = {
@@ -151,7 +160,9 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
 export const useSettingsContext = () => {
   const context = useContext(SettingsContext);
   if (context === undefined) {
-    throw new Error('useSettingsContext must be used within a SettingsProvider');
+    throw new Error(
+      'useSettingsContext must be used within a SettingsProvider'
+    );
   }
   return context;
 };

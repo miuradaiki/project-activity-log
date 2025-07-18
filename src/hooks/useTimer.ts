@@ -9,7 +9,10 @@ export const useTimer = () => {
     if (stored) {
       const parsed = JSON.parse(stored);
       // 保存された開始時刻が8時間以上前の場合はリセット
-      if (parsed.startTime && new Date(parsed.startTime).getTime() < Date.now() - 8 * 60 * 60 * 1000) {
+      if (
+        parsed.startTime &&
+        new Date(parsed.startTime).getTime() < Date.now() - 8 * 60 * 60 * 1000
+      ) {
         return { projectId: null, isRunning: false, startTime: null };
       }
       return parsed;
@@ -33,7 +36,8 @@ export const useTimer = () => {
   const stopTimer = async () => {
     if (timerState.startTime) {
       const endTime = new Date().toISOString();
-      const duration = new Date().getTime() - new Date(timerState.startTime).getTime();
+      const duration =
+        new Date().getTime() - new Date(timerState.startTime).getTime();
 
       // ここで作業記録を保存
       try {

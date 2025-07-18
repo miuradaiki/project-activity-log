@@ -59,7 +59,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const { t } = useLanguage();
-  
+
   // ナビゲーションアイテム
   const mainMenuItems = [
     { id: 'dashboard', text: t('nav.dashboard'), icon: <DashboardIcon /> },
@@ -68,15 +68,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   // 設定メニュー項目
-  const settingsMenuItem = { id: 'settings', text: t('nav.settings'), icon: <SettingsIcon /> };
+  const settingsMenuItem = {
+    id: 'settings',
+    text: t('nav.settings'),
+    icon: <SettingsIcon />,
+  };
 
   // メニュー項目のレンダリング
-  const renderMenuItem = (item: { id: string; text: string; icon: React.ReactNode }) => (
+  const renderMenuItem = (item: {
+    id: string;
+    text: string;
+    icon: React.ReactNode;
+  }) => (
     <ListItem key={item.id} disablePadding>
       <StyledListItemButton
         selected={activePage === item.id}
         onClick={() => onNavigate(item.id)}
-        sx={{ 
+        sx={{
           justifyContent: open ? 'initial' : 'center',
           px: open ? 3 : 2.5,
         }}
@@ -98,12 +106,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
   // ドロワーの内容
   const drawer = (
     <>
-      <Box sx={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: open ? 'space-between' : 'center',
-        p: 2 
-      }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: open ? 'space-between' : 'center',
+          p: 2,
+        }}
+      >
         {open && (
           <Box sx={{ fontSize: '1.2rem', fontWeight: 'bold' }}>
             {t('app.name')}
@@ -120,9 +130,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       <Divider sx={{ my: 1 }} />
 
-      <List sx={{ mb: 2 }}>
-        {renderMenuItem(settingsMenuItem)}
-      </List>
+      <List sx={{ mb: 2 }}>{renderMenuItem(settingsMenuItem)}</List>
     </>
   );
 
@@ -156,8 +164,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           ModalProps={{ keepMounted: true }}
           sx={{
             display: { xs: 'block', md: 'none' },
-            '& .MuiDrawer-paper': { 
-              width: DRAWER_WIDTH, 
+            '& .MuiDrawer-paper': {
+              width: DRAWER_WIDTH,
               boxSizing: 'border-box',
               boxShadow: 3,
             },

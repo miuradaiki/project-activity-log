@@ -18,9 +18,9 @@ export const ExportButton = () => {
   };
 
   return (
-    <Button 
-      variant="contained" 
-      color="primary" 
+    <Button
+      variant="contained"
+      color="primary"
       startIcon={<Download />}
       onClick={handleExport}
     >
@@ -28,4 +28,3 @@ export const ExportButton = () => {
     </Button>
   );
 };
-

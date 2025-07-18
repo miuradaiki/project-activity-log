@@ -8,7 +8,12 @@ import {
   TrendingUp as TrendingUpIcon,
 } from '@mui/icons-material';
 import { Project, TimeEntry } from '../../types';
-import { getDailyWorkHours, getMostActiveProject, getLongestWorkSession, getAverageWorkSession } from '../../utils/analytics';
+import {
+  getDailyWorkHours,
+  getMostActiveProject,
+  getLongestWorkSession,
+  getAverageWorkSession,
+} from '../../utils/analytics';
 import { KPICard } from '../ui/KPICard';
 
 interface DailySummaryProps {
@@ -16,7 +21,10 @@ interface DailySummaryProps {
   timeEntries: TimeEntry[];
 }
 
-export const DailySummary: React.FC<DailySummaryProps> = ({ projects, timeEntries }) => {
+export const DailySummary: React.FC<DailySummaryProps> = ({
+  projects,
+  timeEntries,
+}) => {
   const { t } = useLanguage();
   const today = new Date();
   const todayStart = new Date(today.setHours(0, 0, 0, 0));
@@ -33,31 +41,50 @@ export const DailySummary: React.FC<DailySummaryProps> = ({ projects, timeEntrie
   const totalHoursYesterday = getDailyWorkHours(timeEntries, yesterday);
 
   // 前日比の計算（パーセント）
-  const hoursTrend = totalHoursYesterday > 0
-    ? Math.round(((totalHoursToday - totalHoursYesterday) / totalHoursYesterday) * 100)
-    : 0;
+  const hoursTrend =
+    totalHoursYesterday > 0
+      ? Math.round(
+          ((totalHoursToday - totalHoursYesterday) / totalHoursYesterday) * 100
+        )
+      : 0;
 
   // 最も長い作業時間を計算
   const longestWorkTime = getLongestWorkSession(timeEntries, today);
-  
+
   // 昨日の最も長い作業時間を計算
-  const longestWorkTimeYesterday = getLongestWorkSession(timeEntries, yesterday);
-  
+  const longestWorkTimeYesterday = getLongestWorkSession(
+    timeEntries,
+    yesterday
+  );
+
   // 最長作業時間の前日比
-  const longestTimeTrend = longestWorkTimeYesterday > 0
-    ? Math.round(((longestWorkTime - longestWorkTimeYesterday) / longestWorkTimeYesterday) * 100)
-    : 0;
-    
+  const longestTimeTrend =
+    longestWorkTimeYesterday > 0
+      ? Math.round(
+          ((longestWorkTime - longestWorkTimeYesterday) /
+            longestWorkTimeYesterday) *
+            100
+        )
+      : 0;
+
   // 平均作業時間を計算
   const averageWorkTime = getAverageWorkSession(timeEntries, today);
-  
+
   // 昨日の平均作業時間を計算
-  const averageWorkTimeYesterday = getAverageWorkSession(timeEntries, yesterday);
-  
+  const averageWorkTimeYesterday = getAverageWorkSession(
+    timeEntries,
+    yesterday
+  );
+
   // 平均作業時間の前日比
-  const averageTimeTrend = averageWorkTimeYesterday > 0
-    ? Math.round(((averageWorkTime - averageWorkTimeYesterday) / averageWorkTimeYesterday) * 100)
-    : 0;
+  const averageTimeTrend =
+    averageWorkTimeYesterday > 0
+      ? Math.round(
+          ((averageWorkTime - averageWorkTimeYesterday) /
+            averageWorkTimeYesterday) *
+            100
+        )
+      : 0;
 
   return (
     <Box sx={{ mb: 4 }}>
