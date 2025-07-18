@@ -5,7 +5,6 @@ import {
   Button,
   CircularProgress,
   Typography,
-  useTheme,
 } from '@mui/material';
 import {
   CloudUpload as CloudUploadIcon,
@@ -29,35 +28,12 @@ import { KeyboardShortcutsDialog } from './components/shortcuts/KeyboardShortcut
 // アクティブページをローカルストレージに保存するためのキー
 const ACTIVE_PAGE_STORAGE_KEY = 'project_activity_log_active_page';
 
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
-const TabPanel = (props: TabPanelProps) => {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
-    </div>
-  );
-};
-
 
 const App: React.FC = () => {
   // 多言語対応
   const { t } = useLanguage();
   // テーマとレイアウト管理
   const { isDarkMode, toggleThemeMode } = useThemeMode();
-  const theme = useTheme();
 
   // アクティブページの初期値をローカルストレージから取得
   const getInitialActivePage = (): string => {

@@ -66,11 +66,11 @@ export const Layout: React.FC<LayoutProps> = ({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const currentDrawerWidth = sidebarOpen ? DRAWER_WIDTH : CLOSED_DRAWER_WIDTH;
-  const { t, language } = useLanguage(); // 翻訳関数と言語をインポート
+  const { t: _t, language } = useLanguage(); // 翻訳関数と言語をインポート
   const { isTestMode } = useStorage(); // テストモードの状態を取得
 
   // 現在の言語をログ出力
-  useEffect(() => {}, [language]);
+  useEffect(() => {}, [language]); // _language unused variable kept for potential future use
 
   // タイマー画面に遷移するハンドラー
   const handleTimerClick = () => {

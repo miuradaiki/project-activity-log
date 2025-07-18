@@ -16,8 +16,7 @@ import {
   AccessTime as TimeIcon,
 } from '@mui/icons-material';
 import { TimeEntry, Project } from '../../types';
-import { formatDistanceStrict, intervalToDuration } from 'date-fns';
-import { ja, enUS } from 'date-fns/locale';
+import { intervalToDuration } from 'date-fns';
 
 interface TimelineViewProps {
   timeEntries: TimeEntry[];
@@ -175,7 +174,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
               }}
             />
 
-            {groupedEntries[date].map((entry, index) => {
+            {groupedEntries[date].map((entry, _index) => {
               const project = getProject(entry.projectId);
               const projectColor = theme.palette.primary.main;
 

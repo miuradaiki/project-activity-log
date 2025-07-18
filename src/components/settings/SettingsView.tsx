@@ -3,7 +3,6 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { isTestDataEnabled } from '../../utils/env';
 import {
   Box,
-  Paper,
   Typography,
   Divider,
   TextField,
@@ -30,13 +29,11 @@ import {
   Info as InfoIcon,
   Translate as TranslateIcon,
   Science as ScienceIcon,
-  DeleteSweep as DeleteSweepIcon,
   ToggleOn as ToggleOnIcon,
   ToggleOff as ToggleOffIcon,
 } from '@mui/icons-material';
 import { useSettingsContext } from '../../contexts/SettingsContext';
 import { useStorage } from '../../hooks/useStorage';
-import { Project, TimeEntry } from '../../types';
 
 /**
  * アプリケーション設定画面コンポーネント
@@ -46,8 +43,6 @@ export const SettingsView: React.FC = () => {
   const { settings, isLoading, updateBaseMonthlyHours } = useSettingsContext();
   const { language, setLanguage, t } = useLanguage();
   const {
-    projects,
-    timeEntries,
     setProjects,
     setTimeEntries,
     isTestMode,
@@ -79,7 +74,7 @@ export const SettingsView: React.FC = () => {
     try {
       await updateBaseMonthlyHours(baseMonthlyHours);
       showNotification(t('settings.monthly.hours.saved'), 'success');
-    } catch (error) {
+    } catch {
       showNotification(t('settings.save.error'), 'error');
     }
   };
@@ -96,7 +91,7 @@ export const SettingsView: React.FC = () => {
       await updateBaseMonthlyHours(140); // デフォルト値にリセット
       setBaseMonthlyHours(140); // デフォルト値にリセット
       showNotification(t('settings.reset.success'), 'success');
-    } catch (error) {
+    } catch {
       showNotification(t('settings.reset.error'), 'error');
     }
   };
@@ -144,10 +139,13 @@ export const SettingsView: React.FC = () => {
       setTimeEntries(newTimeEntries);
 
       showNotification('テストデータを再生成しました', 'success');
-    } catch (error) {
-      console.error('テストデータ生成エラー:', error);
+    } catch (_error) {
+      // テストデータ生成エラーをログ出力（本番環境ではログシステムを使用することを推奨）
+      if (process.env.NODE_ENV === 'development') {
+        console.error('テストデータ生成エラー:', _error);
+      }
       const errorMessage =
-        error instanceof Error ? error.message : '不明なエラー';
+        _error instanceof Error ? _error.message : '不明なエラー';
       showNotification(
         `テストデータの生成に失敗しました: ${errorMessage}`,
         'error'

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../../../contexts/LanguageContext';
-import { Box, Typography, Button, useTheme } from '@mui/material';
+import { Box, Typography, Button } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 import { Project, TimeEntry } from '../../../types';
 import { ProjectsGrid } from './ProjectsGrid';
@@ -29,7 +29,6 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({
   onStartTimer,
   onAddProject,
 }) => {
-  const theme = useTheme();
   const { t } = useLanguage();
   const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);

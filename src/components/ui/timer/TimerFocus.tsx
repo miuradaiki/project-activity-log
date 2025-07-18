@@ -9,7 +9,6 @@ import {
   Fade,
   Tooltip,
   Card,
-  CardContent,
   alpha,
   Button,
   Stack,
@@ -95,7 +94,7 @@ export const TimerFocus: React.FC<TimerFocusProps> = ({
         window.clearInterval(intervalId);
       }
     };
-  }, [isRunning, startTime, calculateElapsed, onStop]);
+  }, [isRunning, startTime, calculateElapsed, onStop, t]);
 
   // コンポーネントマウント時に経過時間を再計算
   useEffect(() => {
@@ -104,7 +103,7 @@ export const TimerFocus: React.FC<TimerFocusProps> = ({
       setElapsed(text);
       setElapsedMs(ms);
     }
-  }, []);
+  }, [isRunning, startTime, calculateElapsed]);
 
   // 経過時間に基づいて色を決定
   const getTimerColor = () => {

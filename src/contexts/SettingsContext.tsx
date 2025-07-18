@@ -88,7 +88,9 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({
           setSettings(loadedSettings);
         }
       } catch (error) {
-        console.error('設定の読み込みに失敗しました:', error);
+        if (process.env.NODE_ENV === 'development') {
+          console.error('設定の読み込みに失敗しました:', error);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -131,7 +133,9 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({
         setSettings(updatedSettings);
       }
     } catch (error) {
-      console.error('設定の更新に失敗しました:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('設定の更新に失敗しました:', error);
+      }
       throw error;
     } finally {
       setIsLoading(false);

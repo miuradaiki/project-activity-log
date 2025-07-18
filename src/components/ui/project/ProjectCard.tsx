@@ -23,7 +23,7 @@ import {
   Delete as DeleteIcon,
   MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
-import { Project, TimeEntry } from '../../../types';
+import { Project } from '../../../types';
 
 interface ProjectCardProps {
   project: Project;

@@ -11,7 +11,7 @@ type Language = 'ja' | 'en';
 interface LanguageContextType {
   language: Language;
   setLanguage: (language: Language) => void;
-  t: (key: string, params?: Record<string, any>) => string;
+  t: (key: string, params?: Record<string, unknown>) => string;
 }
 
 // デフォルトの言語コンテキスト
@@ -72,26 +72,30 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
 
   // 翻訳関数
   const t = useCallback(
-    (key: string, params?: Record<string, any>): string => {
+    (key: string, params?: Record<string, unknown>): string => {
       // 言語が存在するかチェック
       if (!translations[language]) {
-        console.warn(`Translation for language "${language}" not found.`);
+        if (process.env.NODE_ENV === 'development') {
+          console.warn(`Translation for language "${language}" not found.`);
+        }
         return key;
       }
 
       // キーが存在するかチェック
-      const translation = (translations as any)[language][key];
+      const translation = (translations as Record<string, Record<string, string>>)[language][key];
       if (!translation) {
-        console.warn(
-          `Translation key "${key}" not found for language "${language}".`
-        );
+        if (process.env.NODE_ENV === 'development') {
+          console.warn(
+            `Translation key "${key}" not found for language "${language}".`
+          );
+        }
         return key;
       }
 
       // パラメータ置換
       if (params) {
         return Object.keys(params).reduce((result, paramKey) => {
-          return result.replace(`{${paramKey}}`, params[paramKey]);
+          return result.replace(`{${paramKey}}`, String(params[paramKey]));
         }, translation);
       }
 

@@ -9,12 +9,10 @@ import {
   Paper,
   alpha,
   Fade,
-  Chip,
 } from '@mui/material';
 import {
   Stop,
   TimerOutlined,
-  ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
 import { Project } from '../../../types';
 import { formatElapsedTime } from '../../../utils/time';

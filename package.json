@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Project activity tracking and management application",
   "main": "main.js",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "start": "cross-env NODE_ENV=development ELECTRON=true electron .",
@@ -14,9 +15,9 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:ci": "jest --ci --coverage --watchAll=false",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 999",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 100",
     "lint:fix": "eslint . --ext ts,tsx --fix",
-    "lint:ci": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 999",
+    "lint:ci": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 100",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,scss,md}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,css,scss,md}\""
   },

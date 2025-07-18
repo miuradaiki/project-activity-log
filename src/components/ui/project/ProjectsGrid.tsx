@@ -4,7 +4,6 @@ import {
   Box,
   Grid,
   Typography,
-  Chip,
   TextField,
   InputAdornment,
   Select,
@@ -177,8 +176,8 @@ export const ProjectsGrid: React.FC<ProjectsGridProps> = ({
   const filteredActiveProjects = getFilteredAndSortedProjects('active');
   const filteredArchivedProjects = getFilteredAndSortedProjects('archived');
 
-  // 現在表示中のプロジェクトリスト
-  const currentProjects =
+  // 現在表示中のプロジェクトリスト（現在は使用していないが、将来的に使用予定）
+  const _currentProjects =
     tabValue === 0
       ? allProjects
       : tabValue === 1

@@ -10,20 +10,18 @@ import {
   Select,
   MenuItem,
   FormControl,
-  InputLabel,
   SelectChangeEvent,
 } from '@mui/material';
 import {
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
-  Info as InfoIcon,
 } from '@mui/icons-material';
 import { TimeEntry, Project } from '../../types';
-import { isWithinDateRange, getDailyWorkHours } from '../../utils/analytics';
+import { getDailyWorkHours } from '../../utils/analytics';
 
 interface ActivityCalendarProps {
   timeEntries: TimeEntry[];
-  projects: Project[];
+  _projects: Project[];
 }
 
 /**
@@ -32,10 +30,10 @@ interface ActivityCalendarProps {
  */
 export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
   timeEntries,
-  projects,
+  _projects,
 }) => {
   const theme = useTheme();
-  const currentDate = new Date();
+  const currentDate = useMemo(() => new Date(), []);
 
   // 表示する年月を管理
   const [year, setYear] = useState(currentDate.getFullYear());
@@ -78,8 +76,8 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
     [year, month]
   );
 
-  // 月名を取得
-  const monthName = useMemo(() => {
+  // 月名を取得（現在は使用していないが、将来的に使用予定）
+  const _monthName = useMemo(() => {
     return new Date(year, month).toLocaleDateString('ja-JP', { month: 'long' });
   }, [year, month]);
 
@@ -245,7 +243,7 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
             >
               <Select
                 value={year}
-                onChange={handleYearChange as any}
+                onChange={handleYearChange}
                 displayEmpty
               >
                 {yearOptions.map((yearOption) => (
@@ -259,7 +257,7 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
             <FormControl variant="outlined" size="small" sx={{ minWidth: 80 }}>
               <Select
                 value={month}
-                onChange={handleMonthChange as any}
+                onChange={handleMonthChange}
                 displayEmpty
               >
                 {monthOptions.map((monthOption) => (

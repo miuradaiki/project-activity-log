@@ -1,9 +1,9 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ManualTimeEntryForm } from '../ManualTimeEntryForm';
 import { LanguageProvider } from '../../../contexts/LanguageContext';
-import { Project, TimeEntry } from '../../../types';
+import { Project } from '../../../types';
 
 // テスト用のプロジェクトデータ
 const mockProjects: Project[] = [

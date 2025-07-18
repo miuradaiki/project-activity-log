@@ -5,8 +5,6 @@ import {
   Typography,
   Box,
   Pagination,
-  Tab,
-  Tabs,
   FormControl,
   InputLabel,
   Select,

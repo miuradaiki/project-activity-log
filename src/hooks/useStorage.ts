@@ -64,7 +64,9 @@ export const useStorage = () => {
 
       setIsDataLoaded(true);
     } catch (error) {
-      console.error('Error loading data:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error loading data:', error);
+      }
       // エラー時は既存のデータを維持
     } finally {
       setIsLoading(false);
@@ -80,7 +82,9 @@ export const useStorage = () => {
     try {
       // データが空の場合は保存しない
       if (projects.length === 0 && timeEntries.length === 0) {
-        console.warn('Preventing save of empty data');
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('Preventing save of empty data');
+        }
         return;
       }
 
@@ -91,7 +95,9 @@ export const useStorage = () => {
       );
 
       if (validTimeEntries.length !== timeEntries.length) {
-        console.warn('Some time entries reference non-existent projects');
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('Some time entries reference non-existent projects');
+        }
         setTimeEntries(validTimeEntries);
       }
       await Promise.all([
@@ -99,7 +105,9 @@ export const useStorage = () => {
         window.electronAPI.saveTimeEntries(validTimeEntries),
       ]);
     } catch (error) {
-      console.error('Error saving data:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error saving data:', error);
+      }
       // エラー発生時にユーザーに通知する処理を追加することを推奨
     }
   }, [projects, timeEntries, isTestMode]);
@@ -153,7 +161,9 @@ export const useStorage = () => {
     async (enabled: boolean) => {
       const isTestEnv = isTestDataEnabled();
       if (!isTestEnv) {
-        console.warn('Test mode is not enabled in environment');
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('Test mode is not enabled in environment');
+        }
         return;
       }
 
