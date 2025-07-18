@@ -245,8 +245,16 @@ app.whenReady().then(async () => {
   });
 
   ipcMain.handle('remove-file', async (_, filePath) => {
-    if (fs.existsSync(filePath)) {
-      await fs.promises.unlink(filePath);
+    const userDataPath = app.getPath('userData');
+    const resolvedPath = path.resolve(userDataPath, filePath);
+
+    // パス検証 - ユーザーデータディレクトリ外のファイルアクセスを防止
+    if (!resolvedPath.startsWith(userDataPath)) {
+      throw new Error('Invalid file path: Access denied outside user data directory');
+    }
+
+    if (fs.existsSync(resolvedPath)) {
+      await fs.promises.unlink(resolvedPath);
       return true;
     }
     return false;
