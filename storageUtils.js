@@ -105,23 +105,43 @@ import Papa from 'papaparse';
  */
 const exportToCSV = async (timeEntries, projects) => {
   try {
+    // データが存在するか確認
+    if (!timeEntries || timeEntries.length === 0) {
+      console.log('No time entries to export');
+      return false;
+    }
+    
+    if (!projects || projects.length === 0) {
+      console.log('No projects found');
+      return false;
+    }
+    
     // プロジェクトデータをIDでマップ化
     const projectMap = projects.reduce((map, project) => {
       map[project.id] = project;
       return map;
     }, {});
 
-    // データを整形
-    const csvData = timeEntries.map(entry => {
+    // データを整形（日付順にソート）
+    const csvData = timeEntries
+      .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
+      .map(entry => {
       const project = projectMap[entry.projectId];
+      const startDate = new Date(entry.startTime);
+      const endDate = new Date(entry.endTime);
+      const durationMs = endDate.getTime() - startDate.getTime();
+      const durationHours = Math.floor(durationMs / (1000 * 60 * 60));
+      const durationMinutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+      
       return {
-        date: new Date(entry.startTime).toLocaleDateString(),
-        start_time: new Date(entry.startTime).toLocaleTimeString(),
-        end_time: new Date(entry.endTime).toLocaleTimeString(),
-        duration_minutes: Math.round((new Date(entry.endTime) - new Date(entry.startTime)) / (1000 * 60)),
-        project_name: project ? project.name : 'Unknown Project',
-        project_description: project ? project.description : '',
-        notes: entry.notes || ''
+        '日付': startDate.toLocaleDateString('ja-JP'),
+        '開始時刻': startDate.toLocaleTimeString('ja-JP'),
+        '終了時刻': endDate.toLocaleTimeString('ja-JP'),
+        '作業時間': `${durationHours}時間${durationMinutes}分`,
+        '作業時間（分）': Math.round(durationMs / (1000 * 60)),
+        'プロジェクト名': project ? project.name : 'Unknown Project',
+        'プロジェクト説明': project ? project.description : '',
+        'メモ': entry.notes || ''
       };
     });
 
@@ -130,9 +150,12 @@ const exportToCSV = async (timeEntries, projects) => {
       header: true,
       quotes: true
     });
+    
+    // BOM付きでUTF-8として保存（Excelで日本語が文字化けしないように）
+    const csvWithBom = '\uFEFF' + csv;
 
     // 保存先を選択
-    const { filePath } = await dialog.showSaveDialog(BrowserWindow.getFocusedWindow(), {
+    const result = await dialog.showSaveDialog(BrowserWindow.getFocusedWindow(), {
       title: '作業時間記録をエクスポート',
       defaultPath: `work-log-${new Date().toISOString().split('T')[0]}.csv`,
       filters: [
@@ -140,8 +163,8 @@ const exportToCSV = async (timeEntries, projects) => {
       ]
     });
 
-    if (filePath) {
-      await fs.promises.writeFile(filePath, csv);
+    if (!result.canceled && result.filePath) {
+      await fs.promises.writeFile(result.filePath, csvWithBom, 'utf-8');
       return true;
     }
     return false;

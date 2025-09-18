@@ -98,7 +98,20 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({
   };
 
   // カスタムツールチップ
-  const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ value?: number; color: string; dataKey: string; name: string }>; label?: string }) => {
+  const CustomTooltip = ({
+    active,
+    payload,
+    label,
+  }: {
+    active?: boolean;
+    payload?: Array<{
+      value?: number;
+      color: string;
+      dataKey: string;
+      name: string;
+    }>;
+    label?: string;
+  }) => {
     if (active && payload && payload.length) {
       const totalHours = payload.reduce(
         (sum: number, item: { value?: number }) => sum + (item.value || 0),
@@ -119,8 +132,17 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({
             {isEnglish ? label : `${label}曜日`}
           </Typography>
           {payload.map(
-            (item: { value?: number; color: string; dataKey: string; name: string }, index: number) =>
-              item.value && item.value > 0 && (
+            (
+              item: {
+                value?: number;
+                color: string;
+                dataKey: string;
+                name: string;
+              },
+              index: number
+            ) =>
+              item.value &&
+              item.value > 0 && (
                 <Box key={index} sx={{ mt: 0.5 }}>
                   <Typography variant="body2" sx={{ color: item.color }}>
                     {item.name}: {item.value.toFixed(1)} {t('units.hours')}
@@ -245,7 +267,10 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({
                 align="right"
                 verticalAlign="middle"
                 formatter={(value: string) => {
-                  const projectData = projectDistribution.find((p: { projectName: string; hours: number }) => p.projectName === value);
+                  const projectData = projectDistribution.find(
+                    (p: { projectName: string; hours: number }) =>
+                      p.projectName === value
+                  );
                   return `${value} (${projectData?.hours?.toFixed(1) || 0}h)`;
                 }}
               />

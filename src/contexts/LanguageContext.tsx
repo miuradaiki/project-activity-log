@@ -82,7 +82,9 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
       }
 
       // キーが存在するかチェック
-      const translation = (translations as Record<string, Record<string, string>>)[language][key];
+      const translation = (
+        translations as Record<string, Record<string, string>>
+      )[language][key];
       if (!translation) {
         if (process.env.NODE_ENV === 'development') {
           console.warn(

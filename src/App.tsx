@@ -1,14 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLanguage } from './contexts/LanguageContext';
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Typography,
-} from '@mui/material';
-import {
-  CloudUpload as CloudUploadIcon,
-} from '@mui/icons-material';
+import { Box, Button, CircularProgress, Typography } from '@mui/material';
+import { CloudUpload as CloudUploadIcon } from '@mui/icons-material';
 import { Project, TimeEntry } from './types';
 
 import { v4 as uuidv4 } from 'uuid';
@@ -27,7 +20,6 @@ import { KeyboardShortcutsDialog } from './components/shortcuts/KeyboardShortcut
 
 // アクティブページをローカルストレージに保存するためのキー
 const ACTIVE_PAGE_STORAGE_KEY = 'project_activity_log_active_page';
-
 
 const App: React.FC = () => {
   // 多言語対応

@@ -25,7 +25,7 @@ export const DailySummary: React.FC<DailySummaryProps> = ({
 }) => {
   const { t } = useLanguage();
   const today = new Date();
-  
+
   // 昨日の日付を計算
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
