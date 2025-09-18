@@ -15,7 +15,6 @@ Object.defineProperty(globalThis, 'import', {
 
 // Jestの global で import.meta をモック
 (global as any).import = {
-  // eslint-disable-line @typescript-eslint/no-explicit-any
   meta: {
     env: {
       VITE_ENABLE_TEST_DATA: 'false',
