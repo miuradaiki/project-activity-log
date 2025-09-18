@@ -48,7 +48,11 @@ export const loadSettings = async (): Promise<AppSettings> => {
       }
     } catch (error: unknown) {
       // ファイルが存在しない場合はデフォルト設定を保存して返す
-      if (error instanceof Error && error.message && error.message.includes('ENOENT')) {
+      if (
+        error instanceof Error &&
+        error.message &&
+        error.message.includes('ENOENT')
+      ) {
         await saveSettings(DEFAULT_SETTINGS);
         return DEFAULT_SETTINGS;
       }
