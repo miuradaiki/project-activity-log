@@ -149,20 +149,20 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
 
     // 時間がマイナスまたは0の場合はエラー
     if (duration <= 0) {
-      alert('終了時間は開始時間より後である必要があります。');
+      window.alert('終了時間は開始時間より後である必要があります。');
       return;
     }
 
     // 1分未満（60000ミリ秒）の場合はエラー
     if (duration < 60000) {
-      alert('1分未満の時間エントリは保存できません。');
+      window.alert('1分未満の時間エントリは保存できません。');
       return;
     }
 
     // 24時間を超える場合の警告
     const hours = differenceInHours(endDateTime, startDateTime);
     if (hours > 24) {
-      const confirmResult = confirm(`${hours}時間の長時間記録になります。続行しますか？`);
+      const confirmResult = window.confirm(`${hours}時間の長時間記録になります。続行しますか？`);
       if (!confirmResult) {
         return;
       }
