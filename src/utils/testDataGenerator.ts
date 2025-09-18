@@ -6,7 +6,6 @@ export const generateTestData = (
   existingProjects: Project[],
   existingTimeEntries: TimeEntry[]
 ) => {
-
   const now = new Date();
 
   // テスト用のプレフィックスを追加して識別可能にする
@@ -56,7 +55,6 @@ export const generateTestData = (
       archivedAt: new Date(now.getFullYear(), now.getMonth(), 5).toISOString(),
     },
   ];
-
 
   // 時間エントリーを生成（過去30日分）
   const newTimeEntries: TimeEntry[] = [];
@@ -110,7 +108,6 @@ export const generateTestData = (
     }
   }
 
-
   // 今日の実行中のタイマーを追加（50%の確率）
   if (Math.random() > 0.5) {
     const runningProject = newProjects[Math.floor(Math.random() * 3)];
@@ -136,7 +133,6 @@ export const generateTestData = (
     projects: [...existingProjects, ...newProjects],
     timeEntries: [...existingTimeEntries, ...newTimeEntries],
   };
-
 
   return result;
 };

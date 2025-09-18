@@ -21,7 +21,13 @@ import {
 import { Update, CalendarToday } from '@mui/icons-material';
 import { Project, TimeEntry } from '../../types';
 import { v4 as uuidv4 } from 'uuid';
-import { addDays, format, isSameDay, differenceInHours, differenceInMinutes } from 'date-fns';
+import {
+  addDays,
+  format,
+  isSameDay,
+  differenceInHours,
+  differenceInMinutes,
+} from 'date-fns';
 
 interface ManualTimeEntryFormProps {
   open: boolean;
@@ -83,7 +89,7 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
   const formatHoursAndMinutes = (totalMinutes: number): string => {
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
-    
+
     if (hours === 0) {
       return `${minutes}分`;
     } else if (minutes === 0) {
@@ -96,7 +102,7 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
   const handleSetCurrentTime = (target: 'start' | 'end') => {
     const currentTime = getCurrentTime();
     const currentDate = new Date().toISOString().split('T')[0];
-    
+
     if (target === 'start') {
       setStartTime(currentTime);
       setStartDate(currentDate);
@@ -107,36 +113,44 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
   };
 
   // 自動分割機能：日跨ぎエントリーを複数のエントリーに分割
-  const createSplitEntries = (projectId: string, startDateTime: Date, endDateTime: Date, description: string): TimeEntry[] => {
+  const createSplitEntries = (
+    projectId: string,
+    startDateTime: Date,
+    endDateTime: Date,
+    description: string
+  ): TimeEntry[] => {
     const entries: TimeEntry[] = [];
     let currentStart = new Date(startDateTime);
     const timestamp = new Date().toISOString();
-    
+
     while (currentStart < endDateTime) {
       const currentEnd = new Date(currentStart);
       currentEnd.setHours(23, 59, 59, 999); // その日の終わり
-      
+
       if (currentEnd > endDateTime) {
         currentEnd.setTime(endDateTime.getTime());
       }
-      
+
       const entry: TimeEntry = {
         id: uuidv4(),
         projectId,
         startTime: currentStart.toISOString(),
         endTime: currentEnd.toISOString(),
-        description: entries.length === 0 ? description : `${description} (${entries.length + 1}日目)`,
+        description:
+          entries.length === 0
+            ? description
+            : `${description} (${entries.length + 1}日目)`,
         createdAt: timestamp,
         updatedAt: timestamp,
       };
-      
+
       entries.push(entry);
-      
+
       // 次の日の開始時刻を設定
       currentStart = addDays(currentStart, 1);
       currentStart.setHours(0, 0, 0, 0);
     }
-    
+
     return entries;
   };
 
@@ -162,7 +176,9 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
     // 24時間を超える場合の警告
     const hours = differenceInHours(endDateTime, startDateTime);
     if (hours > 24) {
-      const confirmResult = window.confirm(`${hours}時間の長時間記録になります。続行しますか？`);
+      const confirmResult = window.confirm(
+        `${hours}時間の長時間記録になります。続行しますか？`
+      );
       if (!confirmResult) {
         return;
       }
@@ -187,13 +203,18 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
 
     // 新規作成の場合
     const isMultiDay = !isSameDay(startDateTime, endDateTime);
-    
+
     if (isMultiDay) {
       // 日跨ぎの場合は常に自動分割
-      const splitEntries = createSplitEntries(projectId, startDateTime, endDateTime, description);
-      
+      const splitEntries = createSplitEntries(
+        projectId,
+        startDateTime,
+        endDateTime,
+        description
+      );
+
       // 複数のエントリーを順次保存
-      splitEntries.forEach(entry => onSave(entry));
+      splitEntries.forEach((entry) => onSave(entry));
     } else {
       // 通常の単一エントリー
       const newTimeEntry: TimeEntry = {
@@ -275,7 +296,7 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
                   ),
                 }}
               />
-              
+
               <TextField
                 label={t('timer.end.date') || '終了日'}
                 type="date"
@@ -293,13 +314,19 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
                 }}
               />
             </Box>
-            
+
             {/* 日跨ぎの警告表示 */}
             {isMultiDay && (
               <Alert severity="info" sx={{ mb: 1 }}>
                 <Typography variant="body2">
-                  {formatHoursAndMinutes(differenceInMinutes(new Date(`${endDate}T${endTime}`), new Date(`${startDate}T${startTime}`)))}
-                  ({format(new Date(startDate), 'M/d')} - {format(new Date(endDate), 'M/d')}) の記録になります。
+                  {formatHoursAndMinutes(
+                    differenceInMinutes(
+                      new Date(`${endDate}T${endTime}`),
+                      new Date(`${startDate}T${startTime}`)
+                    )
+                  )}
+                  ({format(new Date(startDate), 'M/d')} -{' '}
+                  {format(new Date(endDate), 'M/d')}) の記録になります。
                 </Typography>
               </Alert>
             )}
@@ -372,12 +399,11 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
         <DialogActions>
           <Button onClick={handleClose}>{t('projects.cancel')}</Button>
           <Button type="submit" variant="contained" disabled={!isFormValid}>
-            {timeEntry 
+            {timeEntry
               ? t('actions.update')
-              : (!timeEntry && isMultiDay)
+              : !timeEntry && isMultiDay
                 ? `${formatHoursAndMinutes(differenceInMinutes(new Date(`${endDate}T${endTime}`), new Date(`${startDate}T${startTime}`)))}を日別に保存`
-                : t('actions.save')
-            }
+                : t('actions.save')}
           </Button>
         </DialogActions>
       </form>

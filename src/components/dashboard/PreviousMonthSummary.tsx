@@ -97,7 +97,17 @@ export const PreviousMonthSummary: React.FC<PreviousMonthSummaryProps> = ({
   }, [projectData, totalHours]);
 
   // カスタムツールチップ
-  const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ value: number; name: string; payload: { name: string; color: string; percentage: number } }> }) => {
+  const CustomTooltip = ({
+    active,
+    payload,
+  }: {
+    active?: boolean;
+    payload?: Array<{
+      value: number;
+      name: string;
+      payload: { name: string; color: string; percentage: number };
+    }>;
+  }) => {
     if (active && payload && payload.length) {
       return (
         <Box

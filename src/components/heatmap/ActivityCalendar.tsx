@@ -241,11 +241,7 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
               size="small"
               sx={{ minWidth: 80, mr: 1 }}
             >
-              <Select
-                value={year}
-                onChange={handleYearChange}
-                displayEmpty
-              >
+              <Select value={year} onChange={handleYearChange} displayEmpty>
                 {yearOptions.map((yearOption) => (
                   <MenuItem key={yearOption} value={yearOption}>
                     {yearOption}年
@@ -255,11 +251,7 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
             </FormControl>
 
             <FormControl variant="outlined" size="small" sx={{ minWidth: 80 }}>
-              <Select
-                value={month}
-                onChange={handleMonthChange}
-                displayEmpty
-              >
+              <Select value={month} onChange={handleMonthChange} displayEmpty>
                 {monthOptions.map((monthOption) => (
                   <MenuItem key={monthOption} value={monthOption}>
                     {monthOption + 1}月
