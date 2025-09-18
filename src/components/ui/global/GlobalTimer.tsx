@@ -10,10 +10,7 @@ import {
   alpha,
   Fade,
 } from '@mui/material';
-import {
-  Stop,
-  TimerOutlined,
-} from '@mui/icons-material';
+import { Stop, TimerOutlined } from '@mui/icons-material';
 import { Project } from '../../../types';
 import { formatElapsedTime } from '../../../utils/time';
 

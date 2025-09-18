@@ -7,12 +7,14 @@ export const ExportButton = () => {
   const { t } = useLanguage();
   const handleExport = async () => {
     try {
-      const timeEntries = await window.electronAPI.loadTimeEntries();
-      const projects = await window.electronAPI.loadProjects();
-      await window.electronAPI.exportCSV(timeEntries, projects);
-      alert(t('timer.export.success'));
-    } catch (error) {
-      console.error('Export error:', error);
+      // exportCSVは引数を取らない（main.js側でデータを取得する）
+      const result = await window.electronAPI.exportToCSV();
+      if (result && result.success) {
+        alert(t('timer.export.success'));
+      } else {
+        alert(t('timer.export.error'));
+      }
+    } catch {
       alert(t('timer.export.error'));
     }
   };
