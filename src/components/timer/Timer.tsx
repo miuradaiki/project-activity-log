@@ -4,12 +4,7 @@ import { PlayArrow, Stop } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Project } from '../../types';
 import { formatElapsedTime } from '../../utils/time';
-import {
-  GlassCard,
-  GradientCard,
-  fadeInUp,
-  scaleIn,
-} from '../ui/modern/StyledComponents';
+import { GradientCard } from '../ui/modern/StyledComponents';
 
 interface TimerProps {
   project: Project | null;
@@ -71,13 +66,13 @@ export const Timer: React.FC<TimerProps> = ({
     if (isRunning && startTime) {
       setElapsed(calculateElapsed());
     }
-  }, []);
+  }, [isRunning, startTime, calculateElapsed]);
+
+  const theme = useTheme();
 
   if (!project) {
     return null;
   }
-
-  const theme = useTheme();
 
   return (
     <motion.div

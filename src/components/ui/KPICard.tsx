@@ -8,12 +8,7 @@ import {
 } from '@mui/material';
 import { TrendingUp, TrendingDown, TrendingFlat } from '@mui/icons-material';
 import { motion } from 'framer-motion';
-import {
-  GlassCard,
-  AnimatedIconWrapper,
-  fadeInUp,
-  hoverScale,
-} from './modern/StyledComponents';
+import { GlassCard, AnimatedIconWrapper } from './modern/StyledComponents';
 
 interface KPICardProps {
   title: string;

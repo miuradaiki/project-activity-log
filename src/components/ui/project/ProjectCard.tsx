@@ -9,7 +9,6 @@ import {
   MenuItem,
   Tooltip,
   CircularProgress,
-  Chip,
   Divider,
   useTheme,
 } from '@mui/material';
@@ -18,9 +17,6 @@ import {
   GlassCard,
   AnimatedProgressBar,
   StatusBadge,
-  fadeInUp,
-  hoverScale,
-  AnimatedIconWrapper,
 } from '../modern/StyledComponents';
 import {
   PlayArrow as PlayArrowIcon,

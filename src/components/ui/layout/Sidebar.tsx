@@ -4,14 +4,12 @@ import {
   List,
   ListItem,
   ListItemButton,
-  ListItemIcon,
   ListItemText,
   Drawer,
   IconButton,
   useMediaQuery,
   useTheme,
   Divider,
-  Badge,
   Tooltip,
   Typography,
 } from '@mui/material';
@@ -26,12 +24,7 @@ import {
 } from '@mui/icons-material';
 import { styled, alpha } from '@mui/material/styles';
 import { useLanguage } from '../../../contexts/LanguageContext';
-import {
-  MotionBox,
-  fadeInUp,
-  slideInLeft,
-  stagger,
-} from '../modern/StyledComponents';
+import { MotionBox } from '../modern/StyledComponents';
 
 // ドロワーの幅設定
 export const DRAWER_WIDTH = 240;
@@ -175,10 +168,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ) => (
     <motion.div
       key={item.id}
-      variants={fadeInUp}
-      initial="initial"
-      animate="animate"
-      transition={{ delay: index * 0.1 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.1, duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
     >
       <ListItem disablePadding>
         <Tooltip title={!open ? item.text : ''} placement="right" arrow>
@@ -269,9 +261,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </SidebarHeader>
 
       <MotionBox
-        variants={stagger}
-        initial="initial"
-        animate="animate"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
         sx={{ flexGrow: 1, pt: 2 }}
       >
         <List>
