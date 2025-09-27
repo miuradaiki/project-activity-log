@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLanguage } from './contexts/LanguageContext';
-import { Box, Button, CircularProgress, Typography } from '@mui/material';
+import { Box, Button, CircularProgress } from '@mui/material';
 import { CloudUpload as CloudUploadIcon } from '@mui/icons-material';
 import { Project, TimeEntry } from './types';
 
@@ -446,17 +446,8 @@ const App: React.FC = () => {
       case 'timer':
         return (
           <Box sx={{ width: '100%', maxWidth: 1200, mx: 'auto' }}>
-            <Box
-              sx={{
-                mb: 4,
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
-              <Typography variant="h5" component="h1" fontWeight="bold">
-                {t('timer.title')}
-              </Typography>
+            {/* CSVインポートボタン */}
+            <Box sx={{ mb: 3, display: 'flex', justifyContent: 'flex-end' }}>
               <Button
                 variant="outlined"
                 startIcon={<CloudUploadIcon />}
@@ -498,7 +489,12 @@ const App: React.FC = () => {
         );
 
       case 'settings':
-        return <SettingsView />;
+        return (
+          <SettingsView
+            onToggleTheme={toggleThemeMode}
+            isDarkMode={isDarkMode}
+          />
+        );
       default:
         return null;
     }

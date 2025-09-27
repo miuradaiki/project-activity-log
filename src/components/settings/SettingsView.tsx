@@ -21,6 +21,7 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
+  Switch,
 } from '@mui/material';
 import {
   AccessTime as AccessTimeIcon,
@@ -31,14 +32,24 @@ import {
   Science as ScienceIcon,
   ToggleOn as ToggleOnIcon,
   ToggleOff as ToggleOffIcon,
+  Brightness4,
+  Brightness7,
 } from '@mui/icons-material';
 import { useSettingsContext } from '../../contexts/SettingsContext';
 import { useStorage } from '../../hooks/useStorage';
 
+interface SettingsViewProps {
+  onToggleTheme: () => void;
+  isDarkMode: boolean;
+}
+
 /**
  * アプリケーション設定画面コンポーネント
  */
-export const SettingsView: React.FC = () => {
+export const SettingsView: React.FC<SettingsViewProps> = ({
+  onToggleTheme,
+  isDarkMode,
+}) => {
   const theme = useTheme();
   const { settings, isLoading, updateBaseMonthlyHours } = useSettingsContext();
   const { language, setLanguage, t } = useLanguage();
@@ -278,7 +289,7 @@ export const SettingsView: React.FC = () => {
           </Card>
         </Grid>
 
-        {/* 言語設定カード */}
+        {/* 外観設定カード（言語とテーマ） */}
         <Grid item xs={12}>
           <Card
             elevation={1}
@@ -293,11 +304,46 @@ export const SettingsView: React.FC = () => {
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                 <TranslateIcon color="primary" sx={{ mr: 1 }} />
-                <Typography variant="h6">{t('settings.language')}</Typography>
+                <Typography variant="h6">外観設定</Typography>
               </Box>
               <Divider sx={{ mb: 3 }} />
 
+              {/* テーマ切り替え */}
               <Box sx={{ mb: 4 }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    mb: 2,
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    {isDarkMode ? (
+                      <Brightness4 sx={{ mr: 1 }} />
+                    ) : (
+                      <Brightness7 sx={{ mr: 1 }} />
+                    )}
+                    <Typography variant="body1">ダークモード</Typography>
+                  </Box>
+                  <Switch
+                    checked={isDarkMode}
+                    onChange={onToggleTheme}
+                    color="primary"
+                  />
+                </Box>
+                <Typography variant="body2" color="text.secondary">
+                  画面の配色を切り替えます
+                </Typography>
+              </Box>
+
+              <Divider sx={{ mb: 3 }} />
+
+              {/* 言語設定 */}
+              <Box>
+                <Typography variant="body1" sx={{ mb: 2 }}>
+                  {t('settings.language')}
+                </Typography>
                 <Typography
                   variant="body2"
                   color="text.secondary"

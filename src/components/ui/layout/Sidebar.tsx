@@ -11,7 +11,11 @@ import {
   useMediaQuery,
   useTheme,
   Divider,
+  Badge,
+  Tooltip,
+  Typography,
 } from '@mui/material';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Dashboard as DashboardIcon,
   ListAlt as ProjectsIcon,
@@ -20,27 +24,113 @@ import {
   Menu as MenuIcon,
   ChevronLeft as ChevronLeftIcon,
 } from '@mui/icons-material';
-import { styled } from '@mui/material/styles';
+import { styled, alpha } from '@mui/material/styles';
 import { useLanguage } from '../../../contexts/LanguageContext';
+import {
+  MotionBox,
+  fadeInUp,
+  slideInLeft,
+  stagger,
+} from '../modern/StyledComponents';
 
 // ドロワーの幅設定
 export const DRAWER_WIDTH = 240;
 export const CLOSED_DRAWER_WIDTH = 60;
 
-// スタイル付きListItemButton
+// Modern styled components
+const ModernDrawer = styled(Drawer)(({ theme }) => ({
+  '& .MuiDrawer-paper': {
+    background:
+      theme.palette.mode === 'dark'
+        ? 'linear-gradient(180deg, #1A1F2E 0%, #0F1419 100%)'
+        : 'linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)',
+    backdropFilter: 'blur(20px)',
+    borderRight: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+    boxShadow:
+      theme.custom?.shadows?.medium || '0 10px 40px -15px rgba(0,0,0,0.15)',
+  },
+}));
+
 const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
-  borderRadius: theme.spacing(1),
+  borderRadius: theme.custom?.borderRadius?.sm || 8,
   margin: theme.spacing(0.5, 1),
-  '&.Mui-selected': {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.primary.contrastText,
-    '&:hover': {
-      backgroundColor: theme.palette.primary.dark,
-    },
-    '& .MuiListItemIcon-root': {
-      color: theme.palette.primary.contrastText,
+  position: 'relative',
+  overflow: 'hidden',
+  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  '&:hover': {
+    backgroundColor: alpha(theme.palette.primary.main, 0.08),
+    transform: 'translateX(8px)',
+    '&::before': {
+      transform: 'scaleX(1)',
     },
   },
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: 4,
+    background:
+      theme.custom?.gradients?.primary ||
+      'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    transform: 'scaleX(0)',
+    transformOrigin: 'left',
+    transition: 'transform 0.3s ease',
+  },
+  '&.Mui-selected': {
+    background:
+      theme.custom?.gradients?.primary ||
+      'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    color: '#FFFFFF',
+    boxShadow: theme.custom?.shadows?.soft || '0 2px 20px 0 rgba(0,0,0,0.1)',
+    transform: 'translateX(8px)',
+    '&:hover': {
+      background:
+        theme.custom?.gradients?.primary ||
+        'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      filter: 'brightness(1.1)',
+    },
+    '& .MuiListItemIcon-root': {
+      color: '#FFFFFF',
+    },
+    '& .MuiListItemText-primary': {
+      fontWeight: 600,
+    },
+    '&::before': {
+      transform: 'scaleX(1)',
+    },
+  },
+}));
+
+const ModernIconWrapper = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: 40,
+  height: 40,
+  borderRadius: theme.custom?.borderRadius?.sm || 8,
+  transition: 'all 0.3s ease',
+  position: 'relative',
+}));
+
+const SidebarHeader = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(2),
+  borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+  background: alpha(theme.palette.primary.main, 0.05),
+  backdropFilter: 'blur(10px)',
+}));
+
+const BrandText = styled(Typography)(({ theme }) => ({
+  fontWeight: 800,
+  fontSize: '1.2rem',
+  background:
+    theme.custom?.gradients?.primary ||
+    'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  backgroundClip: 'text',
+  letterSpacing: '-0.02em',
 }));
 
 export interface SidebarProps {
@@ -74,59 +164,134 @@ export const Sidebar: React.FC<SidebarProps> = ({
     icon: <SettingsIcon />,
   };
 
-  // メニュー項目のレンダリング
-  const renderMenuItem = (item: {
-    id: string;
-    text: string;
-    icon: React.ReactNode;
-  }) => (
-    <ListItem key={item.id} disablePadding>
-      <StyledListItemButton
-        selected={activePage === item.id}
-        onClick={() => onNavigate(item.id)}
-        sx={{
-          justifyContent: open ? 'initial' : 'center',
-          px: open ? 3 : 2.5,
-        }}
-      >
-        <ListItemIcon
-          sx={{
-            minWidth: open ? 36 : 'auto',
-            mr: open ? 2 : 'auto',
-            justifyContent: 'center',
-          }}
-        >
-          {item.icon}
-        </ListItemIcon>
-        {open && <ListItemText primary={item.text} />}
-      </StyledListItemButton>
-    </ListItem>
+  // Modern menu item rendering with animations
+  const renderMenuItem = (
+    item: {
+      id: string;
+      text: string;
+      icon: React.ReactNode;
+    },
+    index: number
+  ) => (
+    <motion.div
+      key={item.id}
+      variants={fadeInUp}
+      initial="initial"
+      animate="animate"
+      transition={{ delay: index * 0.1 }}
+    >
+      <ListItem disablePadding>
+        <Tooltip title={!open ? item.text : ''} placement="right" arrow>
+          <StyledListItemButton
+            selected={activePage === item.id}
+            onClick={() => onNavigate(item.id)}
+            sx={{
+              justifyContent: open ? 'initial' : 'center',
+              px: open ? 2 : 1.5,
+              py: 1.5,
+            }}
+          >
+            <ModernIconWrapper
+              sx={{
+                minWidth: open ? 40 : 'auto',
+                mr: open ? 2 : 'auto',
+              }}
+            >
+              {item.icon}
+            </ModernIconWrapper>
+            <AnimatePresence>
+              {open && (
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.2 }}
+                  style={{ width: '100%' }}
+                >
+                  <ListItemText
+                    primary={item.text}
+                    primaryTypographyProps={{
+                      fontSize: '0.95rem',
+                      fontWeight: activePage === item.id ? 600 : 500,
+                    }}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </StyledListItemButton>
+        </Tooltip>
+      </ListItem>
+    </motion.div>
   );
 
-  // ドロワーの内容
+  // Modern drawer content with animations
   const drawer = (
     <>
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: open ? 'flex-end' : 'center',
-          p: 1,
-          minHeight: 56,
-        }}
+      <SidebarHeader>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: open ? 'space-between' : 'center',
+          }}
+        >
+          <AnimatePresence>
+            {open && (
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <BrandText variant="h6">Project Log</BrandText>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <IconButton
+            onClick={onToggle}
+            sx={{
+              color: 'primary.main',
+              '&:hover': {
+                background: alpha(theme.palette.primary.main, 0.1),
+                transform: 'scale(1.1)',
+              },
+              transition: 'all 0.2s ease',
+            }}
+          >
+            <motion.div
+              animate={{ rotate: open ? 180 : 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {open ? <ChevronLeftIcon /> : <MenuIcon />}
+            </motion.div>
+          </IconButton>
+        </Box>
+      </SidebarHeader>
+
+      <MotionBox
+        variants={stagger}
+        initial="initial"
+        animate="animate"
+        sx={{ flexGrow: 1, pt: 2 }}
       >
-        <IconButton onClick={onToggle} sx={{ ml: open ? 'auto' : 0 }}>
-          {open ? <ChevronLeftIcon /> : <MenuIcon />}
-        </IconButton>
-      </Box>
+        <List>
+          {mainMenuItems.map((item, index) => renderMenuItem(item, index))}
+        </List>
+      </MotionBox>
 
-      <List sx={{ pt: 2, flexGrow: 1 }}>
-        {mainMenuItems.map(renderMenuItem)}
+      <Divider
+        sx={{
+          mx: 2,
+          borderColor: alpha(theme.palette.divider, 0.1),
+          '&::before, &::after': {
+            borderColor: alpha(theme.palette.divider, 0.1),
+          },
+        }}
+      />
+
+      <List sx={{ pb: 2 }}>
+        {renderMenuItem(settingsMenuItem, mainMenuItems.length)}
       </List>
-
-      <Divider sx={{ my: 1 }} />
-
-      <List sx={{ mb: 2 }}>{renderMenuItem(settingsMenuItem)}</List>
     </>
   );
 
@@ -153,7 +318,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         >
           <MenuIcon />
         </IconButton>
-        <Drawer
+        <ModernDrawer
           variant="temporary"
           open={open}
           onClose={onToggle}
@@ -163,20 +328,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
             '& .MuiDrawer-paper': {
               width: DRAWER_WIDTH,
               boxSizing: 'border-box',
-              boxShadow: 3,
             },
             zIndex: theme.zIndex.appBar + 100,
           }}
         >
           {drawer}
-        </Drawer>
+        </ModernDrawer>
       </>
     );
   }
 
-  // デスクトップ版レイアウト
+  // Modern desktop layout
   return (
-    <Drawer
+    <ModernDrawer
       variant="permanent"
       sx={{
         width: open ? DRAWER_WIDTH : CLOSED_DRAWER_WIDTH,
@@ -184,10 +348,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         '& .MuiDrawer-paper': {
           width: open ? DRAWER_WIDTH : CLOSED_DRAWER_WIDTH,
           boxSizing: 'border-box',
-          borderRight: `1px solid ${theme.palette.divider}`,
           transition: theme.transitions.create('width', {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen,
+            easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+            duration: theme.transitions.duration.complex,
           }),
           overflowX: 'hidden',
           display: 'flex',
@@ -196,6 +359,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       }}
     >
       {drawer}
-    </Drawer>
+    </ModernDrawer>
   );
 };

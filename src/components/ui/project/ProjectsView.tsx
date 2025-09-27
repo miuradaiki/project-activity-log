@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../../../contexts/LanguageContext';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 import { Project, TimeEntry } from '../../../types';
 import { ProjectsGrid } from './ProjectsGrid';
@@ -56,29 +56,8 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({
 
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
-      {/* ヘッダー */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          mb: 4,
-        }}
-      >
-        <Box>
-          <Typography
-            variant="h5"
-            component="h1"
-            fontWeight="bold"
-            gutterBottom
-          >
-            {t('projects.title')}
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            {t('dashboard.progress.subtitle')}
-          </Typography>
-        </Box>
-
+      {/* 新規プロジェクトボタン */}
+      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'flex-end' }}>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
