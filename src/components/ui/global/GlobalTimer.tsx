@@ -130,10 +130,12 @@ export const GlobalTimer: React.FC<GlobalTimerProps> = ({
           transition: 'all 0.3s ease',
           cursor: 'pointer',
           '&:hover': {
-            transform: 'translateY(-4px)',
+            transform: 'translateY(-2px)', // より控えめな移動
             boxShadow: `0 6px 16px ${alpha(timerColor, 0.3)}`,
+            filter: 'brightness(1.05)', // 明度変化を追加
           },
-          maxWidth: 300,
+          maxWidth: { xs: 280, sm: 320, md: 350 },
+          minWidth: 200,
         }}
         onClick={onClick}
       >
@@ -142,19 +144,25 @@ export const GlobalTimer: React.FC<GlobalTimerProps> = ({
             p: 2,
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
+            justifyContent: 'center', // 中央寄せに変更
             gap: 2,
           }}
         >
-          {/* プロジェクト名とステータスインジケーター */}
-          <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
+          {/* ステータスインジケーター */}
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}
+          >
             <Box
               sx={{
                 width: 8,
                 height: 8,
                 borderRadius: '50%',
                 bgcolor: timerColor,
-                mr: 1,
                 boxShadow: `0 0 10px ${timerColor}`,
                 animation: 'pulse 1.5s infinite ease-in-out',
                 '@keyframes pulse': {
@@ -164,54 +172,85 @@ export const GlobalTimer: React.FC<GlobalTimerProps> = ({
                 },
               }}
             />
-            <Box>
-              <Typography
-                variant="subtitle2"
-                component="div"
-                noWrap
-                sx={{
-                  maxWidth: 150,
-                  fontWeight: 'bold',
-                }}
-              >
-                {project.name}
-              </Typography>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
-              >
-                <TimerOutlined
-                  fontSize="inherit"
-                  sx={{ mr: 0.5, color: timerColor }}
-                />
-                {elapsed}
-              </Typography>
-            </Box>
+          </Box>
+
+          {/* プロジェクト名とタイマー */}
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexGrow: 1,
+              minWidth: 0,
+              textAlign: 'center',
+            }}
+          >
+            <Typography
+              variant="subtitle2"
+              component="div"
+              sx={{
+                fontWeight: 'bold',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                width: '100%',
+                textAlign: 'center',
+              }}
+              title={project.name} // ツールチップで完全な名前を表示
+            >
+              {project.name}
+            </Typography>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                whiteSpace: 'nowrap',
+                mt: 0.5,
+              }}
+            >
+              <TimerOutlined
+                fontSize="inherit"
+                sx={{ mr: 0.5, color: timerColor }}
+              />
+              {elapsed}
+            </Typography>
           </Box>
 
           {/* 停止ボタン */}
-          <Tooltip title={t('timer.stop')}>
-            <IconButton
-              color="error"
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation(); // クリックイベントの伝播を止める
-                onStop();
-              }}
-              sx={{
-                bgcolor: alpha(theme.palette.error.main, 0.1),
-                '&:hover': {
-                  bgcolor: alpha(theme.palette.error.main, 0.2),
-                },
-              }}
-            >
-              <Stop fontSize="small" />
-            </IconButton>
-          </Tooltip>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <Tooltip title={t('timer.stop')}>
+              <IconButton
+                color="error"
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation(); // クリックイベントの伝播を止める
+                  onStop();
+                }}
+                sx={{
+                  bgcolor: alpha(theme.palette.error.main, 0.1),
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  '&:hover': {
+                    bgcolor: alpha(theme.palette.error.main, 0.2),
+                  },
+                }}
+              >
+                <Stop fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Box>
         </Box>
       </Paper>
     </Fade>

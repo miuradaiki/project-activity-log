@@ -172,10 +172,17 @@ export const TimerFocus: React.FC<TimerFocusProps> = ({
           borderColor: 'divider',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
+          justifyContent: 'center', // 中央寄せに変更
+          position: 'relative', // 編集ボタンを絶対配置するため
         }}
       >
-        <Box display="flex" alignItems="center">
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          width="100%"
+          sx={{ textAlign: 'center' }}
+        >
           <Box
             sx={{
               width: 8,
@@ -192,7 +199,17 @@ export const TimerFocus: React.FC<TimerFocusProps> = ({
               },
             }}
           />
-          <Typography variant="h6" fontWeight="medium">
+          <Typography
+            variant="h6"
+            fontWeight="medium"
+            sx={{
+              textAlign: 'center',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              maxWidth: '100%',
+            }}
+          >
             {project.name}
           </Typography>
         </Box>
@@ -203,7 +220,12 @@ export const TimerFocus: React.FC<TimerFocusProps> = ({
               onClick={() => setIsEditing(true)}
               color="primary"
               size="small"
-              sx={{ ml: 1 }}
+              sx={{
+                position: 'absolute',
+                right: 16,
+                top: '50%',
+                transform: 'translateY(-50%)',
+              }}
             >
               <EditIcon fontSize="small" />
             </IconButton>

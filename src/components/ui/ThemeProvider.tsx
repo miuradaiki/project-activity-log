@@ -6,7 +6,7 @@ import React, {
   useMemo,
 } from 'react';
 import { ThemeProvider as MuiThemeProvider, CssBaseline } from '@mui/material';
-import { responsiveTheme } from '../../styles/theme';
+import { getResponsiveTheme } from '../../styles/modernTheme';
 
 // テーマモード用のコンテキスト
 interface ThemeContextType {
@@ -48,7 +48,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   }, [isDarkMode]);
 
   // ダークモードまたはライトモードに基づいたテーマを生成
-  const theme = useMemo(() => responsiveTheme(isDarkMode), [isDarkMode]);
+  const theme = useMemo(() => getResponsiveTheme(isDarkMode), [isDarkMode]);
 
   const contextValue = useMemo(
     () => ({
