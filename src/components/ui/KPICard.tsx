@@ -1,13 +1,14 @@
 import React from 'react';
 import {
   Box,
-  Card,
   CardContent,
   Typography,
   SvgIconProps,
   useTheme,
 } from '@mui/material';
 import { TrendingUp, TrendingDown, TrendingFlat } from '@mui/icons-material';
+import { motion } from 'framer-motion';
+import { GlassCard, AnimatedIconWrapper } from './modern/StyledComponents';
 
 interface KPICardProps {
   title: string;
@@ -21,7 +22,7 @@ interface KPICardProps {
 }
 
 /**
- * KPIカードコンポーネント - ダッシュボードの統計情報を表示するためのカード
+ * Modern KPIカードコンポーネント - ダッシュボードの統計情報を表示するための美しいカード
  */
 export const KPICard: React.FC<KPICardProps> = ({
   title,
@@ -73,82 +74,166 @@ export const KPICard: React.FC<KPICardProps> = ({
   const displayTrendValue = trend && !isNaN(trend.value) ? trend.value : 0;
 
   return (
-    <Card
-      sx={{
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        transition: 'transform 0.3s, box-shadow 0.3s',
-        '&:hover': {
-          transform: 'translateY(-4px)',
-          boxShadow: theme.shadows[8],
-        },
-        position: 'relative',
-        overflow: 'hidden',
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '4px',
-          backgroundColor: iconColor,
-        },
-      }}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+      whileHover={{ scale: 1.05, y: -8 }}
+      whileTap={{ scale: 0.95 }}
+      style={{ height: '100%' }}
     >
-      <CardContent
-        sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}
+      <GlassCard
+        sx={{
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          position: 'relative',
+          overflow: 'hidden',
+          '&::after': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '4px',
+            background: `linear-gradient(90deg, ${iconColor}, ${theme.palette.mode === 'dark' ? '#FFFFFF40' : '#00000020'})`,
+          },
+        }}
       >
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            mb: 2,
-          }}
+        <CardContent
+          sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}
         >
           <Box
             sx={{
-              mr: 1.5,
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: `${iconColor}22`,
-              borderRadius: '50%',
-              width: 40,
-              height: 40,
+              mb: 2,
             }}
           >
-            {React.cloneElement(icon, { style: { color: iconColor } })}
-          </Box>
-          <Typography variant="subtitle1" color="text.secondary">
-            {title}
-          </Typography>
-        </Box>
-
-        <Typography
-          variant="h4"
-          component="div"
-          sx={{ mb: 1, fontWeight: 'medium' }}
-        >
-          {value}
-        </Typography>
-
-        {trend && (
-          <Box sx={{ display: 'flex', alignItems: 'center', mt: 'auto' }}>
-            {trendIcon}
-            <Typography
-              variant="body2"
-              sx={{ ml: 0.5, color: trendColor, fontWeight: 'medium' }}
+            <motion.div
+              whileHover={{ scale: 1.1, rotate: 5 }}
+              whileTap={{ scale: 0.95 }}
             >
-              {displayTrendValue > 0 ? '+' : ''}
-              {displayTrendValue}%
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
-              {trend.label}
+              <AnimatedIconWrapper
+                sx={{
+                  mr: 1.5,
+                  background: `linear-gradient(135deg, ${iconColor}20, ${iconColor}10)`,
+                  border: `1px solid ${iconColor}30`,
+                  backdropFilter: 'blur(10px)',
+                }}
+              >
+                {React.cloneElement(icon, {
+                  style: {
+                    color: iconColor,
+                    fontSize: '1.5rem',
+                  },
+                })}
+              </AnimatedIconWrapper>
+            </motion.div>
+            <Typography
+              variant="subtitle1"
+              color="text.secondary"
+              sx={{
+                fontWeight: 500,
+                letterSpacing: '0.02em',
+              }}
+            >
+              {title}
             </Typography>
           </Box>
-        )}
-      </CardContent>
-    </Card>
+
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.5, type: 'spring' }}
+          >
+            <Typography
+              variant="h4"
+              component="div"
+              sx={{
+                mb: 1,
+                fontWeight: 700,
+                background:
+                  theme.palette.mode === 'dark'
+                    ? 'linear-gradient(135deg, #FFFFFF, #B0B3B8)'
+                    : 'linear-gradient(135deg, #1A1F2E, #374151)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                letterSpacing: '-0.02em',
+              }}
+            >
+              {value}
+            </Typography>
+          </motion.div>
+
+          {trend && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.3 }}
+            >
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  mt: 'auto',
+                  p: 1,
+                  borderRadius: theme.custom?.borderRadius?.sm || 8,
+                  background:
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255, 255, 255, 0.03)'
+                      : 'rgba(0, 0, 0, 0.03)',
+                  backdropFilter: 'blur(10px)',
+                  border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)'}`,
+                }}
+              >
+                <motion.div
+                  animate={{
+                    rotate:
+                      trend.value > 0
+                        ? [0, 10, 0]
+                        : trend.value < 0
+                          ? [0, -10, 0]
+                          : 0,
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    repeatType: 'reverse',
+                  }}
+                >
+                  {trendIcon}
+                </motion.div>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    ml: 0.5,
+                    color: trendColor,
+                    fontWeight: 600,
+                    fontSize: '0.875rem',
+                  }}
+                >
+                  {displayTrendValue > 0 ? '+' : ''}
+                  {displayTrendValue}%
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{
+                    ml: 1,
+                    fontSize: '0.75rem',
+                    opacity: 0.8,
+                  }}
+                >
+                  {trend.label}
+                </Typography>
+              </Box>
+            </motion.div>
+          )}
+        </CardContent>
+      </GlassCard>
+    </motion.div>
   );
 };

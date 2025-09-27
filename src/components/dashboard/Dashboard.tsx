@@ -1,13 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLanguage } from '../../contexts/LanguageContext';
-import {
-  Box,
-  Grid,
-  Paper,
-  Typography,
-  useTheme,
-  useMediaQuery,
-} from '@mui/material';
+import { Box, Grid, Paper, useTheme, useMediaQuery } from '@mui/material';
 import { Project, TimeEntry } from '../../types';
 import { DailySummary } from './DailySummary';
 import { WeeklySummary } from './WeeklySummary';
@@ -33,7 +25,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
   onUnarchiveProject,
 }) => {
   const theme = useTheme();
-  const { t } = useLanguage();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   // 将来のレスポンシブ対応のために保持
   void isMobile;
@@ -60,16 +51,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
             : theme.palette.background.default,
       }}
     >
-      {/* ヘッダー */}
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h5" fontWeight="medium">
-          {t('dashboard.title')}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {t('dashboard.subtitle')}
-        </Typography>
-      </Box>
-
       {/* 日次サマリー */}
       <Box sx={{ mb: 4 }}>
         <DailySummary projects={projects} timeEntries={timeEntries} />

@@ -5,6 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ### Development
+
 ```bash
 # Start development environment (recommended)
 npm run electron:dev
@@ -15,6 +16,7 @@ npm run start  # Terminal 2: Electron app
 ```
 
 ### Build
+
 ```bash
 # Build production distributable
 npm run electron:build
@@ -27,14 +29,17 @@ npm run preview
 ```
 
 ### Testing
+
 **No testing framework is currently configured.** The project lacks test infrastructure.
 
 ### Linting
+
 **No linting configuration exists.** Consider adding ESLint and Prettier.
 
 ## Architecture Overview
 
 ### Tech Stack
+
 - **Electron 29.0**: Cross-platform desktop application
 - **React 18.2 + TypeScript**: UI framework with strict type checking
 - **Material-UI (MUI) 5.11**: Component library
@@ -43,6 +48,7 @@ npm run preview
 - **State Management**: React Context API (no Redux/Zustand)
 
 ### Electron Architecture
+
 The app follows standard Electron architecture with secure IPC communication:
 
 1. **Main Process** (`main.js`):
@@ -75,6 +81,7 @@ The app follows standard Electron architecture with secure IPC communication:
    - No global state library - components manage local state
 
 3. **Component Structure**:
+
    ```
    components/
    ├── dashboard/     # Analytics views (daily/weekly/monthly)
@@ -100,29 +107,35 @@ The app follows standard Electron architecture with secure IPC communication:
 ## Important Implementation Details
 
 ### Timer System
+
 - Continues tracking time during system sleep
 - Auto-stops after 8 hours with desktop notification
 - Persists state across app restarts
 
 ### Project Progress Management
+
 - Monthly base hours customizable (80-200 hours)
 - Project allocation by percentage (0-100%)
 - Visual warnings at 90% and 100% completion
 - Real-time progress tracking
 
 ### Data Import
+
 - CSV import with automatic backup
 - Creates new projects if not found
 - Rollback on import failure
 
 ### i18n Support
+
 - Japanese as primary language
 - Translation system in place via `i18n/` directory
 
 ## Development Considerations
 
 ### Working with Electron IPC
+
 All data operations must go through the preload bridge:
+
 ```typescript
 // Good
 await window.electronAPI.saveProjects(projects);
@@ -132,27 +145,43 @@ fs.writeFileSync(...); // Will fail
 ```
 
 ### State Updates
+
 Components handle their own state - no centralized store. When updating shared data:
+
 1. Update via `useStorage` hook
 2. Component re-renders automatically
 3. Other components poll or listen for changes
 
 ### File Paths
+
 Always use Electron's app paths - never hardcode:
+
 ```javascript
 // In main process only
-app.getPath('userData')
+app.getPath('userData');
 ```
 
 ### TypeScript Strict Mode
+
 The project enforces strict TypeScript. Always:
+
 - Define explicit types for function parameters
 - Handle null/undefined cases
 - Use type guards when necessary
 
+### Code Comments
+
+Only include comments that provide valuable context:
+
+- **Do include**: Complex business logic explanations, non-obvious edge cases, security considerations, performance notes
+- **Don't include**: Obvious statements like "// より控えめな移動" or "// 中央寄せに変更"
+- Focus on WHY the code does something, not WHAT it does
+- Avoid redundant comments that duplicate what the code clearly shows
+
 ### Documentation Guidelines
 
 When generating documentation or any content:
+
 - **ALWAYS verify the current date is 2025-09-27**
 - Common error: Writing dates like 2025-01-27 instead of 2025-09-27
 - Double-check all dates before finalizing documentation
@@ -161,7 +190,9 @@ When generating documentation or any content:
 - Focus on technical facts and implementation details only
 
 ### Markdown Formatting
+
 When creating or editing markdown files:
+
 - **ALWAYS end files with a single newline character**
 - Remove trailing whitespace from line endings
 - Follow markdownlint standards for consistent formatting

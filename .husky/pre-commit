@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+
+# Run lint-staged to test only changed files
+echo "🧪 Running tests and checks on staged files..."
+npx lint-staged
+
+# Check if lint-staged passed
+if [ $? -ne 0 ]; then
+  echo "❌ Pre-commit checks failed. Please fix the issues before committing."
+  exit 1
+fi
+
+echo "✅ All pre-commit checks passed!"
