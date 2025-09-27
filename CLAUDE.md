@@ -149,3 +149,19 @@ The project enforces strict TypeScript. Always:
 - Define explicit types for function parameters
 - Handle null/undefined cases
 - Use type guards when necessary
+
+### Documentation Guidelines
+
+When generating documentation or any content:
+- **ALWAYS verify the current date is 2025-09-27**
+- Common error: Writing dates like 2025-01-27 instead of 2025-09-27
+- Double-check all dates before finalizing documentation
+- Use the actual current date, not knowledge cutoff dates
+- **NEVER include time estimates or development duration**
+- Focus on technical facts and implementation details only
+
+### Markdown Formatting
+When creating or editing markdown files:
+- **ALWAYS end files with a single newline character**
+- Remove trailing whitespace from line endings
+- Follow markdownlint standards for consistent formatting
