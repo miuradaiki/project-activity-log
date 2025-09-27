@@ -81,6 +81,7 @@
   },
   "lint-staged": {
     "*.{ts,tsx}": [
+      "npm run lint -- --fix",
       "npm test -- --findRelatedTests --passWithNoTests"
     ],
     "*.{js,jsx,ts,tsx,json,css,md}": [
