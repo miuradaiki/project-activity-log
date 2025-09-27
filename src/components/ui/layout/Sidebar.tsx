@@ -110,16 +110,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
         sx={{
           display: 'flex',
           alignItems: 'center',
-          justifyContent: open ? 'space-between' : 'center',
-          p: 2,
+          justifyContent: open ? 'flex-end' : 'center',
+          p: 1,
+          minHeight: 56,
         }}
       >
-        {open && (
-          <Box sx={{ fontSize: '1.2rem', fontWeight: 'bold' }}>
-            {t('app.name')}
-          </Box>
-        )}
-        <IconButton onClick={onToggle}>
+        <IconButton onClick={onToggle} sx={{ ml: open ? 'auto' : 0 }}>
           {open ? <ChevronLeftIcon /> : <MenuIcon />}
         </IconButton>
       </Box>
