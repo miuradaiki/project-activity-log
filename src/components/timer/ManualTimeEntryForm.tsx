@@ -22,12 +22,12 @@ import { Update, CalendarToday } from '@mui/icons-material';
 import { Project, TimeEntry } from '../../types';
 import { v4 as uuidv4 } from 'uuid';
 import {
-  addDays,
   format,
   isSameDay,
   differenceInHours,
   differenceInMinutes,
 } from 'date-fns';
+import { createSplitEntries } from '../../utils/timeEntryUtils';
 
 interface ManualTimeEntryFormProps {
   open: boolean;
@@ -57,6 +57,8 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
   const [endTime, setEndTime] = useState<string>('17:00');
   const [description, setDescription] = useState<string>('');
 
+  const isEditing = !!timeEntry;
+
   useEffect(() => {
     if (timeEntry) {
       const startDateTime = new Date(timeEntry.startTime);
@@ -64,7 +66,8 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
 
       setProjectId(timeEntry.projectId);
       setStartDate(startDateTime.toISOString().split('T')[0]);
-      setEndDate(endDateTime.toISOString().split('T')[0]);
+      // 編集時は日跨ぎ編集を禁止するため終了日を開始日に固定
+      setEndDate(startDateTime.toISOString().split('T')[0]);
       setStartTime(startDateTime.toTimeString().slice(0, 5));
       setEndTime(endDateTime.toTimeString().slice(0, 5));
       setDescription(timeEntry.description || '');
@@ -113,46 +116,6 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
   };
 
   // 自動分割機能：日跨ぎエントリーを複数のエントリーに分割
-  const createSplitEntries = (
-    projectId: string,
-    startDateTime: Date,
-    endDateTime: Date,
-    description: string
-  ): TimeEntry[] => {
-    const entries: TimeEntry[] = [];
-    let currentStart = new Date(startDateTime);
-    const timestamp = new Date().toISOString();
-
-    while (currentStart < endDateTime) {
-      const currentEnd = new Date(currentStart);
-      currentEnd.setHours(23, 59, 59, 999); // その日の終わり
-
-      if (currentEnd > endDateTime) {
-        currentEnd.setTime(endDateTime.getTime());
-      }
-
-      const entry: TimeEntry = {
-        id: uuidv4(),
-        projectId,
-        startTime: currentStart.toISOString(),
-        endTime: currentEnd.toISOString(),
-        description:
-          entries.length === 0
-            ? description
-            : `${description} (${entries.length + 1}日目)`,
-        createdAt: timestamp,
-        updatedAt: timestamp,
-      };
-
-      entries.push(entry);
-
-      // 次の日の開始時刻を設定
-      currentStart = addDays(currentStart, 1);
-      currentStart.setHours(0, 0, 0, 0);
-    }
-
-    return entries;
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -301,9 +264,14 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
                 label={t('timer.end.date') || '終了日'}
                 type="date"
                 value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
+                onChange={(e) => {
+                  // 編集時は終了日変更不可（跨ぎ禁止）
+                  if (isEditing) return;
+                  setEndDate(e.target.value);
+                }}
                 fullWidth
                 required
+                disabled={isEditing}
                 InputLabelProps={{ shrink: true }}
                 InputProps={{
                   startAdornment: (

@@ -5,6 +5,7 @@ import { CloudUpload as CloudUploadIcon } from '@mui/icons-material';
 import { Project, TimeEntry } from './types';
 
 import { v4 as uuidv4 } from 'uuid';
+import { createTimerEntries } from './utils/timeEntryUtils';
 import { ProjectList } from './components/ProjectList';
 import { ProjectForm } from './components/ProjectForm';
 import { TimeEntryList } from './components/timer/TimeEntryList';
@@ -95,17 +96,16 @@ const App: React.FC = () => {
       return;
     }
 
-    const newTimeEntry: TimeEntry = {
-      id: uuidv4(),
-      projectId: activeProject.id,
+    // 日跨ぎ対応: createTimerEntriesを使用して適切に分割
+    const newTimeEntries = createTimerEntries(
+      activeProject.id,
       startTime,
       endTime,
-      description: '',
-      createdAt: endTime,
-      updatedAt: endTime,
-    };
+      '' // description is empty for timer entries
+    );
 
-    setTimeEntries((prev) => [...prev, newTimeEntry]);
+    // 分割されたエントリーを追加
+    setTimeEntries((prev) => [...prev, ...newTimeEntries]);
     setIsTimerRunning(false);
     setStartTime(null);
     setActiveProject(null);
