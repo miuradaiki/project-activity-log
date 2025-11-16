@@ -58,7 +58,8 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   const [animatedProgress, setAnimatedProgress] = useState(0);
 
   // 進捗率を計算
-  const progress = Math.min((monthlyTime / monthlyTarget) * 100, 100);
+  const progress =
+    monthlyTarget > 0 ? Math.min((monthlyTime / monthlyTarget) * 100, 100) : 0;
 
   // プログレスアニメーション
   useEffect(() => {

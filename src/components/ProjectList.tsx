@@ -125,7 +125,8 @@ export const ProjectList: React.FC<ProjectListProps> = ({
         const isActive = project.id === activeProjectId;
         const monthlyTime = calculateMonthlyTime(project.id);
         const monthlyTarget = project.monthlyCapacity * 140; // 140時間を基準とした月間目標時間
-        const progress = (monthlyTime / monthlyTarget) * 100;
+        const progress =
+          monthlyTarget > 0 ? (monthlyTime / monthlyTarget) * 100 : 0;
 
         let progressColor = 'primary';
         if (progress >= 100) {
