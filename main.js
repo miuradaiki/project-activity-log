@@ -1,4 +1,12 @@
-import { app, BrowserWindow, ipcMain, dialog, Tray, Menu, nativeImage } from 'electron';
+import {
+  app,
+  BrowserWindow,
+  ipcMain,
+  dialog,
+  Tray,
+  Menu,
+  nativeImage,
+} from 'electron';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
@@ -12,7 +20,7 @@ import {
   saveProjects,
   loadTimeEntries,
   saveTimeEntries,
-  exportToCSV
+  exportToCSV,
 } from './storageUtils.js';
 
 // グローバル変数
@@ -22,26 +30,26 @@ let timerState = {
   isRunning: false,
   projectName: '',
   startTime: null,
-  elapsedTime: 0
+  elapsedTime: 0,
 };
 
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
-    minWidth: 900,  // 最小幅を設定
+    minWidth: 900, // 最小幅を設定
     minHeight: 650, // 最小高さを設定
     title: 'Project Activity Log',
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      preload: path.join(__dirname, 'preload.js')
-    }
+      preload: path.join(__dirname, 'preload.js'),
+    },
   });
 
   if (process.env.NODE_ENV === 'development') {
     mainWindow.loadURL('http://localhost:5175');
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools(); // 開発ツールを自動で開かない
   } else {
     mainWindow.loadFile('dist/index.html');
   }
@@ -56,7 +64,7 @@ function createWindow() {
 function createTray() {
   // シンプルな16x16のアイコンを作成
   const icon = nativeImage.createEmpty();
-  
+
   // macOS用のテンプレートアイコンを作成
   if (process.platform === 'darwin') {
     // シンプルな円形のアイコンを作成
@@ -64,14 +72,14 @@ function createTray() {
       'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAdgAAAHYBTnsmCAAAALRJREFUOI2lk7ENwzAMBM+xgQzgEbKBR3AJj+AR3EEaF26sIt9fJCVIvycfSeDu+M8QEYgIRARmhojAzHBOcc5xzvE8D2aGc465LmPvPSIC7z1SSog57r1jZhARiAhEBGutmOcp51xIa4WZYWa49x4RgdYKZoZzCmttmFkppZBSau+9RwQqpWBVy1olIpCmaIxRay20tVpbBTNDRGBmqLUOInTOBRFaa6XOOXRIa0N3BwA+8gEvWHqh1/MAAAAASUVORK5CYII=',
       'base64'
     );
-    
+
     icon.addRepresentation({
       scaleFactor: 1.0,
       width: 16,
       height: 16,
-      buffer: iconBuffer
+      buffer: iconBuffer,
     });
-    
+
     icon.setTemplateImage(true);
   } else {
     // Windows/Linux用のアイコン
@@ -79,23 +87,23 @@ function createTray() {
       'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAdgAAAHYBTnsmCAAAALRJREFUOI2lk7ENwzAMBM+xgQzgEbKBR3AJj+AR3EEaF26sIt9fJCVIvycfSeDu+M8QEYgIRARmhojAzHBOcc5xzvE8D2aGc465LmPvPSIC7z1SSog57r1jZhARiAhEBGutmOcp51xIa4WZYWa49x4RgdYKZoZzCmttmFkppZBSau+9RwQqpWBVy1olIpCmaIxRay20tVpbBTNDRGBmqLUOInTOBRFaa6XOOXRIa0N3BwA+8gEvWHqh1/MAAAAASUVORK5CYII=',
       'base64'
     );
-    
+
     icon.addRepresentation({
       scaleFactor: 1.0,
       width: 16,
       height: 16,
-      buffer: iconBuffer
+      buffer: iconBuffer,
     });
   }
-  
+
   tray = new Tray(icon);
-  
+
   // 初期状態でのトレイタイトルを設定
   updateTrayTitle();
-  
+
   // トレイメニューを作成
   updateTrayMenu();
-  
+
   // トレイアイコンクリック時の動作
   tray.on('click', () => {
     if (mainWindow) {
@@ -114,13 +122,13 @@ function createTray() {
 // トレイのタイトルを更新
 function updateTrayTitle() {
   if (!tray) return;
-  
+
   if (timerState.isRunning) {
     const elapsed = Math.floor((Date.now() - timerState.startTime) / 1000);
     const hours = Math.floor(elapsed / 3600);
     const minutes = Math.floor((elapsed % 3600) / 60);
     const seconds = elapsed % 60;
-    
+
     const timeStr = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     tray.setTitle(`▶️ ${timeStr} - ${timerState.projectName}`);
   } else {
@@ -131,18 +139,18 @@ function updateTrayTitle() {
 // トレイメニューを更新
 function updateTrayMenu() {
   if (!tray) return;
-  
+
   const template = [
     {
-      label: timerState.isRunning 
-        ? `停止: ${timerState.projectName}` 
+      label: timerState.isRunning
+        ? `停止: ${timerState.projectName}`
         : 'タイマー停止中',
       enabled: timerState.isRunning,
       click: () => {
         if (mainWindow) {
           mainWindow.webContents.send('tray-stop-timer');
         }
-      }
+      },
     },
     { type: 'separator' },
     {
@@ -154,16 +162,16 @@ function updateTrayMenu() {
         } else {
           createWindow();
         }
-      }
+      },
     },
     {
       label: '終了',
       click: () => {
         app.quit();
-      }
-    }
+      },
+    },
   ];
-  
+
   const contextMenu = Menu.buildFromTemplate(template);
   tray.setContextMenu(contextMenu);
 }
@@ -183,7 +191,10 @@ const checkStorageFiles = async () => {
     }
 
     if (fs.existsSync(timeEntriesPath)) {
-      const timeEntriesData = await fs.promises.readFile(timeEntriesPath, 'utf-8');
+      const timeEntriesData = await fs.promises.readFile(
+        timeEntriesPath,
+        'utf-8'
+      );
     } else {
     }
   } catch (error) {
@@ -250,7 +261,9 @@ app.whenReady().then(async () => {
 
     // パス検証 - ユーザーデータディレクトリ外のファイルアクセスを防止
     if (!resolvedPath.startsWith(userDataPath)) {
-      throw new Error('Invalid file path: Access denied outside user data directory');
+      throw new Error(
+        'Invalid file path: Access denied outside user data directory'
+      );
     }
 
     if (fs.existsSync(resolvedPath)) {
@@ -263,7 +276,7 @@ app.whenReady().then(async () => {
   ipcMain.handle('show-open-file-dialog', async () => {
     const result = await dialog.showOpenDialog({
       properties: ['openFile'],
-      filters: [{ name: 'CSV Files', extensions: ['csv'] }]
+      filters: [{ name: 'CSV Files', extensions: ['csv'] }],
     });
     if (!result.canceled) {
       return result.filePaths[0];
