@@ -53,10 +53,13 @@ export const translations = {
     'projects.filter.active': '進行中',
     'projects.filter.warning': '注意',
     'projects.filter.completed': '超過',
+    'projects.filter.tracking': '追跡のみ',
     'projects.sort.name': '名前順',
     'projects.sort.progress': '進捗順',
     'projects.sort.remaining': '残り時間順',
     'projects.search': 'プロジェクトを検索',
+    'projects.tracking.cumulative': '今月の累計時間',
+    'projects.tracking.label': '追跡のみ - 今月の累計時間',
 
     // タイマー
     'timer.title': ' ',
@@ -187,10 +190,13 @@ export const translations = {
     'projects.filter.active': 'Active',
     'projects.filter.warning': 'Warning',
     'projects.filter.completed': 'Excess',
+    'projects.filter.tracking': 'Tracking Only',
     'projects.sort.name': 'By Name',
     'projects.sort.progress': 'By Progress',
     'projects.sort.remaining': 'By Remaining Time',
     'projects.search': 'Search projects',
+    'projects.tracking.cumulative': 'Cumulative Hours This Month',
+    'projects.tracking.label': 'Tracking Only - Cumulative Hours This Month',
 
     // Timer
     'timer.title': ' ',

@@ -124,9 +124,10 @@ export const ProjectList: React.FC<ProjectListProps> = ({
       {projects.map((project) => {
         const isActive = project.id === activeProjectId;
         const monthlyTime = calculateMonthlyTime(project.id);
-        const monthlyTarget = project.monthlyCapacity * 140; // 140時間を基準とした月間目標時間
+        const monthlyTarget = project.monthlyCapacity * 140;
         const progress =
           monthlyTarget > 0 ? (monthlyTime / monthlyTarget) * 100 : 0;
+        const isTrackingOnly = project.monthlyCapacity === 0;
 
         let progressColor = 'primary';
         if (progress >= 100) {
@@ -183,29 +184,52 @@ export const ProjectList: React.FC<ProjectListProps> = ({
               {project.description}
             </Typography>
 
-            <Box sx={{ width: '100%' }}>
-              <Box
-                sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}
-              >
-                <Typography variant="body2" color="text.secondary">
-                  {t('projects.utilization')}:{' '}
-                  {(project.monthlyCapacity * 100).toFixed(1)}%
+            {isTrackingOnly ? (
+              <Box sx={{ width: '100%' }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 0.5 }}
+                >
+                  {t('projects.tracking.label')}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {monthlyTime.toFixed(1)} {t('units.hours')} /{' '}
-                  {monthlyTarget.toFixed(1)} {t('units.hours')} (
-                  {progress.toFixed(1)}%)
+                <Typography variant="h6" color="primary" fontWeight="bold">
+                  {monthlyTime.toFixed(1)} {t('units.hours')}
                 </Typography>
               </Box>
-              <LinearProgress
-                variant="determinate"
-                value={Math.min(progress, 100)}
-                color={
-                  progressColor as 'primary' | 'secondary' | 'error' | 'warning'
-                }
-                sx={{ height: 8, borderRadius: 1 }}
-              />
-            </Box>
+            ) : (
+              <Box sx={{ width: '100%' }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    mb: 1,
+                  }}
+                >
+                  <Typography variant="body2" color="text.secondary">
+                    {t('projects.utilization')}:{' '}
+                    {(project.monthlyCapacity * 100).toFixed(1)}%
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {monthlyTime.toFixed(1)} {t('units.hours')} /{' '}
+                    {monthlyTarget.toFixed(1)} {t('units.hours')} (
+                    {progress.toFixed(1)}%)
+                  </Typography>
+                </Box>
+                <LinearProgress
+                  variant="determinate"
+                  value={Math.min(progress, 100)}
+                  color={
+                    progressColor as
+                      | 'primary'
+                      | 'secondary'
+                      | 'error'
+                      | 'warning'
+                  }
+                  sx={{ height: 8, borderRadius: 1 }}
+                />
+              </Box>
+            )}
           </ListItem>
         );
       })}

@@ -126,6 +126,9 @@ export const ProjectProgressCard: React.FC<ProjectProgressCardProps> = ({
     handleMenuClose();
   };
 
+  // 稼働率0%かどうかを判定
+  const isTrackingOnly = project.monthlyCapacity === 0;
+
   // 進捗率の計算
   const progressPercentage =
     targetHours > 0
@@ -139,7 +142,14 @@ export const ProjectProgressCard: React.FC<ProjectProgressCardProps> = ({
   let statusColor = theme.palette.info.main;
   let statusText = t('projects.filter.active');
 
-  if (progressPercentage >= 100) {
+  if (isTrackingOnly) {
+    const greyColor =
+      theme.palette.mode === 'dark'
+        ? theme.palette.grey[500]
+        : theme.palette.grey[600];
+    statusColor = greyColor;
+    statusText = t('projects.filter.tracking');
+  } else if (progressPercentage >= 100) {
     statusColor = theme.palette.error.main;
     statusText = t('projects.filter.completed');
   } else if (progressPercentage >= 90) {
@@ -253,62 +263,75 @@ export const ProjectProgressCard: React.FC<ProjectProgressCardProps> = ({
           )}
 
           {/* 進捗インジケーター */}
-          <Box sx={{ mt: 2 }}>
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                mb: 0.5,
-              }}
-            >
-              <Typography variant="body2" fontWeight="medium">
-                {t('dashboard.progress.title')}
+          {isTrackingOnly ? (
+            // 稼働率0%の場合: シンプルな累計時間表示
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                {t('projects.tracking.cumulative')}
               </Typography>
-              <Typography
-                variant="body2"
-                fontWeight="medium"
-                color={getProgressColor()}
+              <Typography variant="h5" fontWeight="bold" color="primary">
+                {currentHours.toFixed(1)} {t('units.hours')}
+              </Typography>
+            </Box>
+          ) : (
+            // 稼働率設定ありの場合: 従来の進捗表示
+            <Box sx={{ mt: 2 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  mb: 0.5,
+                }}
               >
-                {progressPercentage}%
-              </Typography>
-            </Box>
+                <Typography variant="body2" fontWeight="medium">
+                  {t('dashboard.progress.title')}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  fontWeight="medium"
+                  color={getProgressColor()}
+                >
+                  {progressPercentage}%
+                </Typography>
+              </Box>
 
-            <LinearProgress
-              variant="determinate"
-              value={Math.min(progressPercentage, 100)}
-              sx={{
-                height: 8,
-                borderRadius: 4,
-                mb: 1.5,
-                backgroundColor:
-                  theme.palette.mode === 'light'
-                    ? theme.palette.grey[200]
-                    : theme.palette.grey[700],
-                '& .MuiLinearProgress-bar': {
-                  backgroundColor: getProgressColor(),
+              <LinearProgress
+                variant="determinate"
+                value={Math.min(progressPercentage, 100)}
+                sx={{
+                  height: 8,
                   borderRadius: 4,
-                  transition: 'transform 0.4s linear',
-                },
-              }}
-            />
+                  mb: 1.5,
+                  backgroundColor:
+                    theme.palette.mode === 'light'
+                      ? theme.palette.grey[200]
+                      : theme.palette.grey[700],
+                  '& .MuiLinearProgress-bar': {
+                    backgroundColor: getProgressColor(),
+                    borderRadius: 4,
+                    transition: 'transform 0.4s linear',
+                  },
+                }}
+              />
 
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-              }}
-            >
-              <Typography variant="body2" color="text.secondary">
-                {currentHours.toFixed(1)} {t('units.hours')} /{' '}
-                {targetHours.toFixed(1)} {t('units.hours')}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {t('projects.sort.remaining')} {remainingHours.toFixed(1)}{' '}
-                {t('units.hours')}
-              </Typography>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <Typography variant="body2" color="text.secondary">
+                  {currentHours.toFixed(1)} {t('units.hours')} /{' '}
+                  {targetHours.toFixed(1)} {t('units.hours')}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {t('projects.sort.remaining')} {remainingHours.toFixed(1)}{' '}
+                  {t('units.hours')}
+                </Typography>
+              </Box>
             </Box>
-          </Box>
+          )}
         </CardContent>
       </Card>
 

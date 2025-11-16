@@ -90,6 +90,9 @@ export const ProjectProgressView: React.FC<ProjectProgressViewProps> = ({
         lastDay
       );
 
+      // 稼働率0%かどうかを判定
+      const isTrackingOnly = project.monthlyCapacity === 0;
+
       // 進捗率を計算
       const progressPercentage =
         targetHours > 0
@@ -98,10 +101,12 @@ export const ProjectProgressView: React.FC<ProjectProgressViewProps> = ({
 
       // 進捗状況のステータスを判定
       let status: FilterType = 'active';
-      if (progressPercentage >= 100) {
-        status = 'completed';
-      } else if (progressPercentage >= 90 && progressPercentage < 100) {
-        status = 'at-risk';
+      if (!isTrackingOnly) {
+        if (progressPercentage >= 100) {
+          status = 'completed';
+        } else if (progressPercentage >= 90 && progressPercentage < 100) {
+          status = 'at-risk';
+        }
       }
 
       return {
@@ -110,6 +115,7 @@ export const ProjectProgressView: React.FC<ProjectProgressViewProps> = ({
         targetHours,
         progressPercentage,
         status,
+        isTrackingOnly,
       };
     });
   }, [
@@ -131,8 +137,10 @@ export const ProjectProgressView: React.FC<ProjectProgressViewProps> = ({
       // フィルターに基づいてプロジェクトをフィルタリング
       const filterMatch =
         filterType === 'all' ||
-        item.status === filterType ||
-        (filterType === 'active' && item.status !== 'completed');
+        (item.isTrackingOnly && filterType === 'active') ||
+        (!item.isTrackingOnly &&
+          (item.status === filterType ||
+            (filterType === 'active' && item.status !== 'completed')));
 
       // 検索語に基づいてプロジェクトをフィルタリング
       const searchMatch =
