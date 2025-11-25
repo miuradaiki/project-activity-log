@@ -21,6 +21,15 @@ import { KeyboardShortcutsDialog } from './components/shortcuts/KeyboardShortcut
 
 // アクティブページをローカルストレージに保存するためのキー
 const ACTIVE_PAGE_STORAGE_KEY = 'project_activity_log_active_page';
+// タイマー状態をローカルストレージに保存するためのキー
+const TIMER_STATE_STORAGE_KEY = 'project_activity_log_timer_state';
+
+// タイマー状態の型定義
+interface TimerStateStorage {
+  projectId: string | null;
+  isRunning: boolean;
+  startTime: string | null;
+}
 
 const App: React.FC = () => {
   // 多言語対応
@@ -46,13 +55,93 @@ const App: React.FC = () => {
   const [editingProject, setEditingProject] = useState<Project | undefined>(
     undefined
   );
+  // タイマー状態の初期値をlocalStorageから取得
+  const getInitialTimerState = (): {
+    projectId: string | null;
+    isRunning: boolean;
+    startTime: string | null;
+  } => {
+    const stored = localStorage.getItem(TIMER_STATE_STORAGE_KEY);
+    if (stored) {
+      try {
+        const parsed: TimerStateStorage = JSON.parse(stored);
+        // 8時間以上経過している場合はリセット
+        if (
+          parsed.startTime &&
+          new Date(parsed.startTime).getTime() < Date.now() - 8 * 60 * 60 * 1000
+        ) {
+          localStorage.removeItem(TIMER_STATE_STORAGE_KEY);
+          return { projectId: null, isRunning: false, startTime: null };
+        }
+        return parsed;
+      } catch {
+        localStorage.removeItem(TIMER_STATE_STORAGE_KEY);
+      }
+    }
+    return { projectId: null, isRunning: false, startTime: null };
+  };
+
+  const initialTimerState = getInitialTimerState();
   const [activeProject, setActiveProject] = useState<Project | null>(null);
-  const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const [startTime, setStartTime] = useState<string | null>(null);
+  const [isTimerRunning, setIsTimerRunning] = useState(
+    initialTimerState.isRunning
+  );
+  const [startTime, setStartTime] = useState<string | null>(
+    initialTimerState.startTime
+  );
+  const [timerRestored, setTimerRestored] = useState(false);
 
   // データの読み込み
   const { projects, setProjects, timeEntries, setTimeEntries, isLoading } =
     useStorage();
+
+  // タイマー状態をlocalStorageから復元（projectsがロードされた後）
+  useEffect(() => {
+    if (timerRestored || projects.length === 0) return;
+
+    const stored = localStorage.getItem(TIMER_STATE_STORAGE_KEY);
+    if (stored) {
+      try {
+        const parsed: TimerStateStorage = JSON.parse(stored);
+        if (parsed.isRunning && parsed.projectId && parsed.startTime) {
+          const project = projects.find((p) => p.id === parsed.projectId);
+          if (project && !project.isArchived) {
+            setActiveProject(project);
+            setIsTimerRunning(true);
+            setStartTime(parsed.startTime);
+            // トレイにタイマー開始を通知
+            if (window.electronAPI?.timerStart) {
+              window.electronAPI.timerStart(project.name);
+            }
+          } else {
+            // プロジェクトが見つからない場合はリセット
+            setIsTimerRunning(false);
+            setStartTime(null);
+            localStorage.removeItem(TIMER_STATE_STORAGE_KEY);
+          }
+        }
+      } catch {
+        localStorage.removeItem(TIMER_STATE_STORAGE_KEY);
+      }
+    }
+    setTimerRestored(true);
+  }, [projects, timerRestored]);
+
+  // タイマー状態をlocalStorageに保存（復元完了後のみ）
+  useEffect(() => {
+    if (!timerRestored) return;
+
+    const timerState: TimerStateStorage = {
+      projectId: activeProject?.id || null,
+      isRunning: isTimerRunning,
+      startTime: startTime,
+    };
+    if (isTimerRunning && activeProject && startTime) {
+      localStorage.setItem(TIMER_STATE_STORAGE_KEY, JSON.stringify(timerState));
+    } else {
+      localStorage.removeItem(TIMER_STATE_STORAGE_KEY);
+    }
+  }, [activeProject, isTimerRunning, startTime, timerRestored]);
 
   // コールバック関数
   const openShortcutsDialog = useCallback(() => {
