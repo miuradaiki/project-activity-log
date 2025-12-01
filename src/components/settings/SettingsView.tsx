@@ -235,7 +235,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   </Grid>
                   <Grid item xs={12} md={4}>
                     <TextField
-                      label="月間時間"
+                      label={t('settings.monthly.hours.label')}
                       type="number"
                       value={baseMonthlyHours}
                       onChange={(e) => {
@@ -304,7 +304,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                 <TranslateIcon color="primary" sx={{ mr: 1 }} />
-                <Typography variant="h6">外観設定</Typography>
+                <Typography variant="h6">{t('settings.appearance')}</Typography>
               </Box>
               <Divider sx={{ mb: 3 }} />
 
@@ -324,7 +324,9 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                     ) : (
                       <Brightness7 sx={{ mr: 1 }} />
                     )}
-                    <Typography variant="body1">ダークモード</Typography>
+                    <Typography variant="body1">
+                      {t('settings.darkmode')}
+                    </Typography>
                   </Box>
                   <Switch
                     checked={isDarkMode}
@@ -333,7 +335,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   />
                 </Box>
                 <Typography variant="body2" color="text.secondary">
-                  画面の配色を切り替えます
+                  {t('settings.darkmode.description')}
                 </Typography>
               </Box>
 
