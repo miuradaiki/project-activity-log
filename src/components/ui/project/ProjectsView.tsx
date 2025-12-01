@@ -55,7 +55,7 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({
   };
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
+    <Box sx={{ maxWidth: 1200, mx: 'auto', overflowX: 'hidden' }}>
       {/* 新規プロジェクトボタン */}
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'flex-end' }}>
         <Button
