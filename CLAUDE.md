@@ -30,11 +30,39 @@ npm run preview
 
 ### Testing
 
-**No testing framework is currently configured.** The project lacks test infrastructure.
+```bash
+# Run tests
+npm test
 
-### Linting
+# Run tests in watch mode
+npm run test:watch
 
-**No linting configuration exists.** Consider adding ESLint and Prettier.
+# Run tests with coverage
+npm run test:coverage
+
+# Run tests in CI mode
+npm run test:ci
+```
+
+Testing stack: Jest + React Testing Library
+
+### Linting & Formatting
+
+```bash
+# Run ESLint
+npm run lint
+
+# Run ESLint with auto-fix
+npm run lint:fix
+
+# Format code with Prettier
+npm run format
+
+# Check formatting
+npm run format:check
+```
+
+Pre-commit hooks are configured via Husky + lint-staged to automatically lint and format staged files.
 
 ## Architecture Overview
 
@@ -182,10 +210,7 @@ Only include comments that provide valuable context:
 
 When generating documentation or any content:
 
-- **ALWAYS verify the current date is 2025-09-27**
-- Common error: Writing dates like 2025-01-27 instead of 2025-09-27
-- Double-check all dates before finalizing documentation
-- Use the actual current date, not knowledge cutoff dates
+- Use the actual current date from the environment, not knowledge cutoff dates
 - **NEVER include time estimates or development duration**
 - Focus on technical facts and implementation details only
 
