@@ -109,6 +109,10 @@ export const translations = {
     'settings.language.changed': '言語設定を変更しました',
     'settings.monthly.hours.example':
       'に基づく月間目標時間（基準: {hours}時間/月）',
+    'settings.appearance': '外観設定',
+    'settings.darkmode': 'ダークモード',
+    'settings.darkmode.description': '画面の配色を切り替えます',
+    'settings.monthly.hours.label': '月間時間',
 
     // 共通アクション
     'actions.save': '保存',
@@ -247,6 +251,10 @@ export const translations = {
     'settings.language.changed': 'Language changed',
     'settings.monthly.hours.example':
       ' based monthly target (baseline: {hours} hours/month)',
+    'settings.appearance': 'Appearance',
+    'settings.darkmode': 'Dark Mode',
+    'settings.darkmode.description': 'Switch the color scheme of the screen',
+    'settings.monthly.hours.label': 'Monthly Hours',
 
     // Common Actions
     'actions.save': 'Save',
