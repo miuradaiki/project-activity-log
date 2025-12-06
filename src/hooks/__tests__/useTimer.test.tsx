@@ -10,36 +10,20 @@ Object.defineProperty(window, 'electron', {
   writable: true,
 });
 
-// localStorage のモック
-const localStorageMock = (() => {
-  let store: { [key: string]: string } = {};
-  return {
-    getItem: jest.fn((key: string) => store[key] || null),
-    setItem: jest.fn((key: string, value: string) => {
-      store[key] = value;
-    }),
-    removeItem: jest.fn((key: string) => {
-      delete store[key];
-    }),
-    clear: jest.fn(() => {
-      store = {};
-    }),
-  };
-})();
-
-Object.defineProperty(window, 'localStorage', {
-  value: localStorageMock,
-  writable: true,
-});
-
 const TIMER_STORAGE_KEY = 'project-activity-timer-state';
+
+// setupTests.ts で定義された localStorage モックを参照
+const localStorageMock = window.localStorage as jest.Mocked<
+  typeof window.localStorage
+>;
 
 describe('useTimer フック', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    localStorageMock.clear();
     jest.useFakeTimers();
     jest.setSystemTime(new Date('2025-01-15T10:00:00.000Z'));
+    // localStorageのデフォルト値をリセット
+    localStorageMock.getItem.mockReturnValue(null);
   });
 
   afterEach(() => {
@@ -128,11 +112,10 @@ describe('useTimer フック', () => {
         expect.any(String)
       );
 
-      const savedData = JSON.parse(
-        localStorageMock.setItem.mock.calls[
-          localStorageMock.setItem.mock.calls.length - 1
-        ][1]
+      const setItemCalls = localStorageMock.setItem.mock.calls.filter(
+        (call) => call[0] === TIMER_STORAGE_KEY
       );
+      const savedData = JSON.parse(setItemCalls[setItemCalls.length - 1][1]);
       expect(savedData.projectId).toBe('project-1');
       expect(savedData.isRunning).toBe(true);
     });
@@ -185,7 +168,6 @@ describe('useTimer フック', () => {
     });
 
     test('startTimeがnullの場合、saveTimeEntryは呼ばれない', async () => {
-      // 初期状態（startTime: null）でフックを開始
       localStorageMock.getItem.mockReturnValue(null);
       mockSaveTimeEntry.mockClear();
 
@@ -211,7 +193,6 @@ describe('useTimer フック', () => {
       };
       localStorageMock.getItem.mockReturnValue(JSON.stringify(savedState));
 
-      // フックをレンダリングした後にモックを設定
       const { result } = renderHook(() => useTimer());
 
       // stopTimer呼び出し時にエラーを発生させる
@@ -244,7 +225,7 @@ describe('useTimer フック', () => {
       });
 
       const setItemCalls = localStorageMock.setItem.mock.calls.filter(
-        (call: [string, string]) => call[0] === TIMER_STORAGE_KEY
+        (call) => call[0] === TIMER_STORAGE_KEY
       );
       expect(setItemCalls.length).toBeGreaterThan(0);
 
