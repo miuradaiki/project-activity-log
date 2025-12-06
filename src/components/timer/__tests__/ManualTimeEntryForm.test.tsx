@@ -49,10 +49,29 @@ const renderManualTimeEntryForm = (
   );
 };
 
+const getTimeInputByLabel = (label: RegExp) => {
+  const elements = screen.getAllByLabelText(label);
+  const input = elements.find((el) => el.tagName === 'INPUT');
+  if (!input) {
+    throw new Error(`Time input for ${label} not found`);
+  }
+  return input as HTMLInputElement;
+};
+
+const getSaveButton = () => screen.getByRole('button', { name: /保存|save/i });
+
 describe('ManualTimeEntryForm', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockAlert.mockClear();
+    const getItemMock = window.localStorage.getItem as jest.Mock;
+    getItemMock.mockImplementation((key: string) =>
+      key === 'project_activity_log_language' ? 'en' : null
+    );
+  });
+
+  afterEach(() => {
+    (window.localStorage.getItem as jest.Mock).mockReset();
   });
 
   describe('バリデーション', () => {
@@ -74,7 +93,7 @@ describe('ManualTimeEntryForm', () => {
       fireEvent.change(endTimeInput, { target: { value: '09:00' } });
 
       // 保存ボタンをクリック
-      const saveButton = screen.getByRole('button', { name: /save/i });
+      const saveButton = getSaveButton();
       await userEvent.click(saveButton);
 
       // アラートが表示されることを確認
@@ -102,7 +121,7 @@ describe('ManualTimeEntryForm', () => {
       fireEvent.change(endTimeInput, { target: { value: '10:00' } });
 
       // 保存ボタンをクリック
-      const saveButton = screen.getByRole('button', { name: /save/i });
+      const saveButton = getSaveButton();
       await userEvent.click(saveButton);
 
       // アラートが表示されることを確認（duration <= 0の場合のメッセージ）
@@ -115,19 +134,6 @@ describe('ManualTimeEntryForm', () => {
     it('1分未満の時間エントリの場合、エラーメッセージを表示して保存しない', async () => {
       const onSave = jest.fn();
 
-      // バリデーションロジックを単体テストとして実装
-      const testDate = '2025-01-10';
-      const startTime = '10:00';
-      const endTime = '10:00'; // 同じ時間で30秒の差をシミュレート
-
-      // 実際のコンポーネント内のバリデーションロジックを模擬
-      const startDateTime = new Date(`${testDate}T${startTime}:30`); // 10:00:30
-      const endDateTime = new Date(`${testDate}T${endTime}:59`); // 10:00:59
-      const duration = endDateTime.getTime() - startDateTime.getTime(); // 29秒
-
-      // 1分未満（60000ミリ秒）であることを確認
-      expect(duration).toBeLessThan(60000);
-
       renderManualTimeEntryForm({ onSave });
 
       // プロジェクト選択
@@ -135,22 +141,17 @@ describe('ManualTimeEntryForm', () => {
       await userEvent.click(projectSelect);
       await userEvent.click(screen.getByText('Project 1'));
 
-      // 時間入力欄を見つけて変更（微妙な差で1分未満を作成）
-      const timeInputs = screen.getAllByDisplayValue(/^\d{2}:\d{2}$/);
-      const startTimeInput = timeInputs[0];
-      const endTimeInput = timeInputs[1];
+      const startTimeInput = getTimeInputByLabel(/Start Time/i);
+      const endTimeInput = getTimeInputByLabel(/End Time/i);
 
-      // 10:00:00 から 10:00:30 の30秒間をシミュレート
-      fireEvent.change(startTimeInput, { target: { value: '10:00' } });
-      fireEvent.change(endTimeInput, { target: { value: '10:00' } });
+      fireEvent.change(startTimeInput, { target: { value: '10:00:00' } });
+      fireEvent.change(endTimeInput, { target: { value: '10:00:30' } });
 
-      // 保存ボタンをクリック
-      const saveButton = screen.getByRole('button', { name: /save/i });
+      const saveButton = getSaveButton();
       await userEvent.click(saveButton);
 
-      // 同じ時間の場合は duration <= 0 のチェックに引っかかる
       expect(mockAlert).toHaveBeenCalledWith(
-        '終了時間は開始時間より後である必要があります。'
+        '1分未満の時間エントリは保存できません。'
       );
       expect(onSave).not.toHaveBeenCalled();
     });
@@ -178,7 +179,7 @@ describe('ManualTimeEntryForm', () => {
       await userEvent.type(descriptionInput, 'Test description');
 
       // 保存ボタンをクリック
-      const saveButton = screen.getByRole('button', { name: /save/i });
+      const saveButton = getSaveButton();
       await userEvent.click(saveButton);
 
       // onSaveが正しい引数で呼ばれることを確認
@@ -191,6 +192,64 @@ describe('ManualTimeEntryForm', () => {
 
       expect(onClose).toHaveBeenCalled();
       expect(mockAlert).not.toHaveBeenCalled();
+    });
+
+    it('日跨ぎエントリは自動的に分割されて保存される', async () => {
+      const onSave = jest.fn();
+      renderManualTimeEntryForm({ onSave });
+
+      const projectSelect = screen.getByRole('combobox');
+      await userEvent.click(projectSelect);
+      await userEvent.click(screen.getByText('Project 1'));
+
+      const startDateInput = screen.getByLabelText(/Start Date/i);
+      const endDateInput = screen.getByLabelText(/End Date/i);
+      const startTimeInput = getTimeInputByLabel(/Start Time/i);
+      const endTimeInput = getTimeInputByLabel(/End Time/i);
+
+      fireEvent.change(startDateInput, { target: { value: '2025-01-01' } });
+      fireEvent.change(endDateInput, { target: { value: '2025-01-02' } });
+      fireEvent.change(startTimeInput, { target: { value: '22:00' } });
+      fireEvent.change(endTimeInput, { target: { value: '02:00' } });
+
+      const saveButton = getSaveButton();
+      await userEvent.click(saveButton);
+
+      expect(onSave).toHaveBeenCalledTimes(2);
+      expect(onSave.mock.calls[1][0].description).toContain('2日目');
+    });
+
+    it('24時間を超える場合は確認ダイアログの結果によって保存が制御される', async () => {
+      const onSave = jest.fn();
+      renderManualTimeEntryForm({ onSave });
+
+      const projectSelect = screen.getByRole('combobox');
+      await userEvent.click(projectSelect);
+      await userEvent.click(screen.getByText('Project 1'));
+
+      const startDateInput = screen.getByLabelText(/Start Date/i);
+      const endDateInput = screen.getByLabelText(/End Date/i);
+      const startTimeInput = getTimeInputByLabel(/Start Time/i);
+      const endTimeInput = getTimeInputByLabel(/End Time/i);
+
+      fireEvent.change(startDateInput, { target: { value: '2025-01-01' } });
+      fireEvent.change(endDateInput, { target: { value: '2025-01-02' } });
+      fireEvent.change(startTimeInput, { target: { value: '00:00' } });
+      fireEvent.change(endTimeInput, { target: { value: '02:00' } });
+
+      const confirmSpy = jest.spyOn(window, 'confirm').mockReturnValue(false);
+
+      const saveButton = getSaveButton();
+      await userEvent.click(saveButton);
+
+      expect(confirmSpy).toHaveBeenCalled();
+      expect(onSave).not.toHaveBeenCalled();
+
+      confirmSpy.mockReturnValue(true);
+      await userEvent.click(saveButton);
+      expect(onSave).toHaveBeenCalled();
+
+      confirmSpy.mockRestore();
     });
   });
 });

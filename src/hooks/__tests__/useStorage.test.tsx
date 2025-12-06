@@ -1,10 +1,46 @@
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, act, waitFor } from '@testing-library/react';
 import { useStorage } from '../useStorage';
 import {
   MockElectronAPI,
   createMockProject,
   createMockTimeEntry,
 } from '../../__mocks__/electron';
+import { isTestDataEnabled } from '../../utils/env';
+import { generateTestData } from '../../utils/testDataGenerator';
+
+jest.mock('../../utils/testDataGenerator', () => ({
+  generateTestData: jest.fn(() => ({
+    projects: [
+      {
+        id: 'generated-project',
+        name: 'Generated Project',
+        description: 'generated',
+        monthlyCapacity: 0.5,
+        createdAt: '2025-01-01T00:00:00.000Z',
+        updatedAt: '2025-01-01T00:00:00.000Z',
+        isArchived: false,
+      },
+    ],
+    timeEntries: [
+      {
+        id: 'generated-entry',
+        projectId: 'generated-project',
+        startTime: '2025-01-01T09:00:00.000Z',
+        endTime: '2025-01-01T10:00:00.000Z',
+        description: 'generated',
+        createdAt: '2025-01-01T10:00:00.000Z',
+        updatedAt: '2025-01-01T10:00:00.000Z',
+      },
+    ],
+  })),
+}));
+
+const mockIsTestDataEnabled = isTestDataEnabled as jest.MockedFunction<
+  typeof isTestDataEnabled
+>;
+const mockGenerateTestData = generateTestData as jest.MockedFunction<
+  typeof generateTestData
+>;
 
 describe('useStorage フックの特性テスト', () => {
   let mockAPI: MockElectronAPI;
@@ -23,6 +59,9 @@ describe('useStorage フックの特性テスト', () => {
       value: localStorageMock,
       writable: true,
     });
+
+    mockIsTestDataEnabled.mockReturnValue(false);
+    mockGenerateTestData.mockClear();
   });
 
   describe('初期化時の動作', () => {
@@ -35,8 +74,8 @@ describe('useStorage フックの特性テスト', () => {
       expect(result.current.isLoading).toBe(true);
 
       // データロード完了まで待機
-      await act(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 100));
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
       });
 
       expect(result.current.isLoading).toBe(false);
@@ -53,8 +92,8 @@ describe('useStorage フックの特性テスト', () => {
       const { result } = renderHook(() => useStorage());
 
       // データロード完了まで待機
-      await act(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 100));
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
       });
 
       expect(result.current.projects).toEqual([mockProject]);
@@ -67,16 +106,14 @@ describe('useStorage フックの特性テスト', () => {
     test('プロジェクトのsetProjectsが正常に動作する', async () => {
       const { result } = renderHook(() => useStorage());
 
-      await act(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 100));
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
       });
 
       const newProject = createMockProject({ name: '新しいプロジェクト' });
 
       await act(async () => {
         result.current.setProjects([newProject]);
-        // デバウンス処理のため少し待機
-        await new Promise((resolve) => setTimeout(resolve, 1100));
       });
 
       expect(result.current.projects).toContainEqual(newProject);
@@ -90,8 +127,8 @@ describe('useStorage フックの特性テスト', () => {
 
       const { result } = renderHook(() => useStorage());
 
-      await act(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 100));
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
       });
 
       const updatedProject = {
@@ -113,8 +150,8 @@ describe('useStorage フックの特性テスト', () => {
 
       const { result } = renderHook(() => useStorage());
 
-      await act(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 100));
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
       });
 
       await act(async () => {
@@ -130,8 +167,8 @@ describe('useStorage フックの特性テスト', () => {
     test('タイムエントリーのsetTimeEntriesが正常に動作する', async () => {
       const { result } = renderHook(() => useStorage());
 
-      await act(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 100));
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
       });
 
       const newTimeEntry = createMockTimeEntry();
@@ -141,8 +178,6 @@ describe('useStorage フックの特性テスト', () => {
       await act(async () => {
         result.current.setProjects([relatedProject]);
         result.current.setTimeEntries([newTimeEntry]);
-        // デバウンス処理のため少し待機
-        await new Promise((resolve) => setTimeout(resolve, 1100));
       });
 
       expect(result.current.timeEntries).toContainEqual(newTimeEntry);
@@ -157,8 +192,8 @@ describe('useStorage フックの特性テスト', () => {
 
       const { result } = renderHook(() => useStorage());
 
-      await act(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 100));
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
       });
 
       const updatedTimeEntry = {
@@ -180,8 +215,8 @@ describe('useStorage フックの特性テスト', () => {
 
       const { result } = renderHook(() => useStorage());
 
-      await act(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 100));
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
       });
 
       await act(async () => {
@@ -206,16 +241,19 @@ describe('useStorage フックの特性テスト', () => {
 
       const { result } = renderHook(() => useStorage());
 
-      await act(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 100));
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
       });
 
       // プロジェクトが存在することでデータ操作が発生し、整合性チェックが動作する
+      jest.useFakeTimers();
       await act(async () => {
         result.current.setProjects([validProject]);
-        // デバウンス処理とsaveを待機
-        await new Promise((resolve) => setTimeout(resolve, 1100));
       });
+      await act(async () => {
+        jest.advanceTimersByTime(1200);
+      });
+      jest.useRealTimers();
 
       // 孤立したタイムエントリーが削除されていることを確認
       expect(result.current.timeEntries).toHaveLength(0);
@@ -225,8 +263,8 @@ describe('useStorage フックの特性テスト', () => {
     test('テストモードの切り替えが正常に動作する', async () => {
       const { result } = renderHook(() => useStorage());
 
-      await act(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 100));
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
       });
 
       // テストモード関連の状態確認
@@ -235,6 +273,57 @@ describe('useStorage フックの特性テスト', () => {
         projectCount: 0,
         timeEntryCount: 0,
       });
+    });
+
+    test('テストモードを有効化するとテストデータが生成される', async () => {
+      mockIsTestDataEnabled.mockReturnValue(true);
+      const dispatchSpy = jest.spyOn(window, 'dispatchEvent');
+      const { result } = renderHook(() => useStorage());
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      await act(async () => {
+        await result.current.toggleTestMode(true);
+      });
+
+      expect(result.current.isTestMode).toBe(true);
+      expect(mockGenerateTestData).toHaveBeenCalled();
+      expect(dispatchSpy).toHaveBeenCalledWith(expect.any(Event));
+      expect(result.current.projects[0].name).toBe('Generated Project');
+      expect(window.localStorage.setItem).toHaveBeenCalledWith(
+        'project_activity_log_test_mode',
+        'true'
+      );
+
+      dispatchSpy.mockRestore();
+    });
+  });
+
+  describe('永続化処理', () => {
+    test('空のデータは保存されない', async () => {
+      const { result } = renderHook(() => useStorage());
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      mockAPI.saveProjects.mockClear();
+      mockAPI.saveTimeEntries.mockClear();
+
+      jest.useFakeTimers();
+      await act(async () => {
+        result.current.setProjects([]);
+        result.current.setTimeEntries([]);
+      });
+      await act(async () => {
+        jest.advanceTimersByTime(1200);
+      });
+      jest.useRealTimers();
+
+      expect(mockAPI.saveProjects).not.toHaveBeenCalled();
+      expect(mockAPI.saveTimeEntries).not.toHaveBeenCalled();
     });
   });
 });
