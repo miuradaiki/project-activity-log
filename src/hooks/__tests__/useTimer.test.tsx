@@ -199,7 +199,6 @@ describe('useTimer フック', () => {
     });
 
     test('saveTimeEntryでエラーが発生してもタイマーは停止する', async () => {
-      mockSaveTimeEntry.mockRejectedValueOnce(new Error('Save failed'));
       const consoleErrorSpy = jest
         .spyOn(console, 'error')
         .mockImplementation(() => {});
@@ -212,7 +211,11 @@ describe('useTimer フック', () => {
       };
       localStorageMock.getItem.mockReturnValue(JSON.stringify(savedState));
 
+      // フックをレンダリングした後にモックを設定
       const { result } = renderHook(() => useTimer());
+
+      // stopTimer呼び出し時にエラーを発生させる
+      mockSaveTimeEntry.mockRejectedValueOnce(new Error('Save failed'));
 
       await act(async () => {
         await result.current.stopTimer();
