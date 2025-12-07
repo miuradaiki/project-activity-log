@@ -44,6 +44,9 @@ describe('useTimerController', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     localStorageMock.clear();
+    localStorageMock.getItem.mockClear();
+    localStorageMock.setItem.mockClear();
+    localStorageMock.removeItem.mockClear();
     jest.useFakeTimers();
   });
 
@@ -85,13 +88,16 @@ describe('useTimerController', () => {
     });
 
     it('開始時にlocalStorageに状態を保存する', async () => {
+      jest.useRealTimers();
       const { result } = renderHook(() => useTimerController(mockProjects));
 
       await act(async () => {
         await result.current.start(mockProject);
       });
 
-      expect(localStorageMock.setItem).toHaveBeenCalled();
+      await waitFor(() => {
+        expect(localStorageMock.setItem).toHaveBeenCalled();
+      });
     });
   });
 
@@ -239,6 +245,7 @@ describe('useTimerController', () => {
 
   describe('状態復元', () => {
     it('localStorageから状態を復元する', async () => {
+      jest.useRealTimers();
       const startTime = new Date().toISOString();
       localStorageMock.getItem.mockReturnValueOnce(
         JSON.stringify({
