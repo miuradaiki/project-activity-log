@@ -158,6 +158,69 @@ The app follows standard Electron architecture with secure IPC communication:
 - Japanese as primary language
 - Translation system in place via `i18n/` directory
 
+## Development Methodology
+
+### Test-Driven Development (TDD)
+
+This project follows t-wada style TDD. All development and refactoring MUST adhere to the TDD cycle:
+
+#### The TDD Cycle (Red-Green-Refactor)
+
+1. **Red**: Write a failing test first
+   - Write a test that describes the expected behavior
+   - Run the test and confirm it fails
+   - The test should fail for the right reason
+
+2. **Green**: Write the minimum code to pass the test
+   - Write only enough production code to make the test pass
+   - Do not add extra functionality
+   - It's okay if the code is not perfect at this stage
+
+3. **Refactor**: Improve the code while keeping tests green
+   - Clean up the code (remove duplication, improve naming, etc.)
+   - Run tests after each change to ensure they still pass
+   - Apply design patterns and principles as needed
+
+#### TDD Rules
+
+- **Never write production code without a failing test**
+- **Write only one test at a time**
+- **Keep tests small and focused on a single behavior**
+- **Run tests frequently** (after every small change)
+- **Commit after each successful Red-Green-Refactor cycle**
+
+#### Test Structure
+
+Follow the AAA (Arrange-Act-Assert) pattern:
+
+```typescript
+test('should calculate total time for a project', () => {
+  // Arrange: Set up test data
+  const entries = [
+    { projectId: '1', duration: 3600 },
+    { projectId: '1', duration: 1800 },
+  ];
+
+  // Act: Execute the code under test
+  const total = calculateTotalTime(entries, '1');
+
+  // Assert: Verify the result
+  expect(total).toBe(5400);
+});
+```
+
+#### When Refactoring Existing Code
+
+1. First, ensure existing tests cover the code to be refactored
+2. If tests are missing, add characterization tests before refactoring
+3. Refactor in small steps, running tests after each change
+4. Never change behavior and structure in the same step
+
+#### Test File Location
+
+- Unit tests: `src/**/__tests__/*.test.ts(x)`
+- Test files should mirror the source file structure
+
 ## Development Considerations
 
 ### Working with Electron IPC
