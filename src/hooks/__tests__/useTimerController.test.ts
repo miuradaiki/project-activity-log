@@ -238,7 +238,7 @@ describe('useTimerController', () => {
   });
 
   describe('状態復元', () => {
-    it('localStorageから状態を復元する', () => {
+    it('localStorageから状態を復元する', async () => {
       const startTime = new Date().toISOString();
       localStorageMock.getItem.mockReturnValueOnce(
         JSON.stringify({
@@ -251,7 +251,7 @@ describe('useTimerController', () => {
       const { result } = renderHook(() => useTimerController(mockProjects));
 
       // 復元は非同期で行われるため、waitForを使う
-      waitFor(() => {
+      await waitFor(() => {
         expect(result.current.isRunning).toBe(true);
         expect(result.current.activeProject).toEqual(mockProject);
       });
