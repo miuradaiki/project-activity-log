@@ -38,6 +38,12 @@ const mockProject: Project = {
 
 const mockProjects: Project[] = [mockProject];
 
+const waitForInitialization = async () => {
+  await waitFor(() => {
+    expect(localStorageMock.getItem).toHaveBeenCalled();
+  });
+};
+
 describe('useTimerController', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -89,18 +95,11 @@ describe('useTimerController', () => {
       jest.useRealTimers();
       const { result } = renderHook(() => useTimerController(mockProjects));
 
-      // 初期化が完了するのを待つ（useEffectが実行されるまで）
-      await act(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 0));
-      });
+      await waitForInitialization();
+      localStorageMock.setItem.mockClear();
 
       await act(async () => {
         await result.current.start(mockProject);
-      });
-
-      // useEffectによる保存を待つ
-      await act(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 0));
       });
 
       await waitFor(() => {
@@ -267,6 +266,8 @@ describe('useTimerController', () => {
       });
 
       const { result } = renderHook(() => useTimerController(mockProjects));
+
+      await waitForInitialization();
 
       // 復元は非同期で行われるため、waitForを使う
       await waitFor(() => {
