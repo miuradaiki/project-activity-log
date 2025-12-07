@@ -16,7 +16,11 @@ const localStorageMock = {
     localStorageStore = {};
   }),
 };
-Object.defineProperty(window, 'localStorage', { value: localStorageMock });
+Object.defineProperty(window, 'localStorage', {
+  value: localStorageMock,
+  writable: true,
+  configurable: true,
+});
 
 // electronAPI mock
 const electronAPIMock = {
@@ -39,9 +43,13 @@ const mockProject: Project = {
 const mockProjects: Project[] = [mockProject];
 
 const waitForInitialization = async () => {
-  await waitFor(() => {
-    expect(localStorageMock.getItem).toHaveBeenCalled();
-  });
+  // useEffectが実行されるのを待つために、一定時間待機
+  await waitFor(
+    () => {
+      expect(localStorageMock.getItem).toHaveBeenCalled();
+    },
+    { timeout: 3000, interval: 100 }
+  );
 };
 
 describe('useTimerController', () => {
