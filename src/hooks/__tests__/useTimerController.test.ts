@@ -2,34 +2,6 @@ import { renderHook, act, waitFor } from '@testing-library/react';
 import { useTimerController } from '../useTimerController';
 import { Project } from '../../types';
 
-// localStorage mock
-let localStorageStore: Record<string, string> = {};
-const localStorageMock = {
-  getItem: jest.fn((key: string) => localStorageStore[key] || null),
-  setItem: jest.fn((key: string, value: string) => {
-    localStorageStore[key] = value;
-  }),
-  removeItem: jest.fn((key: string) => {
-    delete localStorageStore[key];
-  }),
-  clear: jest.fn(() => {
-    localStorageStore = {};
-  }),
-};
-Object.defineProperty(window, 'localStorage', {
-  value: localStorageMock,
-  writable: true,
-  configurable: true,
-});
-
-// electronAPI mock
-const electronAPIMock = {
-  timerStart: jest.fn(),
-  timerStop: jest.fn(),
-  onTrayStopTimer: jest.fn(),
-};
-Object.defineProperty(window, 'electronAPI', { value: electronAPIMock });
-
 const mockProject: Project = {
   id: 'project-1',
   name: 'Test Project',
@@ -42,23 +14,31 @@ const mockProject: Project = {
 
 const mockProjects: Project[] = [mockProject];
 
-const waitForInitialization = async () => {
-  // useEffectが実行されるのを待つために、一定時間待機
-  await waitFor(
-    () => {
-      expect(localStorageMock.getItem).toHaveBeenCalled();
-    },
-    { timeout: 3000, interval: 100 }
-  );
-};
+// setupTests.tsで定義されたlocalStorageモックを取得
+const localStorageMock = window.localStorage as jest.Mocked<
+  typeof window.localStorage
+>;
 
 describe('useTimerController', () => {
+  let localStorageStore: Record<string, string> = {};
+
   beforeEach(() => {
     jest.clearAllMocks();
     localStorageStore = {};
+
+    // localStorageモックの実装を設定
     localStorageMock.getItem.mockImplementation(
       (key: string) => localStorageStore[key] || null
     );
+    localStorageMock.setItem.mockImplementation(
+      (key: string, value: string) => {
+        localStorageStore[key] = value;
+      }
+    );
+    localStorageMock.removeItem.mockImplementation((key: string) => {
+      delete localStorageStore[key];
+    });
+
     jest.useFakeTimers();
   });
 
@@ -96,21 +76,27 @@ describe('useTimerController', () => {
         await result.current.start(mockProject);
       });
 
-      expect(electronAPIMock.timerStart).toHaveBeenCalledWith(mockProject.name);
+      expect(window.electronAPI.timerStart).toHaveBeenCalledWith(
+        mockProject.name
+      );
     });
 
     it('開始時にlocalStorageに状態を保存する', async () => {
       jest.useRealTimers();
       const { result } = renderHook(() => useTimerController(mockProjects));
 
-      await waitForInitialization();
+      // 初期化を待つ
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 50));
+      });
+
       localStorageMock.setItem.mockClear();
 
       await act(async () => {
         await result.current.start(mockProject);
       });
 
-      // start後にisRunningがtrueになるのを待ち、その後useEffectによる保存を待つ
+      // start後にuseEffectによる保存を待つ
       await waitFor(
         () => {
           expect(result.current.isRunning).toBe(true);
@@ -161,7 +147,7 @@ describe('useTimerController', () => {
         await result.current.stop();
       });
 
-      expect(electronAPIMock.timerStop).toHaveBeenCalled();
+      expect(window.electronAPI.timerStop).toHaveBeenCalled();
     });
 
     it('1分以上経過した場合、TimeEntryが作成される', async () => {
@@ -229,7 +215,7 @@ describe('useTimerController', () => {
       });
 
       expect(onTimeEntriesCreated).not.toHaveBeenCalled();
-      expect(electronAPIMock.timerStop).not.toHaveBeenCalled();
+      expect(window.electronAPI.timerStop).not.toHaveBeenCalled();
     });
   });
 
@@ -280,46 +266,65 @@ describe('useTimerController', () => {
 
       const { result } = renderHook(() => useTimerController(mockProjects));
 
-      await waitForInitialization();
-
       // 復元は非同期で行われるため、waitForを使う
-      await waitFor(() => {
-        expect(result.current.isRunning).toBe(true);
-        expect(result.current.activeProject).toEqual(mockProject);
-      });
+      await waitFor(
+        () => {
+          expect(result.current.isRunning).toBe(true);
+          expect(result.current.activeProject).toEqual(mockProject);
+        },
+        { timeout: 3000 }
+      );
     });
 
-    it('8時間以上前の状態は復元しない', () => {
+    it('8時間以上前の状態は復元しない', async () => {
+      jest.useRealTimers();
       const oldStartTime = new Date(
         Date.now() - 9 * 60 * 60 * 1000
       ).toISOString();
-      localStorageMock.getItem.mockReturnValueOnce(
-        JSON.stringify({
-          projectId: mockProject.id,
-          isRunning: true,
-          startTime: oldStartTime,
-        })
-      );
+      localStorageMock.getItem.mockImplementation((key: string) => {
+        if (key === 'project_activity_log_timer_state') {
+          return JSON.stringify({
+            projectId: mockProject.id,
+            isRunning: true,
+            startTime: oldStartTime,
+          });
+        }
+        return null;
+      });
 
       const { result } = renderHook(() => useTimerController(mockProjects));
+
+      // 初期化を待つ
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 50));
+      });
 
       expect(result.current.isRunning).toBe(false);
     });
 
-    it('アーカイブされたプロジェクトの状態は復元しない', () => {
+    it('アーカイブされたプロジェクトの状態は復元しない', async () => {
+      jest.useRealTimers();
       const archivedProject = { ...mockProject, isArchived: true };
       const startTime = new Date().toISOString();
-      localStorageMock.getItem.mockReturnValueOnce(
-        JSON.stringify({
-          projectId: archivedProject.id,
-          isRunning: true,
-          startTime,
-        })
-      );
+      localStorageMock.getItem.mockImplementation((key: string) => {
+        if (key === 'project_activity_log_timer_state') {
+          return JSON.stringify({
+            projectId: archivedProject.id,
+            isRunning: true,
+            startTime,
+          });
+        }
+        return null;
+      });
 
       const { result } = renderHook(() =>
         useTimerController([archivedProject])
       );
+
+      // 初期化を待つ
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 50));
+      });
 
       expect(result.current.isRunning).toBe(false);
     });
