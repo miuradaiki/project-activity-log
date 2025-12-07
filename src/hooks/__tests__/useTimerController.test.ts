@@ -3,21 +3,19 @@ import { useTimerController } from '../useTimerController';
 import { Project } from '../../types';
 
 // localStorage mock
-const localStorageMock = (() => {
-  let store: Record<string, string> = {};
-  return {
-    getItem: jest.fn((key: string) => store[key] || null),
-    setItem: jest.fn((key: string, value: string) => {
-      store[key] = value;
-    }),
-    removeItem: jest.fn((key: string) => {
-      delete store[key];
-    }),
-    clear: jest.fn(() => {
-      store = {};
-    }),
-  };
-})();
+let localStorageStore: Record<string, string> = {};
+const localStorageMock = {
+  getItem: jest.fn((key: string) => localStorageStore[key] || null),
+  setItem: jest.fn((key: string, value: string) => {
+    localStorageStore[key] = value;
+  }),
+  removeItem: jest.fn((key: string) => {
+    delete localStorageStore[key];
+  }),
+  clear: jest.fn(() => {
+    localStorageStore = {};
+  }),
+};
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 // electronAPI mock
@@ -43,10 +41,10 @@ const mockProjects: Project[] = [mockProject];
 describe('useTimerController', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    localStorageMock.clear();
-    localStorageMock.getItem.mockClear();
-    localStorageMock.setItem.mockClear();
-    localStorageMock.removeItem.mockClear();
+    localStorageStore = {};
+    localStorageMock.getItem.mockImplementation(
+      (key: string) => localStorageStore[key] || null
+    );
     jest.useFakeTimers();
   });
 
@@ -91,8 +89,18 @@ describe('useTimerController', () => {
       jest.useRealTimers();
       const { result } = renderHook(() => useTimerController(mockProjects));
 
+      // 初期化が完了するのを待つ（useEffectが実行されるまで）
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      });
+
       await act(async () => {
         await result.current.start(mockProject);
+      });
+
+      // useEffectによる保存を待つ
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 0));
       });
 
       await waitFor(() => {
@@ -247,13 +255,16 @@ describe('useTimerController', () => {
     it('localStorageから状態を復元する', async () => {
       jest.useRealTimers();
       const startTime = new Date().toISOString();
-      localStorageMock.getItem.mockReturnValueOnce(
-        JSON.stringify({
-          projectId: mockProject.id,
-          isRunning: true,
-          startTime,
-        })
-      );
+      localStorageMock.getItem.mockImplementation((key: string) => {
+        if (key === 'project_activity_log_timer_state') {
+          return JSON.stringify({
+            projectId: mockProject.id,
+            isRunning: true,
+            startTime,
+          });
+        }
+        return null;
+      });
 
       const { result } = renderHook(() => useTimerController(mockProjects));
 
