@@ -42,6 +42,12 @@ const mockGenerateTestData = generateTestData as jest.MockedFunction<
   typeof generateTestData
 >;
 
+const advanceDebounce = async () => {
+  await act(async () => {
+    jest.advanceTimersByTime(1200);
+  });
+};
+
 describe('useStorage フックの特性テスト', () => {
   let mockAPI: MockElectronAPI;
 
@@ -136,12 +142,16 @@ describe('useStorage フックの特性テスト', () => {
         name: '更新されたプロジェクト',
       };
 
+      mockAPI.saveProjects.mockClear();
+      jest.useFakeTimers();
       await act(async () => {
         result.current.setProjects([updatedProject]);
       });
+      await advanceDebounce();
+      jest.useRealTimers();
 
       expect(result.current.projects[0].name).toBe('更新されたプロジェクト');
-      expect(mockAPI.saveProjects).toHaveBeenCalled();
+      expect(mockAPI.saveProjects).toHaveBeenCalledTimes(1);
     });
 
     test('プロジェクトの削除が正常に動作する', async () => {
@@ -154,12 +164,16 @@ describe('useStorage フックの特性テスト', () => {
         expect(result.current.isLoading).toBe(false);
       });
 
+      mockAPI.saveProjects.mockClear();
+      jest.useFakeTimers();
       await act(async () => {
         result.current.setProjects([]);
       });
+      await advanceDebounce();
+      jest.useRealTimers();
 
       expect(result.current.projects).toHaveLength(0);
-      expect(mockAPI.saveProjects).toHaveBeenCalled();
+      expect(mockAPI.saveProjects).not.toHaveBeenCalled();
     });
   });
 
@@ -188,7 +202,13 @@ describe('useStorage フックの特性テスト', () => {
 
     test('タイムエントリーの配列更新が正常に動作する', async () => {
       const originalTimeEntry = createMockTimeEntry();
-      await mockAPI.saveTimeEntries([originalTimeEntry]);
+      const relatedProject = createMockProject({
+        id: originalTimeEntry.projectId,
+      });
+      await Promise.all([
+        mockAPI.saveProjects([relatedProject]),
+        mockAPI.saveTimeEntries([originalTimeEntry]),
+      ]);
 
       const { result } = renderHook(() => useStorage());
 
@@ -201,17 +221,25 @@ describe('useStorage フックの特性テスト', () => {
         description: '更新された作業',
       };
 
+      mockAPI.saveTimeEntries.mockClear();
+      jest.useFakeTimers();
       await act(async () => {
         result.current.setTimeEntries([updatedTimeEntry]);
       });
+      await advanceDebounce();
+      jest.useRealTimers();
 
       expect(result.current.timeEntries[0].description).toBe('更新された作業');
-      expect(mockAPI.saveTimeEntries).toHaveBeenCalled();
+      expect(mockAPI.saveTimeEntries).toHaveBeenCalledTimes(1);
     });
 
     test('タイムエントリーの削除が正常に動作する', async () => {
       const timeEntry = createMockTimeEntry();
-      await mockAPI.saveTimeEntries([timeEntry]);
+      const relatedProject = createMockProject({ id: timeEntry.projectId });
+      await Promise.all([
+        mockAPI.saveProjects([relatedProject]),
+        mockAPI.saveTimeEntries([timeEntry]),
+      ]);
 
       const { result } = renderHook(() => useStorage());
 
@@ -219,12 +247,16 @@ describe('useStorage フックの特性テスト', () => {
         expect(result.current.isLoading).toBe(false);
       });
 
+      mockAPI.saveTimeEntries.mockClear();
+      jest.useFakeTimers();
       await act(async () => {
         result.current.setTimeEntries([]);
       });
+      await advanceDebounce();
+      jest.useRealTimers();
 
       expect(result.current.timeEntries).toHaveLength(0);
-      expect(mockAPI.saveTimeEntries).toHaveBeenCalled();
+      expect(mockAPI.saveTimeEntries).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -245,6 +277,7 @@ describe('useStorage フックの特性テスト', () => {
         expect(result.current.isLoading).toBe(false);
       });
 
+      mockAPI.saveTimeEntries.mockClear();
       // プロジェクトが存在することでデータ操作が発生し、整合性チェックが動作する
       jest.useFakeTimers();
       await act(async () => {

@@ -1,9 +1,9 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ManualTimeEntryForm } from '../ManualTimeEntryForm';
 import { LanguageProvider } from '../../../contexts/LanguageContext';
-import { Project } from '../../../types';
+import { Project, TimeEntry } from '../../../types';
 
 // テスト用のプロジェクトデータ
 const mockProjects: Project[] = [
@@ -26,6 +26,16 @@ const mockProjects: Project[] = [
     updatedAt: '2025-01-01T00:00:00Z',
   },
 ];
+
+const existingTimeEntry: TimeEntry = {
+  id: 'time-entry-1',
+  projectId: 'project-1',
+  startTime: '2025-01-10T09:00:00.000Z',
+  endTime: '2025-01-10T11:00:00.000Z',
+  description: 'Existing entry',
+  createdAt: '2025-01-10T11:00:00.000Z',
+  updatedAt: '2025-01-10T11:00:00.000Z',
+};
 
 // モックアラート
 const mockAlert = jest.fn();
@@ -58,7 +68,8 @@ const getTimeInputByLabel = (label: RegExp) => {
   return input as HTMLInputElement;
 };
 
-const getSaveButton = () => screen.getByRole('button', { name: /保存|save/i });
+const getSaveButton = () =>
+  screen.getByRole('button', { name: /保存|save|update/i });
 
 describe('ManualTimeEntryForm', () => {
   beforeEach(() => {
@@ -216,7 +227,22 @@ describe('ManualTimeEntryForm', () => {
       await userEvent.click(saveButton);
 
       expect(onSave).toHaveBeenCalledTimes(2);
-      expect(onSave.mock.calls[1][0].description).toContain('2日目');
+      const firstEntry = onSave.mock.calls[0][0];
+      const secondEntry = onSave.mock.calls[1][0];
+
+      expect(firstEntry.description).toBeDefined();
+      expect(secondEntry.description).toContain('2日目');
+      const expectedFirstStart = new Date('2025-01-01T22:00').toISOString();
+      const expectedFirstEnd = new Date(
+        '2025-01-01T23:59:59.999'
+      ).toISOString();
+      const expectedSecondStart = new Date('2025-01-02T00:00').toISOString();
+      const expectedSecondEnd = new Date('2025-01-02T02:00').toISOString();
+
+      expect(firstEntry.startTime).toBe(expectedFirstStart);
+      expect(firstEntry.endTime).toBe(expectedFirstEnd);
+      expect(secondEntry.startTime).toBe(expectedSecondStart);
+      expect(secondEntry.endTime).toBe(expectedSecondEnd);
     });
 
     it('24時間を超える場合は確認ダイアログの結果によって保存が制御される', async () => {
@@ -250,6 +276,105 @@ describe('ManualTimeEntryForm', () => {
       expect(onSave).toHaveBeenCalled();
 
       confirmSpy.mockRestore();
+    });
+
+    it('編集モードでは終了日が固定され、既存エントリが上書きされる', async () => {
+      const onSave = jest.fn();
+      const onClose = jest.fn();
+
+      renderManualTimeEntryForm({
+        onSave,
+        onClose,
+        timeEntry: existingTimeEntry,
+      });
+
+      const endDateInput = screen.getByLabelText(
+        /End Date/i
+      ) as HTMLInputElement;
+      const startDateInput = screen.getByLabelText(
+        /Start Date/i
+      ) as HTMLInputElement;
+      const initialDate = existingTimeEntry.startTime.split('T')[0];
+      await waitFor(() => {
+        expect(startDateInput.value).toBe(initialDate);
+      });
+      expect(endDateInput).toBeDisabled();
+      expect(endDateInput.value).toBe(startDateInput.value);
+
+      const projectSelect = screen.getByRole('combobox');
+      await userEvent.click(projectSelect);
+      await userEvent.click(screen.getByText('Project 2'));
+
+      const startTimeInput = getTimeInputByLabel(/Start Time/i);
+      const endTimeInput = getTimeInputByLabel(/End Time/i);
+      const newStartTime = '10:30';
+      const newEndTime = '14:00';
+      fireEvent.change(startTimeInput, { target: { value: newStartTime } });
+      fireEvent.change(endTimeInput, { target: { value: newEndTime } });
+      const descriptionInput = screen.getByRole('textbox');
+      await userEvent.clear(descriptionInput);
+      await userEvent.type(descriptionInput, 'Edited description');
+
+      const saveButton = getSaveButton();
+      await userEvent.click(saveButton);
+
+      const updatedEntry = onSave.mock.calls[0][0];
+      const expectedStartIso = new Date(
+        `${initialDate}T${newStartTime}`
+      ).toISOString();
+      const expectedEndIso = new Date(
+        `${initialDate}T${newEndTime}`
+      ).toISOString();
+
+      expect(updatedEntry.id).toBe(existingTimeEntry.id);
+      expect(updatedEntry.projectId).toBe('project-2');
+      expect(updatedEntry.startTime).toBe(expectedStartIso);
+      expect(updatedEntry.endTime).toBe(expectedEndIso);
+      expect(updatedEntry.description).toBe('Edited description');
+      expect(updatedEntry.createdAt).toBe(existingTimeEntry.createdAt);
+      expect(updatedEntry.updatedAt).not.toBe(existingTimeEntry.updatedAt);
+      expect(onClose).toHaveBeenCalled();
+      expect(mockAlert).not.toHaveBeenCalled();
+    });
+
+    it('現在時刻ボタンで開始・終了の日時が現在時刻に更新される', async () => {
+      jest.useFakeTimers();
+      const user = userEvent.setup({
+        advanceTimers: jest.advanceTimersByTime,
+      });
+      const mockNow = new Date('2025-01-05T08:30:00.000Z');
+      jest.setSystemTime(mockNow);
+
+      renderManualTimeEntryForm();
+
+      const startDateInput = screen.getByLabelText(
+        /Start Date/i
+      ) as HTMLInputElement;
+      const endDateInput = screen.getByLabelText(
+        /End Date/i
+      ) as HTMLInputElement;
+      const startButton = screen.getByRole('button', {
+        name: 'Set current time as start time',
+      });
+
+      await user.click(startButton);
+
+      const expectedDate = new Date(mockNow).toISOString().split('T')[0];
+      const expectedTime = `${String(mockNow.getHours()).padStart(2, '0')}:${String(mockNow.getMinutes()).padStart(2, '0')}`;
+
+      expect(startDateInput.value).toBe(expectedDate);
+      expect(getTimeInputByLabel(/Start Time/i).value).toBe(expectedTime);
+
+      const endButton = screen.getByRole('button', {
+        name: 'Set current time as end time',
+      });
+
+      await user.click(endButton);
+
+      expect(endDateInput.value).toBe(expectedDate);
+      expect(getTimeInputByLabel(/End Time/i).value).toBe(expectedTime);
+
+      jest.useRealTimers();
     });
   });
 });
