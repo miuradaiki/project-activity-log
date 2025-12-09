@@ -95,6 +95,9 @@ export class MockElectronAPI {
     );
 
   // タイマー関連のモック
+  timerStart = jest.fn();
+  timerStop = jest.fn();
+  onTrayStopTimer = jest.fn();
   onTimerStop = jest.fn();
   removeAllTimerStopListeners = jest.fn();
   updateTrayTimer = jest.fn();
