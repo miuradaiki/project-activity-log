@@ -3,9 +3,9 @@ import { Box, Card, Paper, Button, IconButton } from '@mui/material';
 import { motion } from 'framer-motion';
 
 // Animated wrapper components
-export const MotionBox = motion(Box);
-export const MotionCard = motion(Card);
-export const MotionPaper = motion(Paper);
+export const MotionBox = motion.create(Box);
+export const MotionCard = motion.create(Card);
+export const MotionPaper = motion.create(Paper);
 
 // Glassmorphism Card
 export const GlassCard = styled(MotionCard)(({ theme }) => ({

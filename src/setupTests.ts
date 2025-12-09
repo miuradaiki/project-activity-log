@@ -84,6 +84,8 @@ const localStorageMock = {
 
 Object.defineProperty(window, 'localStorage', {
   value: localStorageMock,
+  writable: true,
+  configurable: true,
 });
 
 // uuid のモック

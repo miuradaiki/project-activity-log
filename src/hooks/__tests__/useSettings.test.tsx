@@ -37,12 +37,16 @@ describe('useSettings フック', () => {
   });
 
   describe('初期化', () => {
-    test('初期状態はデフォルト設定とisLoading=trueで開始される', () => {
+    test('初期状態はデフォルト設定とisLoading=trueで開始される', async () => {
       const { result } = renderHook(() => useSettings());
 
       expect(result.current.settings).toEqual(DEFAULT_SETTINGS);
       expect(result.current.isLoading).toBe(true);
       expect(result.current.error).toBeNull();
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
     });
 
     test('設定の読み込み完了後、isLoadingがfalseになる', async () => {
