@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import {
   Dialog,
@@ -12,22 +12,11 @@ import {
   Select,
   MenuItem,
   Box,
-  IconButton,
-  InputAdornment,
-  Tooltip,
-  Typography,
-  Alert,
 } from '@mui/material';
-import { Update, CalendarToday } from '@mui/icons-material';
 import { Project, TimeEntry } from '../../types';
-import { v4 as uuidv4 } from 'uuid';
-import {
-  format,
-  isSameDay,
-  differenceInHours,
-  differenceInMinutes,
-} from 'date-fns';
-import { createSplitEntries } from '../../utils/timeEntryUtils';
+import { differenceInMinutes } from 'date-fns';
+import { useTimeEntryForm } from './hooks/useTimeEntryForm';
+import { DateTimeFields, formatHoursAndMinutes } from './DateTimeFields';
 
 interface ManualTimeEntryFormProps {
   open: boolean;
@@ -37,7 +26,6 @@ interface ManualTimeEntryFormProps {
   timeEntry?: TimeEntry;
 }
 
-// export defaultをexportに変更
 export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
   open,
   onClose,
@@ -46,168 +34,42 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
   timeEntry,
 }) => {
   const { t } = useLanguage();
-  const [projectId, setProjectId] = useState<string>('');
-  const [startDate, setStartDate] = useState<string>(
-    new Date().toISOString().split('T')[0]
-  );
-  const [endDate, setEndDate] = useState<string>(
-    new Date().toISOString().split('T')[0]
-  );
-  const [startTime, setStartTime] = useState<string>('09:00');
-  const [endTime, setEndTime] = useState<string>('17:00');
-  const [description, setDescription] = useState<string>('');
 
-  const isEditing = !!timeEntry;
+  const {
+    formState,
+    setProjectId,
+    setStartDate,
+    setEndDate,
+    setStartTime,
+    setEndTime,
+    setDescription,
+    isEditing,
+    isMultiDay,
+    isFormValid,
+    handleSetCurrentTime,
+    handleSubmit,
+    handleClose,
+  } = useTimeEntryForm({
+    timeEntry,
+    onSave,
+    onClose,
+  });
 
-  useEffect(() => {
+  const getSubmitButtonLabel = (): string => {
     if (timeEntry) {
-      const startDateTime = new Date(timeEntry.startTime);
-      const endDateTime = new Date(timeEntry.endTime);
-
-      setProjectId(timeEntry.projectId);
-      setStartDate(startDateTime.toISOString().split('T')[0]);
-      // 編集時は日跨ぎ編集を禁止するため終了日を開始日に固定
-      setEndDate(startDateTime.toISOString().split('T')[0]);
-      setStartTime(startDateTime.toTimeString().slice(0, 5));
-      setEndTime(endDateTime.toTimeString().slice(0, 5));
-      setDescription(timeEntry.description || '');
-    } else {
-      // 新規作成時は初期値にリセット
-      const today = new Date().toISOString().split('T')[0];
-      setStartDate(today);
-      setEndDate(today);
-      setStartTime('09:00');
-      setEndTime('17:00');
-      setDescription('');
-      setProjectId('');
+      return t('actions.update');
     }
-  }, [timeEntry]);
-
-  const getCurrentTime = () => {
-    const now = new Date();
-    return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-  };
-
-  // 分単位を時間・分形式に変換するヘルパー関数
-  const formatHoursAndMinutes = (totalMinutes: number): string => {
-    const hours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
-
-    if (hours === 0) {
-      return `${minutes}分`;
-    } else if (minutes === 0) {
-      return `${hours}時間`;
-    } else {
-      return `${hours}時間${minutes}分`;
-    }
-  };
-
-  const handleSetCurrentTime = (target: 'start' | 'end') => {
-    const currentTime = getCurrentTime();
-    const currentDate = new Date().toISOString().split('T')[0];
-
-    if (target === 'start') {
-      setStartTime(currentTime);
-      setStartDate(currentDate);
-    } else {
-      setEndTime(currentTime);
-      setEndDate(currentDate);
-    }
-  };
-
-  // 自動分割機能：日跨ぎエントリーを複数のエントリーに分割
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const startDateTime = new Date(`${startDate}T${startTime}`);
-    const endDateTime = new Date(`${endDate}T${endTime}`);
-    const duration = endDateTime.getTime() - startDateTime.getTime();
-
-    // 時間がマイナスまたは0の場合はエラー
-    if (duration <= 0) {
-      window.alert('終了時間は開始時間より後である必要があります。');
-      return;
-    }
-
-    // 1分未満（60000ミリ秒）の場合はエラー
-    if (duration < 60000) {
-      window.alert('1分未満の時間エントリは保存できません。');
-      return;
-    }
-
-    // 24時間を超える場合の警告
-    const hours = differenceInHours(endDateTime, startDateTime);
-    if (hours > 24) {
-      const confirmResult = window.confirm(
-        `${hours}時間の長時間記録になります。続行しますか？`
-      );
-      if (!confirmResult) {
-        return;
-      }
-    }
-
-    const timestamp = new Date().toISOString();
-
-    // 編集の場合は単純に更新
-    if (timeEntry) {
-      const updatedTimeEntry: TimeEntry = {
-        ...timeEntry,
-        projectId,
-        startTime: startDateTime.toISOString(),
-        endTime: endDateTime.toISOString(),
-        description,
-        updatedAt: timestamp,
-      };
-      onSave(updatedTimeEntry);
-      handleClose();
-      return;
-    }
-
-    // 新規作成の場合
-    const isMultiDay = !isSameDay(startDateTime, endDateTime);
 
     if (isMultiDay) {
-      // 日跨ぎの場合は常に自動分割
-      const splitEntries = createSplitEntries(
-        projectId,
-        startDateTime,
-        endDateTime,
-        description
+      const durationMinutes = differenceInMinutes(
+        new Date(`${formState.endDate}T${formState.endTime}`),
+        new Date(`${formState.startDate}T${formState.startTime}`)
       );
-
-      // 複数のエントリーを順次保存
-      splitEntries.forEach((entry) => onSave(entry));
-    } else {
-      // 通常の単一エントリー
-      const newTimeEntry: TimeEntry = {
-        id: uuidv4(),
-        projectId,
-        startTime: startDateTime.toISOString(),
-        endTime: endDateTime.toISOString(),
-        description,
-        createdAt: timestamp,
-        updatedAt: timestamp,
-      };
-      onSave(newTimeEntry);
+      return `${formatHoursAndMinutes(durationMinutes)}を日別に保存`;
     }
 
-    handleClose();
+    return t('actions.save');
   };
-
-  const handleClose = () => {
-    setProjectId('');
-    const today = new Date().toISOString().split('T')[0];
-    setStartDate(today);
-    setEndDate(today);
-    setStartTime('09:00');
-    setEndTime('17:00');
-    setDescription('');
-    onClose();
-  };
-
-  const isFormValid = projectId && startDate && endDate && startTime && endTime;
-  const isMultiDay = !isSameDay(new Date(startDate), new Date(endDate));
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
@@ -220,7 +82,7 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
             <FormControl fullWidth>
               <InputLabel>{t('timer.project')}</InputLabel>
               <Select
-                value={projectId}
+                value={formState.projectId}
                 onChange={(e) => setProjectId(e.target.value)}
                 label={t('timer.project')}
                 required
@@ -235,129 +97,25 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
               </Select>
             </FormControl>
 
-            {/* 開始日・終了日フィールド */}
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <TextField
-                label={t('timer.start.date') || '開始日'}
-                type="date"
-                value={startDate}
-                onChange={(e) => {
-                  setStartDate(e.target.value);
-                  // 開始日が終了日より後の場合、終了日も同じ日に設定
-                  if (new Date(e.target.value) > new Date(endDate)) {
-                    setEndDate(e.target.value);
-                  }
-                }}
-                fullWidth
-                required
-                InputLabelProps={{ shrink: true }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <CalendarToday fontSize="small" />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-
-              <TextField
-                label={t('timer.end.date') || '終了日'}
-                type="date"
-                value={endDate}
-                onChange={(e) => {
-                  // 編集時は終了日変更不可（跨ぎ禁止）
-                  if (isEditing) return;
-                  setEndDate(e.target.value);
-                }}
-                fullWidth
-                required
-                disabled={isEditing}
-                InputLabelProps={{ shrink: true }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <CalendarToday fontSize="small" />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Box>
-
-            {/* 日跨ぎの警告表示 */}
-            {isMultiDay && (
-              <Alert severity="info" sx={{ mb: 1 }}>
-                <Typography variant="body2">
-                  {formatHoursAndMinutes(
-                    differenceInMinutes(
-                      new Date(`${endDate}T${endTime}`),
-                      new Date(`${startDate}T${startTime}`)
-                    )
-                  )}
-                  ({format(new Date(startDate), 'M/d')} -{' '}
-                  {format(new Date(endDate), 'M/d')}) の記録になります。
-                </Typography>
-              </Alert>
-            )}
-
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <TextField
-                label={t('timer.start.time')}
-                type="time"
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-                fullWidth
-                required
-                InputLabelProps={{ shrink: true }}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <Tooltip title={t('timer.now.start')}>
-                        <IconButton
-                          onClick={() => handleSetCurrentTime('start')}
-                          edge="end"
-                          size="small"
-                          sx={{ mr: -0.5, color: 'primary.main' }}
-                        >
-                          <Update fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-
-              <TextField
-                label={t('timer.end.time')}
-                type="time"
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-                fullWidth
-                required
-                InputLabelProps={{ shrink: true }}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <Tooltip title={t('timer.now.end')}>
-                        <IconButton
-                          onClick={() => handleSetCurrentTime('end')}
-                          edge="end"
-                          size="small"
-                          sx={{ mr: -0.5, color: 'primary.main' }}
-                        >
-                          <Update fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Box>
+            <DateTimeFields
+              startDate={formState.startDate}
+              endDate={formState.endDate}
+              startTime={formState.startTime}
+              endTime={formState.endTime}
+              isEditing={isEditing}
+              isMultiDay={isMultiDay}
+              onStartDateChange={setStartDate}
+              onEndDateChange={setEndDate}
+              onStartTimeChange={setStartTime}
+              onEndTimeChange={setEndTime}
+              onSetCurrentTime={handleSetCurrentTime}
+            />
 
             <TextField
               label={t('timer.description')}
               multiline
               rows={3}
-              value={description}
+              value={formState.description}
               onChange={(e) => setDescription(e.target.value)}
               fullWidth
             />
@@ -367,11 +125,7 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
         <DialogActions>
           <Button onClick={handleClose}>{t('projects.cancel')}</Button>
           <Button type="submit" variant="contained" disabled={!isFormValid}>
-            {timeEntry
-              ? t('actions.update')
-              : !timeEntry && isMultiDay
-                ? `${formatHoursAndMinutes(differenceInMinutes(new Date(`${endDate}T${endTime}`), new Date(`${startDate}T${startTime}`)))}を日別に保存`
-                : t('actions.save')}
+            {getSubmitButtonLabel()}
           </Button>
         </DialogActions>
       </form>
