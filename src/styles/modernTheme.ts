@@ -1,4 +1,9 @@
-import { createTheme, responsiveFontSizes, alpha } from '@mui/material/styles';
+import {
+  createTheme,
+  responsiveFontSizes,
+  alpha,
+  Theme,
+} from '@mui/material/styles';
 
 declare module '@mui/material/styles' {
   interface Theme {
@@ -676,18 +681,18 @@ export const getResponsiveTheme = (isDarkMode: boolean) => {
 };
 
 // Export modern helper functions
-export const getGradient = (theme: any, type: keyof typeof gradients) => {
+export const getGradient = (theme: Theme, type: keyof typeof gradients) => {
   return theme.custom?.gradients?.[type] || gradients[type];
 };
 
 export const getCustomShadow = (
-  theme: any,
+  theme: Theme,
   type: keyof typeof modernShadows
 ) => {
   return theme.custom?.shadows?.[type] || modernShadows[type];
 };
 
-export const applyGlassmorphism = (theme: any) => ({
+export const applyGlassmorphism = (theme: Theme) => ({
   background: theme.custom?.glassmorphism?.background,
   backdropFilter: theme.custom?.glassmorphism?.blur,
   border: theme.custom?.glassmorphism?.border,

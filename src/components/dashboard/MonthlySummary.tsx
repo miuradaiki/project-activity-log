@@ -30,6 +30,7 @@ import {
   getProjectDistribution,
 } from '../../utils/analytics';
 import { projectColorManager } from '../../utils/colorUtils';
+import { MONTH_NAMES } from '../../constants/dateConstants';
 
 interface MonthlySummaryProps {
   projects: Project[];
@@ -63,40 +64,9 @@ export const MonthlySummary: React.FC<MonthlySummaryProps> = ({
 
   // 月の表示名を計算
   const displayMonth = useMemo(() => {
-    const monthNames = {
-      en: [
-        'January',
-        'February',
-        'March',
-        'April',
-        'May',
-        'June',
-        'July',
-        'August',
-        'September',
-        'October',
-        'November',
-        'December',
-      ],
-      ja: [
-        '1月',
-        '2月',
-        '3月',
-        '4月',
-        '5月',
-        '6月',
-        '7月',
-        '8月',
-        '9月',
-        '10月',
-        '11月',
-        '12月',
-      ],
-    };
-
     return isEnglish
-      ? `${monthNames.en[selectedMonth]} ${selectedYear}`
-      : `${selectedYear}年${monthNames.ja[selectedMonth]}`;
+      ? `${MONTH_NAMES.en[selectedMonth]} ${selectedYear}`
+      : `${selectedYear}年${MONTH_NAMES.ja[selectedMonth]}`;
   }, [selectedYear, selectedMonth, isEnglish]);
 
   // プロジェクト分布データ
@@ -138,22 +108,6 @@ export const MonthlySummary: React.FC<MonthlySummaryProps> = ({
     value: i,
     label: isEnglish ? `Month ${i + 1}` : `${i + 1}月`,
   }));
-
-  // 英語の月名（フルスペル）
-  const englishMonthNames = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ];
 
   // カスタムツールチップ（プロジェクト分布用）
   const CustomTooltip = ({
@@ -227,7 +181,7 @@ export const MonthlySummary: React.FC<MonthlySummaryProps> = ({
             >
               {months.map((month, index) => (
                 <MenuItem key={month.value} value={month.value}>
-                  {isEnglish ? englishMonthNames[index] : month.label}
+                  {isEnglish ? MONTH_NAMES.en[index] : month.label}
                 </MenuItem>
               ))}
             </Select>
