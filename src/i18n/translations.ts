@@ -140,6 +140,23 @@ export const translations = {
     'time.last.month': '先月',
     'timer.export.success': '作業記録のエクスポートが完了しました',
     'timer.export.error': 'エクスポートに失敗しました',
+
+    // Monthly Progress Summary
+    'dashboard.monthly.summary.title': '月間進捗サマリー',
+    'dashboard.monthly.summary.worked': '作業時間',
+    'dashboard.monthly.summary.target': '目標時間',
+    'dashboard.monthly.summary.remaining.days': '残り営業日',
+    'dashboard.monthly.summary.required.pace': '必要ペース',
+    'dashboard.monthly.summary.vs.last.month': '先月比',
+    'dashboard.monthly.summary.per.day': '/日',
+    'dashboard.monthly.summary.on.track': '順調',
+    'dashboard.monthly.summary.behind': '遅れ',
+
+    // Activity Heatmap
+    'dashboard.heatmap.title': '活動ヒートマップ',
+    'dashboard.heatmap.less': '少ない',
+    'dashboard.heatmap.more': '多い',
+    'dashboard.heatmap.hours': '{hours}時間',
   },
   en: {
     // Common
@@ -282,5 +299,22 @@ export const translations = {
     'time.last.month': 'Last Month',
     'timer.export.success': 'Time entries exported successfully',
     'timer.export.error': 'Failed to export time entries',
+
+    // Monthly Progress Summary
+    'dashboard.monthly.summary.title': 'Monthly Progress Summary',
+    'dashboard.monthly.summary.worked': 'Hours Worked',
+    'dashboard.monthly.summary.target': 'Target Hours',
+    'dashboard.monthly.summary.remaining.days': 'Working Days Left',
+    'dashboard.monthly.summary.required.pace': 'Required Pace',
+    'dashboard.monthly.summary.vs.last.month': 'vs Last Month',
+    'dashboard.monthly.summary.per.day': '/day',
+    'dashboard.monthly.summary.on.track': 'On Track',
+    'dashboard.monthly.summary.behind': 'Behind',
+
+    // Activity Heatmap
+    'dashboard.heatmap.title': 'Activity Heatmap',
+    'dashboard.heatmap.less': 'Less',
+    'dashboard.heatmap.more': 'More',
+    'dashboard.heatmap.hours': '{hours} hours',
   },
 };
