@@ -21,6 +21,7 @@ import {
   Info as InfoIcon,
 } from '@mui/icons-material';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { APP_CONSTANTS } from '../../constants';
 
 interface WorkHoursSettingsProps {
   baseMonthlyHours: number;
@@ -83,8 +84,8 @@ export const WorkHoursSettings: React.FC<WorkHoursSettingsProps> = ({
                   { value: 140, label: '140h' },
                   { value: 180, label: '180h' },
                 ]}
-                min={80}
-                max={200}
+                min={APP_CONSTANTS.PROJECT.MIN_MONTHLY_HOURS}
+                max={APP_CONSTANTS.PROJECT.MAX_MONTHLY_HOURS}
               />
             </Grid>
             <Grid item xs={12} md={4}>
@@ -94,7 +95,10 @@ export const WorkHoursSettings: React.FC<WorkHoursSettingsProps> = ({
                 value={baseMonthlyHours}
                 onChange={(e) => {
                   const value = Number(e.target.value);
-                  if (value >= 80 && value <= 200) {
+                  if (
+                    value >= APP_CONSTANTS.PROJECT.MIN_MONTHLY_HOURS &&
+                    value <= APP_CONSTANTS.PROJECT.MAX_MONTHLY_HOURS
+                  ) {
                     onBaseMonthlyHoursChange(value);
                   }
                 }}
