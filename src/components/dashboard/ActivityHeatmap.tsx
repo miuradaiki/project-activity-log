@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Box, Typography, Tooltip, useTheme } from '@mui/material';
+import { Box, Typography, Tooltip, useTheme, Theme } from '@mui/material';
 import { motion } from 'framer-motion';
 import { TimeEntry } from '../../types';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -16,7 +16,7 @@ interface ActivityHeatmapProps {
 }
 
 // ヒートマップのカラーを動的に生成（テーマのプライマリカラーを使用）
-const getHeatmapColors = (theme: ReturnType<typeof useTheme>) => {
+const getHeatmapColors = (theme: Theme) => {
   const isDark = theme.palette.mode === 'dark';
 
   if (isDark) {
