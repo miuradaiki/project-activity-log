@@ -21,6 +21,9 @@ export {
   calculateMonthlyProgress,
   calculateMonthlyTargetHours,
   getPreviousMonthProjectDistribution,
+  calculateTotalMonthlyTarget,
+  calculateRemainingWorkingDays,
+  calculateMonthOverMonthChange,
   // Predictions
   predictCompletionDate,
   calculateRecommendedDailyHours,

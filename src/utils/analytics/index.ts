@@ -18,6 +18,9 @@ export {
   calculateMonthlyProgress,
   calculateMonthlyTargetHours,
   getPreviousMonthProjectDistribution,
+  calculateTotalMonthlyTarget,
+  calculateRemainingWorkingDays,
+  calculateMonthOverMonthChange,
 } from './monthly';
 
 // Predictions
@@ -33,3 +36,11 @@ export {
   getMostActiveProject,
   calculateProjectHours,
 } from './aggregations';
+
+// Heatmap
+export {
+  calculateHeatmapLevel,
+  getRolling12MonthRange,
+  generateHeatmapData,
+} from './heatmap';
+export type { HeatmapDay, HeatmapWeek } from './heatmap';

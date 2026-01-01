@@ -503,4 +503,147 @@ describe('analytics ユーティリティ', () => {
       ]);
     });
   });
+
+  describe('calculateTotalMonthlyTarget', () => {
+    test('全プロジェクトの月間目標時間を合計する', () => {
+      const projects = [
+        { ...createProject('p1', 'Project A'), monthlyCapacity: 0.5 }, // 50%
+        { ...createProject('p2', 'Project B'), monthlyCapacity: 0.3 }, // 30%
+      ];
+      const baseMonthlyHours = 140;
+
+      const { calculateTotalMonthlyTarget } = require('../analytics');
+      const result = calculateTotalMonthlyTarget(projects, baseMonthlyHours);
+
+      // 50% of 140 = 70, 30% of 140 = 42, total = 112
+      expect(result).toBe(112);
+    });
+
+    test('アーカイブされたプロジェクトは除外する', () => {
+      const projects = [
+        { ...createProject('p1', 'Project A'), monthlyCapacity: 0.5 },
+        { ...createProject('p2', 'Project B', true), monthlyCapacity: 0.3 }, // archived
+      ];
+      const baseMonthlyHours = 140;
+
+      const { calculateTotalMonthlyTarget } = require('../analytics');
+      const result = calculateTotalMonthlyTarget(projects, baseMonthlyHours);
+
+      // Only 50% of 140 = 70 (Project B is archived)
+      expect(result).toBe(70);
+    });
+
+    test('プロジェクトがない場合は0を返す', () => {
+      const { calculateTotalMonthlyTarget } = require('../analytics');
+      const result = calculateTotalMonthlyTarget([], 140);
+
+      expect(result).toBe(0);
+    });
+  });
+
+  describe('calculateRemainingWorkingDays', () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    test('今月の残り営業日数を計算する', () => {
+      // 2025年1月15日（水曜日）
+      jest.setSystemTime(new Date('2025-01-15T12:00:00Z'));
+
+      const { calculateRemainingWorkingDays } = require('../analytics');
+      const result = calculateRemainingWorkingDays();
+
+      // 1月15日から31日まで: 16,17(金), 20,21,22,23,24(月-金), 27,28,29,30,31(月-金)
+      // 15(水), 16(木), 17(金) = 3日
+      // 20(月), 21(火), 22(水), 23(木), 24(金) = 5日
+      // 27(月), 28(火), 29(水), 30(木), 31(金) = 5日
+      // 合計 = 13日（15日含む）
+      expect(result).toBe(13);
+    });
+
+    test('月末の場合は1を返す', () => {
+      // 2025年1月31日（金曜日）
+      jest.setSystemTime(new Date('2025-01-31T12:00:00Z'));
+
+      const { calculateRemainingWorkingDays } = require('../analytics');
+      const result = calculateRemainingWorkingDays();
+
+      expect(result).toBe(1);
+    });
+
+    test('週末の場合は0を返す', () => {
+      // 2025年1月25日（土曜日）
+      jest.setSystemTime(new Date('2025-01-25T12:00:00Z'));
+
+      const { calculateRemainingWorkingDays } = require('../analytics');
+      const result = calculateRemainingWorkingDays();
+
+      // 27(月), 28(火), 29(水), 30(木), 31(金) = 5日
+      expect(result).toBe(5);
+    });
+  });
+
+  describe('calculateMonthOverMonthChange', () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2025-02-15T12:00:00Z'));
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    test('先月同期間との比較を計算する', () => {
+      const timeEntries = [
+        // 先月（1月1-15日）: 20時間
+        createTimeEntry('p1', '2025-01-10T09:00:00Z', '2025-01-10T17:00:00Z'), // 8時間
+        createTimeEntry('p1', '2025-01-11T09:00:00Z', '2025-01-11T17:00:00Z'), // 8時間
+        createTimeEntry('p1', '2025-01-12T09:00:00Z', '2025-01-12T13:00:00Z'), // 4時間
+        // 今月（2月1-15日）: 24時間
+        createTimeEntry('p1', '2025-02-10T09:00:00Z', '2025-02-10T17:00:00Z'), // 8時間
+        createTimeEntry('p1', '2025-02-11T09:00:00Z', '2025-02-11T17:00:00Z'), // 8時間
+        createTimeEntry('p1', '2025-02-12T09:00:00Z', '2025-02-12T17:00:00Z'), // 8時間
+      ];
+
+      const { calculateMonthOverMonthChange } = require('../analytics');
+      const result = calculateMonthOverMonthChange(timeEntries);
+
+      expect(result.hoursChange).toBe(4); // 24 - 20
+      expect(result.percentageChange).toBe(20); // (4/20) * 100
+      expect(result.trend).toBe('up');
+    });
+
+    test('先月より減少している場合はdownを返す', () => {
+      const timeEntries = [
+        // 先月: 20時間
+        createTimeEntry('p1', '2025-01-10T09:00:00Z', '2025-01-10T17:00:00Z'), // 8時間
+        createTimeEntry('p1', '2025-01-11T09:00:00Z', '2025-01-11T17:00:00Z'), // 8時間
+        createTimeEntry('p1', '2025-01-12T09:00:00Z', '2025-01-12T13:00:00Z'), // 4時間
+        // 今月: 8時間
+        createTimeEntry('p1', '2025-02-10T09:00:00Z', '2025-02-10T17:00:00Z'), // 8時間
+      ];
+
+      const { calculateMonthOverMonthChange } = require('../analytics');
+      const result = calculateMonthOverMonthChange(timeEntries);
+
+      expect(result.hoursChange).toBe(-12);
+      expect(result.trend).toBe('down');
+    });
+
+    test('先月データがない場合はflatを返す', () => {
+      const timeEntries = [
+        createTimeEntry('p1', '2025-02-10T09:00:00Z', '2025-02-10T17:00:00Z'),
+      ];
+
+      const { calculateMonthOverMonthChange } = require('../analytics');
+      const result = calculateMonthOverMonthChange(timeEntries);
+
+      expect(result.percentageChange).toBe(0);
+      expect(result.trend).toBe('flat');
+    });
+  });
 });

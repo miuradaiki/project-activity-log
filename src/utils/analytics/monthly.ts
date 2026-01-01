@@ -167,3 +167,132 @@ export const getPreviousMonthProjectDistribution = (
     endOfPrevMonth
   );
 };
+
+/**
+ * 全プロジェクトの月間目標時間を合計
+ * アーカイブされたプロジェクトは除外
+ */
+export const calculateTotalMonthlyTarget = (
+  projects: Project[],
+  baseMonthlyHours: number
+): number => {
+  const totalTarget = projects
+    .filter((project) => !project.isArchived)
+    .reduce((total, project) => {
+      const targetHours = calculateMonthlyTargetHours(
+        project.monthlyCapacity * 100,
+        baseMonthlyHours
+      );
+      return total + targetHours;
+    }, 0);
+
+  return Number(totalTarget.toFixed(1));
+};
+
+/**
+ * 今月の残り営業日数を計算（土日除外、今日を含む）
+ */
+export const calculateRemainingWorkingDays = (date?: Date): number => {
+  const now = date || new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const lastDay = new Date(year, month + 1, 0).getDate();
+  const today = now.getDate();
+
+  let workingDays = 0;
+
+  for (let day = today; day <= lastDay; day++) {
+    const d = new Date(year, month, day);
+    const dayOfWeek = d.getDay();
+    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+      workingDays++;
+    }
+  }
+
+  return workingDays;
+};
+
+/**
+ * 先月同期間との比較を計算
+ */
+export const calculateMonthOverMonthChange = (
+  timeEntries: TimeEntry[],
+  currentDate?: Date
+): {
+  hoursChange: number;
+  percentageChange: number;
+  trend: 'up' | 'down' | 'flat';
+} => {
+  const now = currentDate || new Date();
+  const currentDay = now.getDate();
+
+  // 今月の1日から今日まで
+  const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const thisMonthEnd = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    currentDay,
+    23,
+    59,
+    59,
+    999
+  );
+
+  // 先月の1日から同じ日まで
+  const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const lastMonthEnd = new Date(
+    now.getFullYear(),
+    now.getMonth() - 1,
+    currentDay,
+    23,
+    59,
+    59,
+    999
+  );
+
+  // 今月の作業時間
+  const thisMonthHours =
+    timeEntries
+      .filter((entry) => {
+        const entryDate = new Date(entry.startTime);
+        return isWithinDateRange(entryDate, thisMonthStart, thisMonthEnd);
+      })
+      .reduce((total, entry) => {
+        return total + calculateDuration(entry.startTime, entry.endTime);
+      }, 0) /
+    (1000 * 60 * 60);
+
+  // 先月の作業時間
+  const lastMonthHours =
+    timeEntries
+      .filter((entry) => {
+        const entryDate = new Date(entry.startTime);
+        return isWithinDateRange(entryDate, lastMonthStart, lastMonthEnd);
+      })
+      .reduce((total, entry) => {
+        return total + calculateDuration(entry.startTime, entry.endTime);
+      }, 0) /
+    (1000 * 60 * 60);
+
+  const hoursChange = Number((thisMonthHours - lastMonthHours).toFixed(1));
+  const percentageChange =
+    lastMonthHours > 0
+      ? Number(((hoursChange / lastMonthHours) * 100).toFixed(0))
+      : 0;
+
+  let trend: 'up' | 'down' | 'flat' = 'flat';
+  // 先月のデータがない場合は比較できないのでflatを返す
+  if (lastMonthHours > 0) {
+    if (hoursChange > 0) {
+      trend = 'up';
+    } else if (hoursChange < 0) {
+      trend = 'down';
+    }
+  }
+
+  return {
+    hoursChange,
+    percentageChange,
+    trend,
+  };
+};
