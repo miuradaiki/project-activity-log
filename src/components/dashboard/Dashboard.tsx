@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Grid, Paper, useTheme, useMediaQuery } from '@mui/material';
 import { Project, TimeEntry } from '../../types';
-import { DailySummary } from './DailySummary';
+import { MonthlyProgressSummary } from './MonthlyProgressSummary';
+import { ActivityHeatmap } from './ActivityHeatmap';
 import { WeeklySummary } from './WeeklySummary';
 import { MonthlySummary } from './MonthlySummary';
 import { ProjectProgressView } from './ProjectProgressView';
@@ -51,9 +52,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
             : theme.palette.background.default,
       }}
     >
-      {/* 日次サマリー */}
-      <Box sx={{ mb: 4 }}>
-        <DailySummary projects={projects} timeEntries={timeEntries} />
+      {/* 月間進捗サマリー */}
+      <Box sx={{ mb: 3 }}>
+        <MonthlyProgressSummary projects={projects} timeEntries={timeEntries} />
+      </Box>
+
+      {/* 活動ヒートマップ */}
+      <Box sx={{ mb: 3 }}>
+        <ActivityHeatmap timeEntries={timeEntries} />
       </Box>
 
       {/* ウィジェット領域 */}
