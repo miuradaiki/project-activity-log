@@ -9,7 +9,6 @@ export interface ElectronAPI {
   loadSettings: () => Promise<AppSettings>;
   saveSettings: (settings: AppSettings) => Promise<void>;
   exportToCSV: () => Promise<{ success: boolean; error?: string }>;
-  importCSV: (filePath: string) => Promise<Array<Record<string, string>>>;
   showOpenDialog: () => Promise<{ canceled: boolean; filePaths: string[] }>;
   showNotification: (title: string, body: string) => void;
   onTimerStop: (callback: () => void) => void;

@@ -69,23 +69,6 @@ export class MockElectronAPI {
   // ファイル関連のモック
   exportCSV = jest.fn().mockResolvedValue(undefined);
 
-  importCSV = jest
-    .fn()
-    .mockImplementation(async (_filePath: string): Promise<any[]> => {
-      // デフォルトではCSVデータを返す
-      return [
-        {
-          date: '2024-01-01',
-          start_time: '09:00:00',
-          end_time: '10:00:00',
-          duration_minutes: 60,
-          project_name: 'テストプロジェクト',
-          project_description: 'テスト用プロジェクト',
-          notes: 'テストメモ',
-        },
-      ];
-    });
-
   showOpenDialog = jest
     .fn()
     .mockImplementation(
@@ -107,32 +90,11 @@ export class MockElectronAPI {
   showNotification = jest.fn();
 }
 
-// テスト用のヘルパー関数
-export const createMockProject = (
-  overrides: Partial<Project> = {}
-): Project => ({
-  id: 'test-project-1',
-  name: 'テストプロジェクト',
-  description: 'テスト用のプロジェクトです',
-  monthlyCapacity: 0.5,
-  createdAt: '2024-01-01T00:00:00.000Z',
-  updatedAt: '2024-01-01T00:00:00.000Z',
-  isArchived: false,
-  ...overrides,
-});
-
-export const createMockTimeEntry = (
-  overrides: Partial<TimeEntry> = {}
-): TimeEntry => ({
-  id: 'test-time-entry-1',
-  projectId: 'test-project-1',
-  startTime: '2024-01-01T09:00:00.000Z',
-  endTime: '2024-01-01T10:00:00.000Z',
-  description: 'テスト作業',
-  createdAt: '2024-01-01T00:00:00.000Z',
-  updatedAt: '2024-01-01T00:00:00.000Z',
-  ...overrides,
-});
+// テスト用のヘルパー関数を共通ヘルパーから再エクスポート
+export {
+  createMockProject,
+  createMockTimeEntry,
+} from '../__tests__/helpers/testFactories';
 
 export const createMockSettings = (
   overrides: Partial<AppSettings> = {}

@@ -29,7 +29,7 @@ module.exports = {
   ],
   coverageReporters: ['text', 'lcov', 'html'],
   coverageDirectory: 'coverage',
-  testPathIgnorePatterns: ['/node_modules/', '/dist/'],
+  testPathIgnorePatterns: ['/node_modules/', '/dist/', '/__tests__/helpers/'],
   transformIgnorePatterns: [
     'node_modules/(?!(@testing-library|@jest)/)',
   ],
