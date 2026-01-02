@@ -260,6 +260,18 @@ The project enforces strict TypeScript. Always:
 - Handle null/undefined cases
 - Use type guards when necessary
 
+### UI Implementation
+
+When implementing UI components, follow the design guidelines defined in `docs/design-guidelines.md`:
+
+- Use `theme.palette` for colors (no hardcoded values)
+- Use `theme.spacing` for margins/paddings (8px unit)
+- Support both light and dark modes
+- Use existing custom components (`GlassCard`, `StatusBadge`, etc.) from `src/components/ui/modern/StyledComponents.tsx`
+- Apply responsive design with MUI breakpoints (xs, md, lg)
+- Use Framer Motion for animations (keep them subtle and consistent)
+- Always add `aria-label` for accessibility
+
 ### Code Comments
 
 Only include comments that provide valuable context:
