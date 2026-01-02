@@ -3,18 +3,11 @@ import {
   ProjectColorManager,
   projectColorManager,
 } from '../colorUtils';
-import { Project } from '../../types';
+import { createMockProject } from '../../__tests__/helpers';
 
-// テスト用のプロジェクトデータ
-const createProject = (id: string, name: string): Project => ({
-  id,
-  name,
-  description: '',
-  monthlyCapacity: 0.5,
-  isArchived: false,
-  createdAt: '2025-01-01T00:00:00Z',
-  updatedAt: '2025-01-01T00:00:00Z',
-});
+// 簡易ファクトリ関数（互換性のため）
+const createProject = (id: string, name: string) =>
+  createMockProject({ id, name });
 
 describe('colorUtils', () => {
   describe('PROJECT_COLORS', () => {
@@ -124,11 +117,6 @@ describe('colorUtils', () => {
   });
 
   describe('projectColorManager (グローバルインスタンス)', () => {
-    test('グローバルインスタンスが利用可能', () => {
-      expect(projectColorManager).toBeDefined();
-      expect(projectColorManager).toBeInstanceOf(Object);
-    });
-
     test('グローバルインスタンスを使用して色を取得できる', () => {
       const projects = [
         createProject('global-p1', 'Global Project 1'),

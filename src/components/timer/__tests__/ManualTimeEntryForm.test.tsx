@@ -3,31 +3,28 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ManualTimeEntryForm } from '../ManualTimeEntryForm';
 import { LanguageProvider } from '../../../contexts/LanguageContext';
-import { Project, TimeEntry } from '../../../types';
+import {
+  createMockProject,
+  createMockTimeEntry,
+} from '../../../__tests__/helpers';
+import { ManualTimeEntryFormTestHelper } from './helpers/ManualTimeEntryFormHelper';
 
 // テスト用のプロジェクトデータ
-const mockProjects: Project[] = [
-  {
+const mockProjects = [
+  createMockProject({
     id: 'project-1',
     name: 'Project 1',
     description: 'Test project 1',
-    monthlyCapacity: 0.5,
-    isArchived: false,
-    createdAt: '2025-01-01T00:00:00Z',
-    updatedAt: '2025-01-01T00:00:00Z',
-  },
-  {
+  }),
+  createMockProject({
     id: 'project-2',
     name: 'Project 2',
     description: 'Test project 2',
     monthlyCapacity: 0.3,
-    isArchived: false,
-    createdAt: '2025-01-01T00:00:00Z',
-    updatedAt: '2025-01-01T00:00:00Z',
-  },
+  }),
 ];
 
-const existingTimeEntry: TimeEntry = {
+const existingTimeEntry = createMockTimeEntry({
   id: 'time-entry-1',
   projectId: 'project-1',
   startTime: '2025-01-10T09:00:00.000Z',
@@ -35,7 +32,7 @@ const existingTimeEntry: TimeEntry = {
   description: 'Existing entry',
   createdAt: '2025-01-10T11:00:00.000Z',
   updatedAt: '2025-01-10T11:00:00.000Z',
-};
+});
 
 // モックアラート
 const mockAlert = jest.fn();
@@ -59,17 +56,20 @@ const renderManualTimeEntryForm = (
   );
 };
 
+// ヘルパーインスタンスを作成する関数
+const createHelper = (advanceTimers?: (ms: number) => void) =>
+  new ManualTimeEntryFormTestHelper(advanceTimers);
+
+// ローカルヘルパー関数（互換性のため残す）
 const getTimeInputByLabel = (label: RegExp) => {
-  const elements = screen.getAllByLabelText(label);
-  const input = elements.find((el) => el.tagName === 'INPUT');
-  if (!input) {
-    throw new Error(`Time input for ${label} not found`);
-  }
-  return input as HTMLInputElement;
+  const helper = createHelper();
+  return helper.getTimeInputByLabel(label);
 };
 
-const getSaveButton = () =>
-  screen.getByRole('button', { name: /保存|save|update/i });
+const getSaveButton = () => {
+  const helper = createHelper();
+  return helper.getSaveButton();
+};
 
 describe('ManualTimeEntryForm', () => {
   beforeEach(() => {

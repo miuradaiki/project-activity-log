@@ -1,3 +1,14 @@
+/**
+ * useTimer フック テスト
+ *
+ * このテストファイルはタイマーの低レベル機能に焦点を当てています：
+ * - タイマーの基本動作（開始/停止、状態管理）
+ * - ブラウザAPI（localStorage）との連携
+ * - 状態の永続化と復元
+ *
+ * 高レベルのプロジェクト連携やTimeEntry生成のテストは
+ * useTimerController.test.ts を参照してください。
+ */
 import { renderHook, act } from '@testing-library/react';
 import { useTimer } from '../useTimer';
 

@@ -17,37 +17,21 @@ import {
   getAverageWorkSession,
   getPreviousMonthProjectDistribution,
 } from '../analytics';
-import { TimeEntry, Project } from '../../types';
+import { TimeEntry } from '../../types';
+import {
+  createMockProject,
+  createMockTimeEntry,
+} from '../../__tests__/helpers';
 
-// テスト用のプロジェクトデータ
-const createProject = (
-  id: string,
-  name: string,
-  isArchived = false
-): Project => ({
-  id,
-  name,
-  description: '',
-  monthlyCapacity: 0.5,
-  isArchived,
-  createdAt: '2025-01-01T00:00:00Z',
-  updatedAt: '2025-01-01T00:00:00Z',
-});
+// 簡易ファクトリ関数（互換性のため）
+const createProject = (id: string, name: string, isArchived = false) =>
+  createMockProject({ id, name, isArchived });
 
-// テスト用のタイムエントリーデータ
 const createTimeEntry = (
   projectId: string,
   startTime: string,
   endTime: string
-): TimeEntry => ({
-  id: `entry-${Math.random().toString(36).substr(2, 9)}`,
-  projectId,
-  startTime,
-  endTime,
-  description: '',
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-});
+) => createMockTimeEntry({ projectId, startTime, endTime });
 
 describe('analytics ユーティリティ', () => {
   describe('isWithinDateRange', () => {
@@ -364,10 +348,26 @@ describe('analytics ユーティリティ', () => {
     });
 
     test('完了予定日を予測する', () => {
-      const result = predictCompletionDate(10, 40, 5); // あと30時間、1日5時間ペース
+      // Arrange: 残り30時間、1日5時間ペースで6日後に完了予定
+      const currentHours = 10;
+      const targetHours = 40;
+      const dailyAverage = 5;
+      const remainingHours = targetHours - currentHours; // 30時間
+      const daysToComplete = Math.ceil(remainingHours / dailyAverage); // 6日
 
+      // Act
+      const result = predictCompletionDate(
+        currentHours,
+        targetHours,
+        dailyAverage
+      );
+
+      // Assert
       expect(result).not.toBeNull();
-      expect(result!.getDate()).toBe(21); // 6日後
+      const baseDate = new Date('2025-01-15');
+      const expectedDate = new Date(baseDate);
+      expectedDate.setDate(expectedDate.getDate() + daysToComplete);
+      expect(result!.getDate()).toBe(expectedDate.getDate());
     });
 
     test('すでに目標達成の場合はnullを返す', () => {

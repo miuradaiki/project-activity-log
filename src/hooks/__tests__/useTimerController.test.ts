@@ -1,48 +1,42 @@
+/**
+ * useTimerController フック テスト
+ *
+ * このテストファイルはタイマーの高レベル機能に焦点を当てています：
+ * - プロジェクトとの連携
+ * - TimeEntry の生成
+ * - Electron API 連携
+ * - ビジネスロジック（1分未満エントリーの破棄、8時間制限など）
+ *
+ * 低レベルのタイマー基本動作のテストは
+ * useTimer.test.tsx を参照してください。
+ */
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useTimerController } from '../useTimerController';
-import { Project } from '../../types';
+import { createMockProject } from '../../__tests__/helpers';
+import {
+  setupLocalStorageMock,
+  LocalStorageMockStore,
+} from '../../__tests__/helpers';
 
-const mockProject: Project = {
+const mockProject = createMockProject({
   id: 'project-1',
   name: 'Test Project',
   description: 'Test Description',
-  monthlyCapacity: 0.5,
-  createdAt: '2024-01-01T00:00:00.000Z',
-  updatedAt: '2024-01-01T00:00:00.000Z',
-  isArchived: false,
-};
+});
 
-const mockProjects: Project[] = [mockProject];
-
-// setupTests.tsで定義されたlocalStorageモックを取得
-const localStorageMock = window.localStorage as jest.Mocked<
-  typeof window.localStorage
->;
+const mockProjects = [mockProject];
 
 describe('useTimerController', () => {
-  let localStorageStore: Record<string, string> = {};
+  let localStorage: LocalStorageMockStore;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    localStorageStore = {};
-
-    // localStorageモックの実装を設定
-    localStorageMock.getItem.mockImplementation(
-      (key: string) => localStorageStore[key] || null
-    );
-    localStorageMock.setItem.mockImplementation(
-      (key: string, value: string) => {
-        localStorageStore[key] = value;
-      }
-    );
-    localStorageMock.removeItem.mockImplementation((key: string) => {
-      delete localStorageStore[key];
-    });
-
+    localStorage = setupLocalStorageMock();
     jest.useFakeTimers();
   });
 
   afterEach(() => {
+    localStorage.reset();
     jest.useRealTimers();
   });
 
@@ -83,6 +77,9 @@ describe('useTimerController', () => {
 
     it('開始時にlocalStorageに状態を保存する', async () => {
       jest.useRealTimers();
+      const localStorageMock = window.localStorage as jest.Mocked<
+        typeof window.localStorage
+      >;
       const { result } = renderHook(() => useTimerController(mockProjects));
 
       // 初期化を待つ
@@ -252,6 +249,9 @@ describe('useTimerController', () => {
   describe('状態復元', () => {
     it('localStorageから状態を復元する', async () => {
       jest.useRealTimers();
+      const localStorageMock = window.localStorage as jest.Mocked<
+        typeof window.localStorage
+      >;
       const startTime = new Date().toISOString();
       localStorageMock.getItem.mockImplementation((key: string) => {
         if (key === 'project_activity_log_timer_state') {
@@ -278,6 +278,9 @@ describe('useTimerController', () => {
 
     it('8時間以上前の状態は復元しない', async () => {
       jest.useRealTimers();
+      const localStorageMock = window.localStorage as jest.Mocked<
+        typeof window.localStorage
+      >;
       const oldStartTime = new Date(
         Date.now() - 9 * 60 * 60 * 1000
       ).toISOString();
@@ -304,6 +307,9 @@ describe('useTimerController', () => {
 
     it('アーカイブされたプロジェクトの状態は復元しない', async () => {
       jest.useRealTimers();
+      const localStorageMock = window.localStorage as jest.Mocked<
+        typeof window.localStorage
+      >;
       const archivedProject = { ...mockProject, isArchived: true };
       const startTime = new Date().toISOString();
       localStorageMock.getItem.mockImplementation((key: string) => {
