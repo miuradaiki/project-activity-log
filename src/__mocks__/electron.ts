@@ -69,23 +69,6 @@ export class MockElectronAPI {
   // ファイル関連のモック
   exportCSV = jest.fn().mockResolvedValue(undefined);
 
-  importCSV = jest
-    .fn()
-    .mockImplementation(async (_filePath: string): Promise<any[]> => {
-      // デフォルトではCSVデータを返す
-      return [
-        {
-          date: '2024-01-01',
-          start_time: '09:00:00',
-          end_time: '10:00:00',
-          duration_minutes: 60,
-          project_name: 'テストプロジェクト',
-          project_description: 'テスト用プロジェクト',
-          notes: 'テストメモ',
-        },
-      ];
-    });
-
   showOpenDialog = jest
     .fn()
     .mockImplementation(

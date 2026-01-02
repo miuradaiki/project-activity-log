@@ -7,12 +7,14 @@
 ## 導入の背景
 
 ### 現状の課題
+
 - テストが一切存在しない状態（テストカバレッジ0%）
 - App.tsxが549行の巨大コンポーネントとなっている
 - 責務が分離されておらず、保守性が低い
 - リファクタリング時にデグレードが発生するリスクが高い
 
 ### t-wadaアプローチの採用理由
+
 1. **「テストがないコードはレガシーコード」**の原則
 2. **特性テスト（Characterization Test）**による現状動作の保護
 3. **安全なリファクタリング**の実現
@@ -20,6 +22,7 @@
 ## 技術スタック
 
 ### テストフレームワーク
+
 - **Jest 30.0.3**: JavaScriptテストフレームワーク
 - **React Testing Library 16.3.0**: Reactコンポーネントのテスト
 - **@testing-library/user-event 14.6.1**: ユーザーインタラクションのシミュレーション
@@ -27,6 +30,7 @@
 - **jest-environment-jsdom 30.0.2**: ブラウザ環境のシミュレーション
 
 ### 主要な設定ファイル
+
 - `jest.config.js`: Jest設定
 - `src/setupTests.ts`: テスト環境のセットアップ
 - `.github/workflows/test.yml`: CI/CD設定
@@ -65,31 +69,31 @@ Electronアプリケーションのテストのため、`src/__mocks__/electron.
 ```typescript
 export class MockElectronAPI {
   // プロジェクトデータの管理
-  loadProjects = jest.fn()
-  saveProjects = jest.fn()
-  
+  loadProjects = jest.fn();
+  saveProjects = jest.fn();
+
   // タイムエントリーの管理
-  loadTimeEntries = jest.fn()
-  saveTimeEntries = jest.fn()
-  
+  loadTimeEntries = jest.fn();
+  saveTimeEntries = jest.fn();
+
   // 設定の管理
-  loadSettings = jest.fn()
-  saveSettings = jest.fn()
-  
+  loadSettings = jest.fn();
+  saveSettings = jest.fn();
+
   // ファイル操作
-  exportCSV = jest.fn()
-  importCSV = jest.fn()
-  showOpenDialog = jest.fn()
-  
+  exportCSV = jest.fn();
+  showOpenDialog = jest.fn();
+
   // タイマー・通知機能
-  updateTrayTimer = jest.fn()
-  showNotification = jest.fn()
+  updateTrayTimer = jest.fn();
+  showNotification = jest.fn();
 }
 ```
 
 ### 2. ブラウザAPIのモック
 
 MUIやRechartsで使用されるブラウザAPIのモック化：
+
 - `ResizeObserver`
 - `IntersectionObserver`
 - `matchMedia`
@@ -105,6 +109,7 @@ MUIやRechartsで使用されるブラウザAPIのモック化：
 現在の動作を保護するため、以下のコンポーネント・機能をテスト：
 
 #### useStorageフック
+
 - データの初期化
 - プロジェクトのCRUD操作
 - タイムエントリーのCRUD操作
@@ -112,6 +117,7 @@ MUIやRechartsで使用されるブラウザAPIのモック化：
 - データ整合性チェック
 
 #### Timerコンポーネント
+
 - タイマーの開始・停止
 - 時間表示の正確性
 - 8時間制限機能
@@ -139,7 +145,7 @@ module.exports = {
   ],
   coverageReporters: ['text', 'lcov', 'html'],
   coverageDirectory: 'coverage',
-}
+};
 ```
 
 ### NPMスクリプト
@@ -160,11 +166,13 @@ Node.js 18.x と 20.x でのマトリックステスト、型チェック、カ�
 ## セキュリティ考慮事項
 
 ### テストデータの分離
+
 - 本番データとテストデータの完全分離
 - `MockElectronAPI.reset()`による各テスト間のデータクリア
 - LocalStorageの適切なモック化
 
 ### 機密情報の除外
+
 - カバレッジ対象から型定義ファイルを除外
 - エントリーポイントファイルを除外
 - 設定ファイルの適切な管理
@@ -172,22 +180,26 @@ Node.js 18.x と 20.x でのマトリックステスト、型チェック、カ�
 ## 今後の展開
 
 ### Phase 1完了: テスト基盤構築 ✅
+
 - [x] Jest + React Testing Library設定
 - [x] Electronモック環境構築
 - [x] 特性テスト作成
 - [x] CI/CD設定
 
 ### Phase 2予定: ドメインロジック抽出
+
 - [ ] タイマービジネスロジックの抽出
 - [ ] プロジェクト管理ロジックの統一
 - [ ] 稼働率計算の共通化
 
 ### Phase 3予定: 状態管理改善
+
 - [ ] Context APIによる状態分離
 - [ ] カスタムフックへのロジック移行
 - [ ] プロップドリリング解消
 
 ### Phase 4予定: コンポーネント分離
+
 - [ ] App.tsxの責務分離
 - [ ] 表示ロジックとビジネスロジックの分離
 - [ ] 共通コンポーネントの抽出
