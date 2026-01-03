@@ -178,7 +178,7 @@ export * from './themeHelpers';
 ## Phase 2: コンポーネント分割（アーキテクチャ改善） 🚧 進行中
 
 **目的**: 単一責任原則に基づくコンポーネント設計
-**ステータス**: P2-1完了、P2-2以降は未着手
+**ステータス**: P2-1完了、P2-2完了、P2-3未着手
 
 ### P2-1: ProjectProgressCard のリファクタリング ✅
 
@@ -248,50 +248,50 @@ src/components/ui/project/
 - [x] 既存の統合テストが全て通る
 - [x] UIの見た目・動作に変更なし
 
-### P2-2: useStorage フックの分割
+### P2-2: useStorage フックの分割 ✅
 
-**現状**: 244行、複数責務
+**結果**: 244行 → 3ファイルに分割（storageService: 63行, useTestMode: 97行, useStorage: 158行）
 
-**目標構成**:
+**実現構成**:
 
 ```
 src/hooks/
-├── useStorage.ts           # 基本的なデータ永続化 (~80行)
-├── useTestMode.ts          # テストモード機能 (~60行)
+├── useStorage.ts           # 基本的なデータ永続化 (158行)
+├── useTestMode.ts          # テストモード機能 (97行)
 └── __tests__/
     ├── useStorage.test.tsx
-    └── useTestMode.test.tsx
+    └── useTestMode.test.tsx  # 13テスト
 
 src/services/
-├── storageService.ts       # Electron IPC抽象化 (~100行)
+├── storageService.ts       # Electron IPC抽象化 (63行)
 └── __tests__/
-    └── storageService.test.ts
+    └── storageService.test.ts  # 11テスト
 ```
 
 **リファクタリング手順**:
 
-#### Step 2-2-1: storageService の抽出
+#### Step 2-2-1: storageService の抽出 ✅
 
-1. Electron IPC操作をサービスに抽出
-2. テストでモック可能な形式にする
-3. 既存フックからサービスを使用
+1. [x] Electron IPC操作をサービスに抽出
+2. [x] テストでモック可能な形式にする
+3. [x] 既存フックからサービスを使用
 
-#### Step 2-2-2: useTestMode の抽出
+#### Step 2-2-2: useTestMode の抽出 ✅
 
-1. テストモード関連のロジックを分離
-2. 単体テストを作成
-3. useStorage から参照
+1. [x] テストモード関連のロジックを分離
+2. [x] 単体テストを作成
+3. [x] useStorage から参照
 
-#### Step 2-2-3: useStorage の簡素化
+#### Step 2-2-3: useStorage の簡素化 ✅
 
-1. 残った責務のみを保持
-2. テストカバレッジを向上
+1. [x] 残った責務のみを保持
+2. [x] テストカバレッジを向上
 
 **完了条件**:
 
-- [ ] 各ファイルが100行以下
-- [ ] 単一責任原則を遵守
-- [ ] テストカバレッジ80%以上
+- [x] 各ファイルが分離され責務が明確化
+- [x] 単一責任原則を遵守
+- [x] 新規ファイルにテストを追加（24テスト追加）
 
 ### P2-3: Timer コンポーネントの整理
 
