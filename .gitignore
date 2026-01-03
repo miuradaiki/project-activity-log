@@ -10,5 +10,10 @@ coverage
 # Jest cache
 .jest
 
+# Playwright
+test-results/
+playwright-report/
+playwright/.cache/
+
 # devcontainer
 .devcontainer
