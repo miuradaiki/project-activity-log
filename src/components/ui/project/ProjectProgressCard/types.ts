@@ -1,3 +1,4 @@
+import React from 'react';
 import { Project } from '../../../../types';
 
 export interface ProjectProgressCardProps {
@@ -37,4 +38,22 @@ export interface ProjectTargetDialogProps {
   baseMonthlyHours: number;
   onClose: () => void;
   onSave: (newMonthlyCapacity: number) => void;
+}
+
+export interface ProjectCardHeaderProps {
+  statusText: string;
+  statusColor: string;
+  monthlyCapacity: number;
+  projectId: string;
+  onStartTimer: (projectId: string) => void;
+  onMenuOpen: (event: React.MouseEvent<HTMLElement>) => void;
+}
+
+export interface ProjectCardProgressProps {
+  isTrackingOnly: boolean;
+  currentHours: number;
+  targetHours: number;
+  progressPercentage: number;
+  progressColor: string;
+  remainingHours: number;
 }
