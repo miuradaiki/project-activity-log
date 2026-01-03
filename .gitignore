@@ -15,5 +15,8 @@ test-results/
 playwright-report/
 playwright/.cache/
 
+# E2E test data
+.test-user-data/
+
 # devcontainer
 .devcontainer
