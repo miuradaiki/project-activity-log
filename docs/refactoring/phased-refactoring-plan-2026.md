@@ -182,7 +182,7 @@ export * from './themeHelpers';
 
 ### P2-1: ProjectProgressCard のリファクタリング ✅
 
-**現状**: 456行 → 174行にリファクタリング完了が混在
+**結果**: 456行 → 174行（61%削減）
 
 **目標構成**:
 
@@ -214,14 +214,14 @@ src/components/ui/project/
 
 1. [x] `ProjectProgressCard/types.ts` を作成
 2. [x] Props型、内部状態型を定義
-3. [ ] 既存ファイルからインポートするよう変更
+3. [x] 既存ファイルからインポートするよう変更
 
 #### Step 2-1-2: useProjectProgress フックの抽出 ✅
 
 1. [x] テストファイル `useProjectProgress.test.ts` を作成（Red）
 2. [x] フックを実装（Green）
 3. [x] リファクタリング
-4. [ ] 元のコンポーネントでフックを使用するよう変更
+4. [x] 元のコンポーネントでフックを使用するよう変更
 
 #### Step 2-1-3: ProjectTargetDialog の抽出 ✅
 
