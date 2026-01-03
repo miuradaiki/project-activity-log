@@ -12,9 +12,11 @@ const mockProjects: Project[] = [
   {
     id: '1',
     name: 'Test Project',
-    color: '#1976d2',
+    description: 'Test project description',
     monthlyCapacity: 50,
     isArchived: false,
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-01-01T00:00:00Z',
   },
 ];
 
@@ -24,6 +26,9 @@ const mockTimeEntries: TimeEntry[] = [
     projectId: '1',
     startTime: '2026-01-01T09:00:00Z',
     endTime: '2026-01-01T10:00:00Z',
+    description: '',
+    createdAt: '2026-01-01T09:00:00Z',
+    updatedAt: '2026-01-01T10:00:00Z',
   },
 ];
 
@@ -168,9 +173,11 @@ describe('useTestMode', () => {
       const newProject: Project = {
         id: '2',
         name: 'New Project',
-        color: '#ff0000',
+        description: 'New project description',
         monthlyCapacity: 30,
         isArchived: false,
+        createdAt: '2026-01-02T00:00:00Z',
+        updatedAt: '2026-01-02T00:00:00Z',
       };
 
       act(() => {
