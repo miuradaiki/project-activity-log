@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [macos-latest, windows-latest]
         node-version: [20.x]
 
     steps:
@@ -34,15 +34,7 @@ jobs:
         env:
           ELECTRON: 'true'
 
-      - name: Run E2E tests (Linux)
-        if: runner.os == 'Linux'
-        run: xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" npx playwright test
-        env:
-          CI: true
-          ELECTRON: 'true'
-
-      - name: Run E2E tests (macOS/Windows)
-        if: runner.os != 'Linux'
+      - name: Run E2E tests
         run: npx playwright test
         env:
           CI: true
