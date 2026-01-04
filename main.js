@@ -14,6 +14,12 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// テスト環境用: 分離されたuserDataディレクトリを使用
+if (process.env.NODE_ENV === 'test') {
+  const testUserDataPath = path.join(__dirname, '.test-user-data');
+  app.setPath('userData', testUserDataPath);
+}
+
 import {
   initStorage,
   loadProjects,
