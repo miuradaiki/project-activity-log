@@ -2,20 +2,25 @@ import fs from 'fs';
 import path from 'path';
 import { app, dialog, BrowserWindow } from 'electron';
 
-const USER_DATA_PATH = app.getPath('userData');
-const STORAGE_PATH = path.join(USER_DATA_PATH, 'data');
+// パスを遅延評価で取得（ESMのインポートホイスティング対策）
+const getStoragePath = () => {
+  const userDataPath = app.getPath('userData');
+  return path.join(userDataPath, 'data');
+};
 
 // ストレージディレクトリの作成
 const initStorage = () => {
-  if (!fs.existsSync(STORAGE_PATH)) {
-    fs.mkdirSync(STORAGE_PATH, { recursive: true });
+  const storagePath = getStoragePath();
+  if (!fs.existsSync(storagePath)) {
+    fs.mkdirSync(storagePath, { recursive: true });
   }
 };
 
 // プロジェクトデータの復元
 const recoverProjects = async () => {
-  const timeEntriesPath = path.join(STORAGE_PATH, 'timeEntries.json');
-  const projectsPath = path.join(STORAGE_PATH, 'projects.json');
+  const storagePath = getStoragePath();
+  const timeEntriesPath = path.join(storagePath, 'timeEntries.json');
+  const projectsPath = path.join(storagePath, 'projects.json');
 
   try {
     // プロジェクトファイルが空の場合のみ実行
@@ -26,18 +31,23 @@ const recoverProjects = async () => {
     }
 
     // タイムエントリーからプロジェクトIDを収集
-    const timeEntriesData = await fs.promises.readFile(timeEntriesPath, 'utf-8');
+    const timeEntriesData = await fs.promises.readFile(
+      timeEntriesPath,
+      'utf-8'
+    );
     const timeEntries = JSON.parse(timeEntriesData);
 
     // ユニークなプロジェクトIDを抽出
-    const projectIds = [...new Set(timeEntries.map(entry => entry.projectId))];
+    const projectIds = [
+      ...new Set(timeEntries.map((entry) => entry.projectId)),
+    ];
 
     // プロジェクトデータを復元
-    const recoveredProjects = projectIds.map(id => ({
+    const recoveredProjects = projectIds.map((id) => ({
       id,
-      name: 'Recovered Project',  // 仮の名前
+      name: 'Recovered Project', // 仮の名前
       description: '復元されたプロジェクト',
-      monthlyCapacity: 0.5,  // デフォルト値
+      monthlyCapacity: 0.5, // デフォルト値
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     }));
@@ -54,13 +64,13 @@ const recoverProjects = async () => {
 
 // プロジェクトデータの保存
 const saveProjects = async (projects) => {
-  const filePath = path.join(STORAGE_PATH, 'projects.json');
+  const filePath = path.join(getStoragePath(), 'projects.json');
   await fs.promises.writeFile(filePath, JSON.stringify(projects, null, 2));
 };
 
 // プロジェクトデータの読み込み
 const loadProjects = async () => {
-  const filePath = path.join(STORAGE_PATH, 'projects.json');
+  const filePath = path.join(getStoragePath(), 'projects.json');
   try {
     const data = await fs.promises.readFile(filePath, 'utf-8');
     const projects = JSON.parse(data);
@@ -73,19 +83,19 @@ const loadProjects = async () => {
     return projects;
   } catch (error) {
     console.error('Error loading projects:', error);
-    return await recoverProjects();  // エラー時も復元を試みる
+    return await recoverProjects(); // エラー時も復元を試みる
   }
 };
 
 // 時間記録データの保存
 const saveTimeEntries = async (timeEntries) => {
-  const filePath = path.join(STORAGE_PATH, 'timeEntries.json');
+  const filePath = path.join(getStoragePath(), 'timeEntries.json');
   await fs.promises.writeFile(filePath, JSON.stringify(timeEntries, null, 2));
 };
 
 // 時間記録データの読み込み
 const loadTimeEntries = async () => {
-  const filePath = path.join(STORAGE_PATH, 'timeEntries.json');
+  const filePath = path.join(getStoragePath(), 'timeEntries.json');
   try {
     const data = await fs.promises.readFile(filePath, 'utf-8');
     const entries = JSON.parse(data);
@@ -110,12 +120,12 @@ const exportToCSV = async (timeEntries, projects) => {
       console.log('No time entries to export');
       return false;
     }
-    
+
     if (!projects || projects.length === 0) {
       console.log('No projects found');
       return false;
     }
-    
+
     // プロジェクトデータをIDでマップ化
     const projectMap = projects.reduce((map, project) => {
       map[project.id] = project;
@@ -124,44 +134,50 @@ const exportToCSV = async (timeEntries, projects) => {
 
     // データを整形（日付順にソート）
     const csvData = timeEntries
-      .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
-      .map(entry => {
-      const project = projectMap[entry.projectId];
-      const startDate = new Date(entry.startTime);
-      const endDate = new Date(entry.endTime);
-      const durationMs = endDate.getTime() - startDate.getTime();
-      const durationHours = Math.floor(durationMs / (1000 * 60 * 60));
-      const durationMinutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
-      
-      return {
-        '日付': startDate.toLocaleDateString('ja-JP'),
-        '開始時刻': startDate.toLocaleTimeString('ja-JP'),
-        '終了時刻': endDate.toLocaleTimeString('ja-JP'),
-        '作業時間': `${durationHours}時間${durationMinutes}分`,
-        '作業時間（分）': Math.round(durationMs / (1000 * 60)),
-        'プロジェクト名': project ? project.name : 'Unknown Project',
-        'プロジェクト説明': project ? project.description : '',
-        'メモ': entry.notes || ''
-      };
-    });
+      .sort(
+        (a, b) =>
+          new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+      )
+      .map((entry) => {
+        const project = projectMap[entry.projectId];
+        const startDate = new Date(entry.startTime);
+        const endDate = new Date(entry.endTime);
+        const durationMs = endDate.getTime() - startDate.getTime();
+        const durationHours = Math.floor(durationMs / (1000 * 60 * 60));
+        const durationMinutes = Math.floor(
+          (durationMs % (1000 * 60 * 60)) / (1000 * 60)
+        );
+
+        return {
+          日付: startDate.toLocaleDateString('ja-JP'),
+          開始時刻: startDate.toLocaleTimeString('ja-JP'),
+          終了時刻: endDate.toLocaleTimeString('ja-JP'),
+          作業時間: `${durationHours}時間${durationMinutes}分`,
+          '作業時間（分）': Math.round(durationMs / (1000 * 60)),
+          プロジェクト名: project ? project.name : 'Unknown Project',
+          プロジェクト説明: project ? project.description : '',
+          メモ: entry.notes || '',
+        };
+      });
 
     // CSVにエクスポート
     const csv = Papa.unparse(csvData, {
       header: true,
-      quotes: true
+      quotes: true,
     });
-    
+
     // BOM付きでUTF-8として保存（Excelで日本語が文字化けしないように）
     const csvWithBom = '\uFEFF' + csv;
 
     // 保存先を選択
-    const result = await dialog.showSaveDialog(BrowserWindow.getFocusedWindow(), {
-      title: '作業時間記録をエクスポート',
-      defaultPath: `work-log-${new Date().toISOString().split('T')[0]}.csv`,
-      filters: [
-        { name: 'CSV Files', extensions: ['csv'] }
-      ]
-    });
+    const result = await dialog.showSaveDialog(
+      BrowserWindow.getFocusedWindow(),
+      {
+        title: '作業時間記録をエクスポート',
+        defaultPath: `work-log-${new Date().toISOString().split('T')[0]}.csv`,
+        filters: [{ name: 'CSV Files', extensions: ['csv'] }],
+      }
+    );
 
     if (!result.canceled && result.filePath) {
       await fs.promises.writeFile(result.filePath, csvWithBom, 'utf-8');
