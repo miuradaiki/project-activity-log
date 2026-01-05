@@ -319,14 +319,14 @@ src/components/timer/
 - [x] コンポーネントが適切に分割
 - [x] 単一責任原則を遵守
 - [x] 新規ファイルにテストを追加（13テスト追加）
-- [x] 既存テストが全て通る（321テスト）
+- [x] 既存テストが全て通る（399テスト - P3-2完了時点）
 
 ---
 
 ## Phase 3: テストカバレッジ向上
 
 **目的**: コード品質の保証とリグレッション防止
-**ステータス**: P3-1完了
+**ステータス**: P3-1完了、P3-2完了
 
 ### P3-1: 重要ユーティリティのテスト追加 ✅
 
@@ -352,30 +352,43 @@ src/components/timer/
 - 境界値: 空配列、大量データ
 - エラーハンドリング: 例外発生時の動作
 
-### P3-2: ダッシュボードコンポーネントのテスト追加
+### P3-2: ダッシュボードコンポーネントのテスト追加 ✅
 
-**対象**:
+**対象とカバレッジ**:
 
-- [ ] `Dashboard.tsx`
-- [ ] `MonthlySummary.tsx`
-- [ ] `WeeklySummary.tsx`
-- [ ] `ActivityHeatmap.tsx`
-- [ ] `ProjectComparisonView.tsx`
+| コンポーネント              | テスト数 | カバレッジ |
+| --------------------------- | -------- | ---------- |
+| `Dashboard.tsx`             | 6        | 86.95%     |
+| `MonthlySummary.tsx`        | 12       | 82%        |
+| `WeeklySummary.tsx`         | 12       | 84.21%     |
+| `ActivityHeatmap.tsx`       | 10       | 98.14%     |
+| `ProjectComparisonView.tsx` | 16       | 90.74%     |
 
-**テスト戦略**:
+**追加テスト**:
 
-1. スナップショットテストで基本レンダリングを確認
-2. ユーザーインタラクションテスト
-3. データ境界値テスト（空データ、大量データ）
+- `src/components/dashboard/__tests__/Dashboard.test.tsx` - 6テスト
+- `src/components/dashboard/__tests__/MonthlySummary.test.tsx` - 12テスト
+- `src/components/dashboard/__tests__/WeeklySummary.test.tsx` - 12テスト
+- `src/components/dashboard/__tests__/ActivityHeatmap.test.tsx` - 10テスト
+- `src/components/comparison/__tests__/ProjectComparisonView.test.tsx` - 16テスト
+
+**テスト観点**:
+
+1. 基本レンダリングテスト
+2. ユーザーインタラクションテスト（タブ切替、週移動、表示モード切替）
+3. データ境界値テスト（空データ）
+4. 多言語対応テスト（日本語/英語）
 
 ### P3-3: カバレッジ目標
 
-| メトリクス | 現在  | Phase 3 終了時目標 |
-| ---------- | ----- | ------------------ |
-| Statements | 44.6% | 65%                |
-| Branches   | 34.5% | 55%                |
-| Functions  | 40.9% | 65%                |
-| Lines      | 44.2% | 65%                |
+| メトリクス | Phase 3 開始時 | P3-2 完了後 | 目標 |
+| ---------- | -------------- | ----------- | ---- |
+| Statements | 44.6%          | 55.68%      | 65%  |
+| Branches   | 34.5%          | 43.55%      | 55%  |
+| Functions  | 40.9%          | 52.35%      | 65%  |
+| Lines      | 44.2%          | 55.39%      | 65%  |
+
+**進捗**: P3-2完了により全メトリクスが向上。目標達成に向けて追加テストが必要。
 
 ---
 
