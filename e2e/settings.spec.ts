@@ -24,7 +24,7 @@ test.beforeAll(async () => {
   });
   window = await electronApp.firstWindow();
   await window.waitForLoadState('domcontentloaded');
-  await window.waitForTimeout(1000);
+  await window.waitForTimeout(2000);
 });
 
 test.afterAll(async () => {
@@ -35,10 +35,9 @@ test.describe('Settings', () => {
   test.beforeEach(async () => {
     // 設定アイコンをクリックして設定画面に移動
     const settingsIcon = window.locator('[data-testid="SettingsIcon"]').first();
-    if (await settingsIcon.isVisible()) {
-      await settingsIcon.click();
-      await window.waitForTimeout(500);
-    }
+    await expect(settingsIcon).toBeVisible({ timeout: 10000 });
+    await settingsIcon.click();
+    await window.waitForTimeout(1000);
   });
 
   test.describe('Settings Navigation', () => {
@@ -59,11 +58,9 @@ test.describe('Settings', () => {
 
   test.describe('Monthly Base Hours Setting', () => {
     test('should display monthly base hours setting', async () => {
-      // 月間基本時間の設定が表示されていることを確認
-      const baseHoursLabel = window.locator('text=月間基本時間').first();
-      if (await baseHoursLabel.isVisible()) {
-        await expect(baseHoursLabel).toBeVisible();
-      }
+      // 月間基準時間の設定が表示されていることを確認
+      const baseHoursLabel = window.locator('text=月間基準時間').first();
+      await expect(baseHoursLabel).toBeVisible({ timeout: 10000 });
     });
 
     test('should have input field for base hours', async () => {

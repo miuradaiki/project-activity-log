@@ -25,7 +25,7 @@ test.beforeAll(async () => {
   window = await electronApp.firstWindow();
   await window.waitForLoadState('domcontentloaded');
   // UIがレンダリングされるのを待つ
-  await window.waitForTimeout(1000);
+  await window.waitForTimeout(2000);
 });
 
 test.afterAll(async () => {
@@ -57,10 +57,9 @@ test.describe('Navigation', () => {
     const dashboardIcon = window
       .locator('[data-testid="DashboardIcon"]')
       .first();
-    if (await dashboardIcon.isVisible()) {
-      await dashboardIcon.click();
-      await window.waitForTimeout(500);
-    }
+    await expect(dashboardIcon).toBeVisible({ timeout: 10000 });
+    await dashboardIcon.click();
+    await window.waitForTimeout(1000);
   });
 
   test('should show project list on initial load', async () => {
