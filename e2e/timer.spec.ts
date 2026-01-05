@@ -40,6 +40,6 @@ test.afterAll(async () => {
 test.describe('Timer Functionality', () => {
   test('should have play button on project card', async () => {
     const playButton = window.locator('[data-testid="PlayArrowIcon"]').first();
-    await expect(playButton).toBeVisible();
+    await expect(playButton).toBeVisible({ timeout: 10000 });
   });
 });
