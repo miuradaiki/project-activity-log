@@ -43,10 +43,14 @@ describe('SettingsContext', () => {
       expect(result.current.settings.workHours.baseMonthlyHours).toBe(140);
     });
 
-    it('初期状態ではisLoadingがtrueである', () => {
+    it('初期状態ではisLoadingがtrueである', async () => {
       const { result } = renderHook(() => useSettingsContext(), { wrapper });
 
       expect(result.current.isLoading).toBe(true);
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
     });
   });
 
