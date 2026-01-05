@@ -326,15 +326,24 @@ src/components/timer/
 ## Phase 3: テストカバレッジ向上
 
 **目的**: コード品質の保証とリグレッション防止
+**ステータス**: P3-1完了
 
-### P3-1: 重要ユーティリティのテスト追加
+### P3-1: 重要ユーティリティのテスト追加 ✅
 
 **優先度: 高**
 
-| ファイル                       | 現在のカバレッジ | 目標 |
-| ------------------------------ | ---------------- | ---- |
-| `src/utils/backupUtils.ts`     | 0%               | 90%  |
-| `src/utils/safeImportUtils.ts` | 0%               | 90%  |
+| ファイル                       | 以前のカバレッジ | 目標 | 結果 |
+| ------------------------------ | ---------------- | ---- | ---- |
+| `src/utils/backupUtils.ts`     | 0%               | 90%  | 100% |
+| `src/utils/safeImportUtils.ts` | 0%               | 90%  | 100% |
+
+**追加テスト**:
+
+- `src/utils/__tests__/backupUtils.test.ts` - 13テスト
+  - createBackup: 7テスト（正常系4、異常系3）
+  - restoreFromBackup: 6テスト（正常系3、異常系3）
+- `src/utils/__tests__/safeImportUtils.test.ts` - 9テスト
+  - safeImportWorkLog: 9テスト（正常系5、異常系4）
 
 **テスト観点**:
 
