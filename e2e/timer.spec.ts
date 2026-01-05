@@ -24,14 +24,13 @@ test.beforeAll(async () => {
   });
   window = await electronApp.firstWindow();
   await window.waitForLoadState('domcontentloaded');
-  await window.waitForTimeout(1000);
+  await window.waitForTimeout(2000);
 
   // プロジェクト画面（ListAltアイコン）に遷移
   const projectsIcon = window.locator('[data-testid="ListAltIcon"]').first();
-  if (await projectsIcon.isVisible()) {
-    await projectsIcon.click();
-    await window.waitForTimeout(500);
-  }
+  await expect(projectsIcon).toBeVisible({ timeout: 10000 });
+  await projectsIcon.click();
+  await window.waitForTimeout(1000);
 });
 
 test.afterAll(async () => {
