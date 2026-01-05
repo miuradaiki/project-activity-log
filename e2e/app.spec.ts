@@ -45,6 +45,12 @@ test.describe('Application Launch', () => {
   });
 
   test('should display the main content area with projects', async () => {
+    // プロジェクト画面に遷移
+    const projectsIcon = window.locator('[data-testid="ListAltIcon"]').first();
+    await expect(projectsIcon).toBeVisible({ timeout: 10000 });
+    await projectsIcon.click();
+    await window.waitForTimeout(1000);
+
     // プロジェクトタブが表示されていることを確認
     const tabContent = window.locator('text=進行中').first();
     await expect(tabContent).toBeVisible({ timeout: 10000 });
