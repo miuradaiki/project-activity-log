@@ -283,7 +283,7 @@ describe('ProjectComparisonView', () => {
   });
 
   describe('空データの処理', () => {
-    it('プロジェクトが選択されていない場合にメッセージが表示される', () => {
+    it('activeProjectsが空の場合、自動的にプロジェクトが選択される', async () => {
       renderWithTheme(
         <ProjectComparisonView
           projects={mockProjects}
@@ -292,8 +292,13 @@ describe('ProjectComparisonView', () => {
         />
       );
 
-      // 初期選択で自動選択されるので、空にはならない
-      // ただし、全てアーカイブされている場合は空になる
+      // 自動選択により、プロジェクト詳細が表示されることを確認
+      await waitFor(() => {
+        expect(screen.getByText('プロジェクト詳細')).toBeInTheDocument();
+      });
+
+      // 棒グラフも表示される
+      expect(screen.getByTestId('bar-chart')).toBeInTheDocument();
     });
 
     it('タイムエントリーがなくてもエラーなくレンダリングされる', () => {

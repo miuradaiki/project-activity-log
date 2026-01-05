@@ -71,10 +71,17 @@ jest.mock('../../ui/modern/StyledComponents', () => ({
 
 const theme = createTheme();
 
-const mockTranslations: Record<string, string> = {
-  'dashboard.heatmap.title': '活動ヒートマップ',
-  'dashboard.heatmap.less': '少',
-  'dashboard.heatmap.more': '多',
+const mockTranslations: Record<string, Record<string, string>> = {
+  ja: {
+    'dashboard.heatmap.title': '活動ヒートマップ',
+    'dashboard.heatmap.less': '少',
+    'dashboard.heatmap.more': '多',
+  },
+  en: {
+    'dashboard.heatmap.title': 'Activity Heatmap',
+    'dashboard.heatmap.less': 'Less',
+    'dashboard.heatmap.more': 'More',
+  },
 };
 
 const renderWithProviders = (
@@ -84,7 +91,7 @@ const renderWithProviders = (
   const languageContextValue = {
     language,
     setLanguage: jest.fn(),
-    t: (key: string) => mockTranslations[key] || key,
+    t: (key: string) => mockTranslations[language][key] || key,
   };
 
   return render(
@@ -172,6 +179,17 @@ describe('ActivityHeatmap', () => {
       expect(screen.getByText('Mon')).toBeInTheDocument();
       expect(screen.getByText('Wed')).toBeInTheDocument();
       expect(screen.getByText('Fri')).toBeInTheDocument();
+    });
+
+    it('英語モードでタイトルと凡例が英語表示される', () => {
+      renderWithProviders(
+        <ActivityHeatmap timeEntries={mockTimeEntries} />,
+        'en'
+      );
+
+      expect(screen.getByText('Activity Heatmap')).toBeInTheDocument();
+      expect(screen.getByText('Less')).toBeInTheDocument();
+      expect(screen.getByText('More')).toBeInTheDocument();
     });
   });
 

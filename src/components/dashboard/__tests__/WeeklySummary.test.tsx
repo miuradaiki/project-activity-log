@@ -280,7 +280,11 @@ describe('WeeklySummary', () => {
       );
 
       // 英語形式の日付（例: "Jan 6, 2026 - Jan 12, 2026"）が含まれていることを確認
-      expect(screen.getByText(/-/)).toBeInTheDocument();
+      // 月の短縮名（Jan, Feb, Mar など）と年を含む形式
+      const dateElement = screen.getByText(
+        /[A-Z][a-z]{2}\s+\d{1,2},\s+\d{4}\s+-\s+[A-Z][a-z]{2}\s+\d{1,2},\s+\d{4}/
+      );
+      expect(dateElement).toBeInTheDocument();
     });
   });
 });
