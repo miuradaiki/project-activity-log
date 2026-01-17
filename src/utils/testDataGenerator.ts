@@ -15,8 +15,8 @@ export const generateTestData = (
   const newProjects: Project[] = [
     {
       id: uuidv4(),
-      name: testPrefix + 'Webアプリケーション開発',
-      description: 'ReactとTypeScriptを使用したフロントエンド開発',
+      name: testPrefix + 'EC開発',
+      description: 'ECサイトのフルリニューアル',
       monthlyCapacity: 0.4, // 40%
       createdAt: new Date(now.getFullYear(), now.getMonth(), 1).toISOString(),
       updatedAt: new Date().toISOString(),
@@ -24,8 +24,8 @@ export const generateTestData = (
     },
     {
       id: uuidv4(),
-      name: testPrefix + 'APIサーバー開発',
-      description: 'Node.jsとExpressを使用したバックエンド開発',
+      name: testPrefix + '在庫管理システム改修',
+      description: '在庫管理システムの機能追加・改修',
       monthlyCapacity: 0.3, // 30%
       createdAt: new Date(now.getFullYear(), now.getMonth(), 1).toISOString(),
       updatedAt: new Date().toISOString(),
@@ -33,8 +33,8 @@ export const generateTestData = (
     },
     {
       id: uuidv4(),
-      name: testPrefix + 'データベース設計',
-      description: 'PostgreSQLのスキーマ設計と最適化',
+      name: testPrefix + '顧客管理基盤',
+      description: '顧客情報の一元管理基盤構築',
       monthlyCapacity: 0.2, // 20%
       createdAt: new Date(now.getFullYear(), now.getMonth(), 1).toISOString(),
       updatedAt: new Date().toISOString(),
@@ -42,8 +42,8 @@ export const generateTestData = (
     },
     {
       id: uuidv4(),
-      name: testPrefix + 'ドキュメント作成',
-      description: '技術仕様書と操作マニュアルの作成',
+      name: testPrefix + '社内ポータル',
+      description: '社内情報共有ポータル構築',
       monthlyCapacity: 0.1, // 10%
       createdAt: new Date(
         now.getFullYear(),
@@ -85,14 +85,14 @@ export const generateTestData = (
       endTime.setMinutes(endTime.getMinutes() + duration);
 
       const descriptions = [
-        'コンポーネントの実装',
-        'バグ修正',
+        '機能実装',
+        '不具合対応',
         'コードレビュー',
-        'テストコード作成',
-        'リファクタリング',
-        'ミーティング',
-        '設計検討',
-        'ドキュメント更新',
+        'テスト作成・実行',
+        '設計・技術検討',
+        '定例MTG',
+        'クライアント打ち合わせ',
+        '仕様確認・ドキュメント作成',
       ];
 
       newTimeEntries.push({
