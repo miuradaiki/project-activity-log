@@ -403,32 +403,61 @@ src/components/timer/
 
 ---
 
-## Phase 4: i18n 完全対応
+## Phase 4: i18n 完全対応 🚧 進行中
 
 **目的**: 多言語対応の完全化
+**ステータス**: P4-1一部完了（ProjectComparisonView.tsx）
 
 ### P4-1: ハードコード文字列の抽出
 
-**対象ファイル**:
+#### ProjectComparisonView.tsx ✅ 完了
 
-- `src/components/comparison/ProjectComparisonView.tsx`
+**完了日**: 2026年1月19日
 
-**手順**:
+**追加した翻訳キー** (13キー):
 
-1. ハードコードされた日本語文字列を特定
-2. `src/i18n/ja.json` にキーを追加
-3. `t()` 関数で置き換え
-4. 英語翻訳を追加（必要に応じて）
+| キー                        | 日本語                                 | English                                   |
+| --------------------------- | -------------------------------------- | ----------------------------------------- |
+| `comparison.title`          | プロジェクト比較                       | Project Comparison                        |
+| `comparison.subtitle`       | 複数プロジェクトの進捗状況を比較       | Compare progress across multiple projects |
+| `comparison.actual`         | 実績                                   | Actual                                    |
+| `comparison.target`         | 目標                                   | Target                                    |
+| `comparison.view.pie`       | 円グラフ表示                           | Pie Chart View                            |
+| `comparison.view.bar`       | 棒グラフ表示                           | Bar Chart View                            |
+| `comparison.selectProjects` | 比較するプロジェクト                   | Projects to Compare                       |
+| `comparison.unknown`        | Unknown                                | Unknown                                   |
+| `comparison.noSelection`    | 比較するプロジェクトを選択してください | Please select projects to compare         |
+| `comparison.details`        | プロジェクト詳細                       | Project Details                           |
+| `comparison.progress`       | 進捗:                                  | Progress:                                 |
+| `comparison.actualLabel`    | 実績:                                  | Actual:                                   |
+| `comparison.targetLabel`    | 目標:                                  | Target:                                   |
 
-**サンプル変更**:
+**変更ファイル**:
 
-```typescript
-// Before
-<Typography variant="h6">プロジェクト比較</Typography>
+- `src/i18n/translations.ts` - 翻訳キー追加
+- `src/components/comparison/ProjectComparisonView.tsx` - i18n適用
+- `src/components/comparison/__tests__/ProjectComparisonView.test.tsx` - テストモック更新
 
-// After
-<Typography variant="h6">{t('comparison.title')}</Typography>
-```
+**完了条件**:
+
+- [x] `ProjectComparisonView.tsx` にハードコード日本語文字列がない
+- [x] 日本語・英語の両方で正しく表示される
+- [x] 既存テストがすべて通る（485テスト）
+- [x] `npm run lint` でエラーがない
+
+#### 残り対象ファイル（後続PRで対応予定）
+
+| ファイル                     | 主なハードコード                                      | 状態   |
+| ---------------------------- | ----------------------------------------------------- | ------ |
+| `ActivityCalendar.tsx`       | 曜日配列 `['日', '月', '火', '水', '木', '金', '土']` | 未着手 |
+| `KeyboardShortcuts.tsx`      | ショートカット説明文（約10箇所）                      | 未着手 |
+| `MonthlySummary.tsx`         | `'年'`, `'月'`, `'プロジェクト分布'`, `'週別推移'`    | 未着手 |
+| `ActivityHeatmap.tsx`        | 曜日配列、`'時間'`                                    | 未着手 |
+| `PreviousMonthSummary.tsx`   | `'先月の稼働状況'`                                    | 未着手 |
+| `MonthlyProgressSummary.tsx` | `'日'`                                                | 未着手 |
+| `Layout.tsx`                 | `'追加'`（デフォルト値）                              | 未着手 |
+| `AchievementAlert.tsx`       | `'プロジェクト'`                                      | 未着手 |
+| `DateTimeFields.tsx`         | `'開始日'`, `'終了日'`（フォールバック）              | 未着手 |
 
 ### P4-2: i18n キー整理
 

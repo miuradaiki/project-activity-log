@@ -8,6 +8,33 @@ import {
 } from '../../../__mocks__/electron';
 import { Project, TimeEntry } from '../../../types';
 
+// LanguageContext のモック
+jest.mock('../../../contexts/LanguageContext', () => ({
+  useLanguage: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        'comparison.title': 'プロジェクト比較',
+        'comparison.subtitle': '複数プロジェクトの進捗状況を比較',
+        'comparison.actual': '実績',
+        'comparison.target': '目標',
+        'comparison.view.pie': '円グラフ表示',
+        'comparison.view.bar': '棒グラフ表示',
+        'comparison.selectProjects': '比較するプロジェクト',
+        'comparison.unknown': 'Unknown',
+        'comparison.noSelection': '比較するプロジェクトを選択してください',
+        'comparison.details': 'プロジェクト詳細',
+        'comparison.progress': '進捗:',
+        'comparison.actualLabel': '実績:',
+        'comparison.targetLabel': '目標:',
+        'units.hours': '時間',
+      };
+      return translations[key] || key;
+    },
+    language: 'ja',
+    setLanguage: jest.fn(),
+  }),
+}));
+
 // Recharts のモック
 jest.mock('recharts', () => ({
   BarChart: ({ children }: { children: React.ReactNode }) => (

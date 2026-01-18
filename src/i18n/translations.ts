@@ -157,6 +157,21 @@ export const translations = {
     'dashboard.heatmap.less': '少ない',
     'dashboard.heatmap.more': '多い',
     'dashboard.heatmap.hours': '{hours}時間',
+
+    // Project Comparison
+    'comparison.title': 'プロジェクト比較',
+    'comparison.subtitle': '複数プロジェクトの進捗状況を比較',
+    'comparison.actual': '実績',
+    'comparison.target': '目標',
+    'comparison.view.pie': '円グラフ表示',
+    'comparison.view.bar': '棒グラフ表示',
+    'comparison.selectProjects': '比較するプロジェクト',
+    'comparison.unknown': 'Unknown',
+    'comparison.noSelection': '比較するプロジェクトを選択してください',
+    'comparison.details': 'プロジェクト詳細',
+    'comparison.progress': '進捗:',
+    'comparison.actualLabel': '実績:',
+    'comparison.targetLabel': '目標:',
   },
   en: {
     // Common
@@ -316,5 +331,20 @@ export const translations = {
     'dashboard.heatmap.less': 'Less',
     'dashboard.heatmap.more': 'More',
     'dashboard.heatmap.hours': '{hours} hours',
+
+    // Project Comparison
+    'comparison.title': 'Project Comparison',
+    'comparison.subtitle': 'Compare progress across multiple projects',
+    'comparison.actual': 'Actual',
+    'comparison.target': 'Target',
+    'comparison.view.pie': 'Pie Chart View',
+    'comparison.view.bar': 'Bar Chart View',
+    'comparison.selectProjects': 'Projects to Compare',
+    'comparison.unknown': 'Unknown',
+    'comparison.noSelection': 'Please select projects to compare',
+    'comparison.details': 'Project Details',
+    'comparison.progress': 'Progress:',
+    'comparison.actualLabel': 'Actual:',
+    'comparison.targetLabel': 'Target:',
   },
 };

@@ -35,6 +35,7 @@ import {
 } from '@mui/icons-material';
 import { Project, TimeEntry } from '../../types';
 import { calculateProjectHours } from '../../utils/analytics';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface ProjectComparisonViewProps {
   projects: Project[];
@@ -54,6 +55,7 @@ export const ProjectComparisonView: React.FC<ProjectComparisonViewProps> = ({
   activeProjects = [],
 }) => {
   const theme = useTheme();
+  const { t } = useLanguage();
   const [selectedProjects, setSelectedProjects] =
     useState<string[]>(activeProjects);
   const [viewMode, setViewMode] = useState<ViewMode>('bar');
@@ -163,7 +165,7 @@ export const ProjectComparisonView: React.FC<ProjectComparisonViewProps> = ({
   const barChartData = useMemo(() => {
     return [
       {
-        name: '実績',
+        name: t('comparison.actual'),
         ...projectData.reduce(
           (acc, project) => {
             acc[project.name] = project.monthlyHours;
@@ -173,7 +175,7 @@ export const ProjectComparisonView: React.FC<ProjectComparisonViewProps> = ({
         ),
       },
       {
-        name: '目標',
+        name: t('comparison.target'),
         ...projectData.reduce(
           (acc, project) => {
             acc[project.name] = project.targetHours;
@@ -183,7 +185,7 @@ export const ProjectComparisonView: React.FC<ProjectComparisonViewProps> = ({
         ),
       },
     ];
-  }, [projectData]);
+  }, [projectData, t]);
 
   // 円グラフデータの準備
   const pieChartData = useMemo(() => {
@@ -215,15 +217,21 @@ export const ProjectComparisonView: React.FC<ProjectComparisonViewProps> = ({
       >
         <Box>
           <Typography variant="h6" fontWeight="medium">
-            プロジェクト比較
+            {t('comparison.title')}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            複数プロジェクトの進捗状況を比較
+            {t('comparison.subtitle')}
           </Typography>
         </Box>
 
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Tooltip title={viewMode === 'bar' ? '円グラフ表示' : '棒グラフ表示'}>
+          <Tooltip
+            title={
+              viewMode === 'bar'
+                ? t('comparison.view.pie')
+                : t('comparison.view.bar')
+            }
+          >
             <IconButton onClick={toggleViewMode}>
               {viewMode === 'bar' ? <DonutLargeIcon /> : <ViewWeekIcon />}
             </IconButton>
@@ -235,7 +243,7 @@ export const ProjectComparisonView: React.FC<ProjectComparisonViewProps> = ({
       <Box sx={{ mb: 3 }}>
         <FormControl fullWidth size="small">
           <InputLabel id="project-comparison-select-label">
-            比較するプロジェクト
+            {t('comparison.selectProjects')}
           </InputLabel>
           <Select
             labelId="project-comparison-select-label"
@@ -249,7 +257,7 @@ export const ProjectComparisonView: React.FC<ProjectComparisonViewProps> = ({
                   return (
                     <Chip
                       key={value}
-                      label={project?.name || 'Unknown'}
+                      label={project?.name || t('comparison.unknown')}
                       size="small"
                       sx={{
                         backgroundColor: getProjectColor(index),
@@ -284,7 +292,7 @@ export const ProjectComparisonView: React.FC<ProjectComparisonViewProps> = ({
             }}
           >
             <Typography variant="body1" color="text.secondary">
-              比較するプロジェクトを選択してください
+              {t('comparison.noSelection')}
             </Typography>
           </Box>
         ) : viewMode === 'bar' ? (
@@ -298,7 +306,10 @@ export const ProjectComparisonView: React.FC<ProjectComparisonViewProps> = ({
               <XAxis type="number" unit="h" />
               <YAxis dataKey="name" type="category" width={80} />
               <RechartsTooltip
-                formatter={(value: number) => [`${value.toFixed(1)}時間`, '']}
+                formatter={(value: number) => [
+                  `${value.toFixed(1)}${t('units.hours')}`,
+                  '',
+                ]}
               />
               <Legend />
               {projectData.map((project) => (
@@ -329,7 +340,10 @@ export const ProjectComparisonView: React.FC<ProjectComparisonViewProps> = ({
                 ))}
               </Pie>
               <RechartsTooltip
-                formatter={(value: number) => [`${value.toFixed(1)}時間`, '']}
+                formatter={(value: number) => [
+                  `${value.toFixed(1)}${t('units.hours')}`,
+                  '',
+                ]}
               />
               <Legend />
             </PieChart>
@@ -342,7 +356,7 @@ export const ProjectComparisonView: React.FC<ProjectComparisonViewProps> = ({
         <Box sx={{ mt: 2 }}>
           <Divider sx={{ mb: 2 }} />
           <Typography variant="subtitle2" sx={{ mb: 2 }}>
-            プロジェクト詳細
+            {t('comparison.details')}
           </Typography>
           <Grid container spacing={2}>
             {projectData.map((project) => (
@@ -372,7 +386,7 @@ export const ProjectComparisonView: React.FC<ProjectComparisonViewProps> = ({
                     }}
                   >
                     <Typography variant="body2" color="text.secondary">
-                      進捗:
+                      {t('comparison.progress')}
                     </Typography>
                     <Typography variant="body2" fontWeight="medium">
                       {project.progressPercentage.toFixed(1)}%
@@ -398,10 +412,12 @@ export const ProjectComparisonView: React.FC<ProjectComparisonViewProps> = ({
                     sx={{ display: 'flex', justifyContent: 'space-between' }}
                   >
                     <Typography variant="body2" color="text.secondary">
-                      実績: {project.monthlyHours.toFixed(1)}h
+                      {t('comparison.actualLabel')}{' '}
+                      {project.monthlyHours.toFixed(1)}h
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      目標: {project.targetHours.toFixed(1)}h
+                      {t('comparison.targetLabel')}{' '}
+                      {project.targetHours.toFixed(1)}h
                     </Typography>
                   </Box>
                 </Box>
