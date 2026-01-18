@@ -207,10 +207,10 @@ export const useTimeEntryForm = ({
 
   const isFormValid = Boolean(
     formState.projectId &&
-      formState.startDate &&
-      formState.endDate &&
-      formState.startTime &&
-      formState.endTime
+    formState.startDate &&
+    formState.endDate &&
+    formState.startTime &&
+    formState.endTime
   );
 
   const isMultiDay = !isSameDay(

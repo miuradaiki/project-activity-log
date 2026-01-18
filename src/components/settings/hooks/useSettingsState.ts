@@ -98,9 +98,8 @@ export const useSettingsState = (): UseSettingsStateReturn => {
 
   const handleRegenerateTestData = useCallback(async () => {
     try {
-      const { generateTestData } = await import(
-        '../../../utils/testDataGenerator'
-      );
+      const { generateTestData } =
+        await import('../../../utils/testDataGenerator');
       const { projects: newProjects, timeEntries: newTimeEntries } =
         generateTestData([], []);
 
