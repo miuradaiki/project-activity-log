@@ -17,7 +17,6 @@
 | `src/styles/modernTheme.ts`                           | 699  | 中                   |
 | `src/utils/__tests__/analytics.test.ts`               | 649  | 低（テストファイル） |
 | `src/components/ui/ProjectProgressCard.tsx`           | 456  | 高                   |
-| `src/components/comparison/ProjectComparisonView.tsx` | 415  | 高                   |
 | `src/components/heatmap/ActivityCalendar.tsx`         | 385  | 中                   |
 | `src/components/ui/modern/StyledComponents.tsx`       | 376  | 低                   |
 | `src/components/dashboard/MonthlyProgressSummary.tsx` | 370  | 高                   |
@@ -29,7 +28,6 @@
 **問題点**:
 
 - `ProjectProgressCard.tsx`（456行）: UIロジック、状態管理、ダイアログが1つのコンポーネントに集中
-- `ProjectComparisonView.tsx`（415行）: 複数のチャートタイプ、データ変換ロジックが混在
 - `modernTheme.ts`（699行）: ライト/ダークテーマの定義が重複
 
 #### 1.1.2 コード重複パターン
@@ -105,17 +103,6 @@ import { FlagCircle as _TargetIcon } from '@mui/icons-material';
 - `useTestMode.ts` - テストモード機能
 - `storageService.ts` - ストレージ操作の抽象化
 
-#### 1.2.3 ハードコードされた文字列
-
-`ProjectComparisonView.tsx` に日本語文字列が直接記述:
-
-```typescript
-<Typography variant="h6">プロジェクト比較</Typography>
-<Typography>複数プロジェクトの進捗状況を比較</Typography>
-```
-
-i18n システムを使用すべき箇所で直接文字列が使用されている。
-
 ### 1.3 テスト負債
 
 #### 1.3.1 テストカバレッジ
@@ -146,7 +133,6 @@ i18n システムを使用すべき箇所で直接文字列が使用されてい
 - `MonthlySummary.tsx`
 - `WeeklySummary.tsx`
 - `ActivityHeatmap.tsx`
-- `ProjectComparisonView.tsx`
 
 ### 1.4 依存関係の健全性
 
@@ -295,14 +281,7 @@ components/ui/project/
 - **工数**: 24時間
 - **効果**: カバレッジ +15%、データ保護の信頼性向上
 
-#### M-3: i18n未対応箇所の修正
-
-`ProjectComparisonView.tsx` の日本語ハードコード解消
-
-- **工数**: 4時間
-- **効果**: 多言語対応完全化
-
-#### M-4: useStorageフックの分割
+#### M-3: useStorageフックの分割
 
 ```typescript
 // hooks/useStorage.ts - 純粋なストレージ操作のみ
