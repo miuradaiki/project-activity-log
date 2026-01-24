@@ -289,6 +289,16 @@ When generating documentation or any content:
 - **NEVER include time estimates or development duration**
 - Focus on technical facts and implementation details only
 
+### Implementation Plan Tracking
+
+When working on tasks based on implementation plans or specification documents:
+
+- **ALWAYS update the source document** to indicate progress after completing work
+- Mark completed items with checkboxes `[x]` or status labels (e.g., `[DONE]`, `[COMPLETED]`)
+- Add completion dates where appropriate
+- If partially completed, clearly note what remains to be done
+- This ensures traceability between plans and actual implementation
+
 ### Markdown Formatting
 
 When creating or editing markdown files:
