@@ -142,16 +142,14 @@ export const PreviousMonthSummary: React.FC<PreviousMonthSummaryProps> = ({
           mb: 3,
         }}
       >
-        <Typography variant="h6">
-          {isEnglish ? 'Previous Month Activity' : '先月の稼働状況'}
-        </Typography>
+        <Typography variant="h6">{t('dashboard.previous.title')}</Typography>
         <Typography variant="subtitle1" color="text.secondary">
           {prevMonth.display}
         </Typography>
       </Box>
 
       <Typography variant="subtitle1" gutterBottom>
-        {isEnglish ? 'Total Hours:' : '合計時間:'} {totalHours.toFixed(1)}{' '}
+        {t('dashboard.previous.total')} {totalHours.toFixed(1)}{' '}
         {t('units.hours')}
       </Typography>
 
@@ -204,9 +202,7 @@ export const PreviousMonthSummary: React.FC<PreviousMonthSummaryProps> = ({
           }}
         >
           <Typography variant="body1" color="text.secondary">
-            {isEnglish
-              ? 'No activity data for the previous month'
-              : '先月の稼働データがありません'}
+            {t('dashboard.previous.no.data')}
           </Typography>
         </Box>
       )}

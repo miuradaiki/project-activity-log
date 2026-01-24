@@ -129,9 +129,9 @@ export const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({
   // ツールチップの内容
   const getTooltipContent = (day: HeatmapDay): string => {
     const dateStr = formatDate(day.date);
-    const hoursStr = isEnglish
-      ? `${day.hours.toFixed(1)} hours`
-      : `${day.hours.toFixed(1)}時間`;
+    const hoursStr = t('dashboard.heatmap.hours', {
+      hours: day.hours.toFixed(1),
+    });
     return `${dateStr}: ${hoursStr}`;
   };
 
@@ -311,7 +311,7 @@ export const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({
                           }}
                           aria-label={
                             day
-                              ? `${formatDate(day.date)}: ${day.hours.toFixed(1)}${isEnglish ? ' hours' : '時間'}`
+                              ? `${formatDate(day.date)}: ${t('dashboard.heatmap.hours', { hours: day.hours.toFixed(1) })}`
                               : undefined
                           }
                         />

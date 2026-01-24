@@ -18,6 +18,7 @@ import {
 } from '@mui/icons-material';
 import { TimeEntry, Project } from '../../types';
 import { getDailyWorkHours } from '../../utils/analytics';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface ActivityCalendarProps {
   timeEntries: TimeEntry[];
@@ -33,6 +34,8 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
   _projects,
 }) => {
   const theme = useTheme();
+  const { t, language } = useLanguage();
+  const isEnglish = language === 'en';
   const currentDate = useMemo(() => new Date(), []);
 
   // 表示する年月を管理
@@ -81,8 +84,10 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
     return new Date(year, month).toLocaleDateString('ja-JP', { month: 'long' });
   }, [year, month]);
 
-  // 曜日の配列（日本語表記）
-  const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
+  // 曜日の配列
+  const weekdays = isEnglish
+    ? ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    : ['日', '月', '火', '水', '木', '金', '土'];
 
   // カレンダーのデータを生成
   const calendarData = useMemo(() => {
@@ -214,10 +219,10 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
     >
       <Box sx={{ mb: 3 }}>
         <Typography variant="h6" fontWeight="medium">
-          活動カレンダー
+          {t('calendar.title')}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          作業時間の分布を視覚化
+          {t('calendar.subtitle')}
         </Typography>
       </Box>
 
@@ -244,7 +249,8 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
               <Select value={year} onChange={handleYearChange} displayEmpty>
                 {yearOptions.map((yearOption) => (
                   <MenuItem key={yearOption} value={yearOption}>
-                    {yearOption}年
+                    {yearOption}
+                    {isEnglish ? '' : t('dashboard.monthly.year')}
                   </MenuItem>
                 ))}
               </Select>
@@ -254,7 +260,14 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
               <Select value={month} onChange={handleMonthChange} displayEmpty>
                 {monthOptions.map((monthOption) => (
                   <MenuItem key={monthOption} value={monthOption}>
-                    {monthOption + 1}月
+                    {isEnglish
+                      ? new Date(2000, monthOption).toLocaleDateString(
+                          'en-US',
+                          {
+                            month: 'short',
+                          }
+                        )
+                      : `${monthOption + 1}${t('dashboard.monthly.month')}`}
                   </MenuItem>
                 ))}
               </Select>
@@ -267,7 +280,7 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
         </Box>
 
         <Typography variant="body2" fontWeight="medium">
-          合計: {totalHoursInMonth.toFixed(1)}時間
+          {t('calendar.total', { hours: totalHoursInMonth.toFixed(1) })}
         </Typography>
       </Box>
 
@@ -301,7 +314,11 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
               <Grid item xs={12 / 7} key={`day-${rowIndex}-${colIndex}`}>
                 {day ? (
                   <Tooltip
-                    title={`${year}年${month + 1}月${day.day}日: ${day.hoursWorked.toFixed(1)}時間`}
+                    title={
+                      isEnglish
+                        ? `${new Date(year, month, day.day).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}: ${day.hoursWorked.toFixed(1)} hours`
+                        : `${year}年${month + 1}月${day.day}日: ${day.hoursWorked.toFixed(1)}時間`
+                    }
                     arrow
                   >
                     <Box
@@ -363,10 +380,14 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
         }}
       >
         <Typography variant="caption" sx={{ mr: 1 }}>
-          活動レベル:
+          {t('calendar.activity.level')}
         </Typography>
         {[0, 2, 4, 6, 8].map((hour, index) => (
-          <Tooltip key={index} title={`${hour}時間`} arrow>
+          <Tooltip
+            key={index}
+            title={isEnglish ? `${hour} hours` : `${hour}時間`}
+            arrow
+          >
             <Box
               sx={{
                 width: 20,

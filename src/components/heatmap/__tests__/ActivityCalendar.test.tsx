@@ -7,6 +7,7 @@ import {
   createMockProject,
   createMockTimeEntry,
 } from '../../../__mocks__/electron';
+import { LanguageContext } from '../../../contexts/LanguageContext';
 
 jest.mock('../../../utils/analytics', () => ({
   getDailyWorkHours: jest.fn((timeEntries: TimeEntry[], date: Date) => {
@@ -21,8 +22,39 @@ jest.mock('../../../utils/analytics', () => ({
 
 const theme = createTheme();
 
+const mockTranslations: Record<string, string> = {
+  'calendar.title': '活動カレンダー',
+  'calendar.subtitle': '作業時間の分布を視覚化',
+  'calendar.total': '合計: {hours}時間',
+  'calendar.activity.level': '活動レベル:',
+  'dashboard.monthly.year': '年',
+  'dashboard.monthly.month': '月',
+};
+
+const mockT = (key: string, params?: Record<string, string>) => {
+  let value = mockTranslations[key] || key;
+  if (params) {
+    Object.entries(params).forEach(([k, v]) => {
+      value = value.replace(`{${k}}`, v);
+    });
+  }
+  return value;
+};
+
+const languageContextValue = {
+  language: 'ja' as const,
+  setLanguage: jest.fn(),
+  t: mockT,
+};
+
 const renderWithTheme = (ui: React.ReactElement) => {
-  return render(<ThemeProvider theme={theme}>{ui}</ThemeProvider>);
+  return render(
+    <ThemeProvider theme={theme}>
+      <LanguageContext.Provider value={languageContextValue}>
+        {ui}
+      </LanguageContext.Provider>
+    </ThemeProvider>
+  );
 };
 
 describe('ActivityCalendar', () => {
