@@ -25,10 +25,9 @@
 
 #### 中優先度（チャート・ヒートマップ用カラー）
 
-| ファイル                    | 行     | 現状                                 | 推奨修正                            |
-| --------------------------- | ------ | ------------------------------------ | ----------------------------------- |
-| `ActivityHeatmap.tsx`       | 25-40  | ヒートマップカラー配列をハードコード | `theme.custom.heatmapColors` を新設 |
-| `ProjectComparisonView.tsx` | 97-102 | カラーパレット配列をハードコード     | `theme.custom.chartColors` を新設   |
+| ファイル              | 行    | 現状                                 | 推奨修正                            |
+| --------------------- | ----- | ------------------------------------ | ----------------------------------- |
+| `ActivityHeatmap.tsx` | 25-40 | ヒートマップカラー配列をハードコード | `theme.custom.heatmapColors` を新設 |
 
 ### 2.2 グラデーション直書き
 
@@ -160,23 +159,7 @@ const getHeatmapColors = (theme: Theme) => {
 };
 ```
 
-#### 2.4 ProjectComparisonView.tsx
-
-```typescript
-// Before
-const colorPalette = [
-  theme.palette.primary.main,
-  theme.palette.secondary.main,
-  '#10B981',
-  '#F59E0B',
-  // ...
-];
-
-// After
-const colorPalette = theme.custom.chartColors;
-```
-
-#### 2.5 DailySummary.tsx
+#### 2.4 DailySummary.tsx
 
 ```typescript
 // Before
@@ -214,7 +197,6 @@ declare module '@mui/material/styles' {
 | `src/components/ui/layout/Sidebar.tsx`                 | 2     | #FFFFFF → theme.palette, フォールバック削除 |
 | `src/components/timer/Timer.tsx`                       | 2     | #FFFFFF → theme.palette, rgba → alpha()     |
 | `src/components/dashboard/ActivityHeatmap.tsx`         | 2     | ハードコード色 → theme.custom.heatmapColors |
-| `src/components/comparison/ProjectComparisonView.tsx`  | 2     | ハードコード色 → theme.custom.chartColors   |
 | `src/components/dashboard/DailySummary.tsx`            | 2     | ハードコード色 → theme.palette              |
 | `src/components/dashboard/WeeklySummary.tsx`           | 2     | #8884d8 → theme.palette.primary.main        |
 | `src/components/ui/KPICard.tsx`                        | 2     | グラデーション → theme.custom.gradients     |

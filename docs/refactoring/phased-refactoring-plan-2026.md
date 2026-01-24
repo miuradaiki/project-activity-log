@@ -407,28 +407,44 @@ src/components/timer/
 
 **目的**: 多言語対応の完全化
 
+### P4-0: デッドコード削除 ✅ 完了
+
+**完了日**: 2026年1月19日
+
+i18n対応調査中に発見されたデッドコードを削除しました。
+
+| ファイル                                                             | 状態     | 備考                    |
+| -------------------------------------------------------------------- | -------- | ----------------------- |
+| `src/components/comparison/ProjectComparisonView.tsx`                | **削除** | アプリ内で未使用        |
+| `src/components/comparison/__tests__/ProjectComparisonView.test.tsx` | **削除** | 上記のテスト (16テスト) |
+
+**結果**:
+
+- コード削減: 771行
+- テスト総数: 485 → 469テスト
+
 ### P4-1: ハードコード文字列の抽出
 
 **対象ファイル**:
 
-- `src/components/comparison/ProjectComparisonView.tsx`
+| ファイル                     | 主なハードコード                                      | 状態   |
+| ---------------------------- | ----------------------------------------------------- | ------ |
+| `ActivityCalendar.tsx`       | 曜日配列 `['日', '月', '火', '水', '木', '金', '土']` | 未着手 |
+| `KeyboardShortcuts.tsx`      | ショートカット説明文（約10箇所）                      | 未着手 |
+| `MonthlySummary.tsx`         | `'年'`, `'月'`, `'プロジェクト分布'`, `'週別推移'`    | 未着手 |
+| `ActivityHeatmap.tsx`        | 曜日配列、`'時間'`                                    | 未着手 |
+| `PreviousMonthSummary.tsx`   | `'先月の稼働状況'`                                    | 未着手 |
+| `MonthlyProgressSummary.tsx` | `'日'`                                                | 未着手 |
+| `Layout.tsx`                 | `'追加'`（デフォルト値）                              | 未着手 |
+| `AchievementAlert.tsx`       | `'プロジェクト'`                                      | 未着手 |
+| `DateTimeFields.tsx`         | `'開始日'`, `'終了日'`（フォールバック）              | 未着手 |
 
 **手順**:
 
 1. ハードコードされた日本語文字列を特定
-2. `src/i18n/ja.json` にキーを追加
+2. `src/i18n/translations.ts` にキーを追加
 3. `t()` 関数で置き換え
-4. 英語翻訳を追加（必要に応じて）
-
-**サンプル変更**:
-
-```typescript
-// Before
-<Typography variant="h6">プロジェクト比較</Typography>
-
-// After
-<Typography variant="h6">{t('comparison.title')}</Typography>
-```
+4. 英語翻訳を追加
 
 ### P4-2: i18n キー整理
 

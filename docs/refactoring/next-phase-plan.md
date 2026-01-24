@@ -452,22 +452,7 @@ src/components/dashboard/
 
 **優先度: 🟡 中**
 
-#### 4.1 ProjectComparisonView.tsx (415行)
-
-**分解計画:**
-
-```text
-src/components/comparison/
-├── ProjectComparisonView/
-│   ├── index.tsx                  # メイン (~120行)
-│   ├── ComparisonChart.tsx        # グラフ表示 (~150行)
-│   ├── ComparisonTable.tsx        # テーブル表示 (~100行)
-│   ├── ProjectSelector.tsx        # プロジェクト選択UI (~80行)
-│   └── hooks/
-│       └── useComparisonData.ts   # 比較データ計算 (~100行)
-```
-
-#### 4.2 ActivityCalendar.tsx (385行)
+#### 4.1 ActivityCalendar.tsx (385行)
 
 **分解計画:**
 

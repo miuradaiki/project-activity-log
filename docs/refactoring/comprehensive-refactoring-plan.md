@@ -68,7 +68,6 @@
 
 - `src/components/dashboard/` - 全ダッシュボードコンポーネント
 - `src/components/settings/` - 設定画面コンポーネント
-- `src/components/comparison/` - 比較ビュー
 - `src/styles/` - テーマファイル
 
 ---
@@ -128,7 +127,6 @@
 | ~~**SettingsView.tsx**~~        | ~~488~~ → 98  | 3        | ~~複数の設定セクション混在~~   | ✅ 解消    |
 | **ProjectProgressCard.tsx**     | 456           | 4        | ダイアログ処理混在             | 📋 未対応  |
 | ~~**TimerFocus.tsx**~~          | ~~415~~ → 199 | 5        | ~~複数責務~~                   | ✅ 解消    |
-| **ProjectComparisonView.tsx**   | 415           | 3        | 複雑なレイアウト               | 📋 未対応  |
 | **ActivityCalendar.tsx**        | 385           | 3        | 複雑な計算ロジック             | 📋 未対応  |
 | ~~**ManualTimeEntryForm.tsx**~~ | ~~380~~ → 134 | 7        | ~~最多useState~~               | ✅ 解消    |
 | **MonthlySummary.tsx**          | 378           | 3        | レイアウトと計算混在           | 📋 未対応  |
@@ -325,11 +323,10 @@ src/components/timer/
 
 #### P1: ビジネスロジック層
 
-| ファイル                    | テスト内容               | ステータス |
-| --------------------------- | ------------------------ | ---------- |
-| `Dashboard.tsx`             | サマリー表示、データ集計 | 📋 計画中  |
-| `backupUtils.ts`            | バックアップ生成・復元   | 📋 計画中  |
-| `ProjectComparisonView.tsx` | 比較ロジック             | 📋 計画中  |
+| ファイル         | テスト内容               | ステータス |
+| ---------------- | ------------------------ | ---------- |
+| `Dashboard.tsx`  | サマリー表示、データ集計 | 📋 計画中  |
+| `backupUtils.ts` | バックアップ生成・復元   | 📋 計画中  |
 
 #### P2: UIコンポーネント層
 

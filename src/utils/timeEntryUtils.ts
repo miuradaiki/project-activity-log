@@ -22,15 +22,17 @@ export const createSplitEntries = (
 
   // 同じ日の場合は分割しない
   if (isSameDay(startDateTime, endDateTime)) {
-    return [{
-      id: uuidv4(),
-      projectId,
-      startTime: startDateTime.toISOString(),
-      endTime: endDateTime.toISOString(),
-      description,
-      createdAt: timestamp,
-      updatedAt: timestamp,
-    }];
+    return [
+      {
+        id: uuidv4(),
+        projectId,
+        startTime: startDateTime.toISOString(),
+        endTime: endDateTime.toISOString(),
+        description,
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      },
+    ];
   }
 
   // 日跨ぎの場合は日別に分割
