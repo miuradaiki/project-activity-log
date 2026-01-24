@@ -1,121 +1,121 @@
 # Project Activity Log
 
-複数プロジェクトの作業時間を記録・分析するデスクトップアプリケーション。
+A desktop application for tracking and analyzing work time across multiple projects.
 
-月間の稼働配分を設定し、プロジェクトごとの進捗を可視化。タイマー機能とダッシュボードで日々の作業を効率的に管理できます。
+Set monthly work allocation and visualize progress per project. Efficiently manage daily work with timer functionality and dashboards.
 
-## クイックスタート
+## Quick Start
 
 ```bash
-# インストール
+# Installation
 git clone https://github.com/daikimiura/project-activity-log.git
 cd project-activity-log
 npm install
 
-# 起動
+# Launch
 npm run electron:dev
 ```
 
-**動作環境**: Node.js v16以上
+**Requirements**: Node.js v16 or higher
 
-## 画面構成
+## Screens
 
-アプリは4つの画面で構成されています。サイドバーまたはキーボードショートカットで切り替えできます。
+The app consists of 4 screens. Switch between them using the sidebar or keyboard shortcuts.
 
-### タイマー画面 (`Ctrl+3`)
+### Timer Screen (`Ctrl+3`)
 
-作業時間を記録するメイン画面です。
+The main screen for recording work time.
 
-- **タイマー**: プロジェクトを選択して開始。スリープ中も時間を継続記録し、8時間経過で自動停止
-- **手動入力**: 過去の作業時間を日付・時間指定で追加
-- **履歴**: タイムラインまたはリスト形式で作業記録を確認・編集・削除
+- **Timer**: Select a project and start. Continues tracking during system sleep, auto-stops after 8 hours
+- **Manual Entry**: Add past work time with date and time specification
+- **History**: View, edit, and delete work records in timeline or list format
 
-### ダッシュボード画面 (`Ctrl+1`)
+### Dashboard Screen (`Ctrl+1`)
 
-作業データを分析・可視化します。
+Analyze and visualize work data.
 
-- **日次**: 本日の作業時間と作業プロジェクト
-- **週次**: 日別の作業時間推移、プロジェクト別の時間配分
-- **月次**: 週別の作業時間推移、月間サマリー
-- **アクティビティカレンダー**: GitHubスタイルのヒートマップ
+- **Daily**: Today's work time and active projects
+- **Weekly**: Daily work time trends, time distribution by project
+- **Monthly**: Weekly work time trends, monthly summary
+- **Activity Calendar**: GitHub-style heatmap
 
-### プロジェクト画面 (`Ctrl+2`)
+### Projects Screen (`Ctrl+2`)
 
-プロジェクトの作成・管理と進捗確認を行います。
+Create and manage projects, track progress.
 
-- **稼働率**: 各プロジェクトに月間の工数配分を設定（例: プロジェクトAに40%、Bに60%）
-- **進捗管理**: 月間目標時間に対する実績をプログレスバーで表示。90%で警告、100%超過で超過警告
-- **フィルタ・ソート**: 状態別の絞り込み、名前・進捗率・残り時間での並べ替え
-- **アーカイブ**: 完了したプロジェクトを非表示化
+- **Allocation**: Set monthly work allocation for each project (e.g., 40% for Project A, 60% for B)
+- **Progress Tracking**: Display actual vs target hours with progress bars. Warning at 90%, exceeded warning at 100%+
+- **Filter & Sort**: Filter by status, sort by name, progress rate, or remaining time
+- **Archive**: Hide completed projects
 
-### 設定画面 (`Ctrl+,`)
+### Settings Screen (`Ctrl+,`)
 
-- **月間基準時間**: 80〜200時間で設定。これに各プロジェクトの稼働率を掛けて月間目標時間を算出
-- **外観**: ダークモード切り替え (`Alt+L`)
+- **Monthly Base Hours**: Set between 80-200 hours. Multiplied by each project's allocation to calculate monthly target hours
+- **Appearance**: Toggle dark mode (`Alt+L`)
 
-## キーボードショートカット
+## Keyboard Shortcuts
 
-| 操作               | ショートカット           |
-| ------------------ | ------------------------ |
-| ダッシュボード     | `Ctrl+1`                 |
-| プロジェクト       | `Ctrl+2`                 |
-| タイマー           | `Ctrl+3`                 |
-| 設定               | `Ctrl+,`                 |
-| 新規プロジェクト   | `Ctrl+N`                 |
-| タイマー開始/停止  | `Space` (タイマー画面)   |
-| タイマー停止       | `Escape`                 |
-| テーマ切替         | `Alt+L`                  |
-| ショートカット一覧 | `Ctrl+H` または `Ctrl+/` |
+| Action           | Shortcut               |
+| ---------------- | ---------------------- |
+| Dashboard        | `Ctrl+1`               |
+| Projects         | `Ctrl+2`               |
+| Timer            | `Ctrl+3`               |
+| Settings         | `Ctrl+,`               |
+| New Project      | `Ctrl+N`               |
+| Start/Stop Timer | `Space` (Timer screen) |
+| Stop Timer       | `Escape`               |
+| Toggle Theme     | `Alt+L`                |
+| Shortcuts List   | `Ctrl+H` or `Ctrl+/`   |
 
-## データ
+## Data
 
-すべてのデータはローカルに保存されます。外部サーバーへの送信はありません。
+All data is stored locally. No data is sent to external servers.
 
 ```
 [userData]/
 ├── data/
-│   ├── projects.json      # プロジェクト情報
-│   └── timeEntries.json   # 作業時間記録
-├── settings.json          # アプリ設定
-└── backups/               # 自動バックアップ
+│   ├── projects.json      # Project information
+│   └── timeEntries.json   # Time entries
+├── settings.json          # App settings
+└── backups/               # Automatic backups
 ```
 
-**CSVインポート**: 他ツールからの移行に対応。インポート前に自動バックアップを作成し、失敗時は自動復元します。
+**CSV Import**: Supports migration from other tools. Creates automatic backup before import and auto-restores on failure.
 
 ```csv
 date,start_time,end_time,duration_minutes,project_name,project_description,notes
-2025/2/3,10:35:42,11:28:19,53,プロジェクト名,説明,メモ
+2025/2/3,10:35:42,11:28:19,53,Project Name,Description,Notes
 ```
 
-## 開発
+## Development
 
-### コマンド
+### Commands
 
 ```bash
-npm run electron:dev      # 開発環境起動
-npm run electron:build    # 本番ビルド
-npm test                  # ユニットテスト
-npm run test:e2e          # E2Eテスト (Playwright)
+npm run electron:dev      # Start development environment
+npm run electron:build    # Production build
+npm test                  # Unit tests
+npm run test:e2e          # E2E tests (Playwright)
 npm run lint              # ESLint
 npm run format            # Prettier
 ```
 
-### 技術スタック
+### Tech Stack
 
-| カテゴリ       | 技術                                |
-| -------------- | ----------------------------------- |
-| フレームワーク | Electron 29, React 18, TypeScript 5 |
-| UI             | Material-UI 5, Framer Motion 12     |
-| データ可視化   | Recharts 2                          |
-| ビルド         | Vite 5                              |
-| テスト         | Jest 30, Playwright                 |
+| Category  | Technology                          |
+| --------- | ----------------------------------- |
+| Framework | Electron 29, React 18, TypeScript 5 |
+| UI        | Material-UI 5, Framer Motion 12     |
+| Charts    | Recharts 2                          |
+| Build     | Vite 5                              |
+| Testing   | Jest 30, Playwright                 |
 
-### アーキテクチャ
+### Architecture
 
-標準的なElectronアーキテクチャを採用。メインプロセスがファイルI/Oを担当し、レンダラープロセス（React）とはIPC経由で通信します。
+Uses standard Electron architecture. The main process handles file I/O and communicates with the renderer process (React) via IPC.
 
-詳細は [CLAUDE.md](./CLAUDE.md) を参照してください。
+See [CLAUDE.md](./CLAUDE.md) for details.
 
-## ライセンス
+## License
 
 MIT License
