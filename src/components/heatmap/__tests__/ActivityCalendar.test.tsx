@@ -31,11 +31,11 @@ const mockTranslations: Record<string, string> = {
   'dashboard.monthly.month': '月',
 };
 
-const mockT = (key: string, params?: Record<string, string>) => {
+const mockT = (key: string, params?: Record<string, unknown>) => {
   let value = mockTranslations[key] || key;
   if (params) {
     Object.entries(params).forEach(([k, v]) => {
-      value = value.replace(`{${k}}`, v);
+      value = value.replace(`{${k}}`, String(v));
     });
   }
   return value;
