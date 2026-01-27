@@ -12,6 +12,7 @@ import { Add as AddIcon } from '@mui/icons-material';
 import { Sidebar, DRAWER_WIDTH, CLOSED_DRAWER_WIDTH } from './Sidebar';
 import { GlobalTimer } from '../global/GlobalTimer';
 import { Project } from '../../../types';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 export interface LayoutProps {
   children: React.ReactNode;
@@ -39,13 +40,14 @@ export const Layout: React.FC<LayoutProps> = ({
   onToggleSidebar,
   onAddButtonClick,
   showAddButton = false,
-  addButtonTooltip = '追加',
+  addButtonTooltip,
   activeProject = null,
   isTimerRunning = false,
   startTime = null,
   onStopTimer = () => {},
 }) => {
   const theme = useTheme();
+  const { t } = useLanguage();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const currentDrawerWidth = sidebarOpen ? DRAWER_WIDTH : CLOSED_DRAWER_WIDTH;
 
@@ -99,7 +101,7 @@ export const Layout: React.FC<LayoutProps> = ({
 
         {/* フローティングアクションボタン */}
         {showAddButton && onAddButtonClick && (
-          <Tooltip title={addButtonTooltip}>
+          <Tooltip title={addButtonTooltip || t('actions.add')}>
             <Fab
               color="primary"
               aria-label="add"

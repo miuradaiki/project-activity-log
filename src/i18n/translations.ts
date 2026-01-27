@@ -157,6 +157,41 @@ export const translations = {
     'dashboard.heatmap.less': '少ない',
     'dashboard.heatmap.more': '多い',
     'dashboard.heatmap.hours': '{hours}時間',
+
+    // Calendar
+    'calendar.title': '活動カレンダー',
+    'calendar.subtitle': '作業時間の分布を視覚化',
+    'calendar.total': '合計: {hours}時間',
+    'calendar.activity.level': '活動レベル:',
+
+    // Dashboard Monthly Extended
+    'dashboard.monthly.year': '年',
+    'dashboard.monthly.month': '月',
+    'dashboard.monthly.tab.projects': 'プロジェクト分布',
+    'dashboard.monthly.tab.weekly': '週別推移',
+    'dashboard.monthly.week': '週',
+    'dashboard.monthly.week.nth': '第{n}週',
+    'dashboard.monthly.no.activity': 'この月の稼働データがありません',
+    'dashboard.monthly.no.projects': 'この月のプロジェクトデータがありません',
+
+    // Previous Month
+    'dashboard.previous.title': '先月の稼働状況',
+    'dashboard.previous.total': '合計時間:',
+    'dashboard.previous.no.data': '先月の稼働データがありません',
+
+    // Actions Extended
+    'actions.close': '閉じる',
+
+    // Units Extended
+    'units.day': '日',
+    'units.days': '日',
+
+    // Format
+    'format.duration.hours.minutes': '{hours}時間{minutes}分',
+    'format.duration.hours': '{hours}時間',
+    'format.duration.minutes': '{minutes}分',
+    'timer.multiday.notice':
+      '{duration} ({startDate} - {endDate}) の記録になります。',
   },
   en: {
     // Common
@@ -316,5 +351,40 @@ export const translations = {
     'dashboard.heatmap.less': 'Less',
     'dashboard.heatmap.more': 'More',
     'dashboard.heatmap.hours': '{hours} hours',
+
+    // Calendar
+    'calendar.title': 'Activity Calendar',
+    'calendar.subtitle': 'Visualize work time distribution',
+    'calendar.total': 'Total: {hours} hours',
+    'calendar.activity.level': 'Activity Level:',
+
+    // Dashboard Monthly Extended
+    'dashboard.monthly.year': 'Year',
+    'dashboard.monthly.month': 'Month',
+    'dashboard.monthly.tab.projects': 'Project Distribution',
+    'dashboard.monthly.tab.weekly': 'Weekly Trend',
+    'dashboard.monthly.week': 'Week',
+    'dashboard.monthly.week.nth': 'Week {n}',
+    'dashboard.monthly.no.activity': 'No activity data for this month',
+    'dashboard.monthly.no.projects': 'No project data for this month',
+
+    // Previous Month
+    'dashboard.previous.title': 'Previous Month Activity',
+    'dashboard.previous.total': 'Total Hours:',
+    'dashboard.previous.no.data': 'No activity data for the previous month',
+
+    // Actions Extended
+    'actions.close': 'Close',
+
+    // Units Extended
+    'units.day': 'day',
+    'units.days': 'days',
+
+    // Format
+    'format.duration.hours.minutes': '{hours}h {minutes}m',
+    'format.duration.hours': '{hours}h',
+    'format.duration.minutes': '{minutes}m',
+    'timer.multiday.notice':
+      'This will be a {duration} entry ({startDate} - {endDate}).',
   },
 };

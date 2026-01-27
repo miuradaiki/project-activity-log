@@ -106,7 +106,7 @@ export const MonthlySummary: React.FC<MonthlySummaryProps> = ({
   // 月の選択肢を生成
   const months = Array.from({ length: 12 }, (_, i) => ({
     value: i,
-    label: isEnglish ? `Month ${i + 1}` : `${i + 1}月`,
+    label: `${i + 1}${t('dashboard.monthly.month')}`,
   }));
 
   // カスタムツールチップ（プロジェクト分布用）
@@ -158,25 +158,25 @@ export const MonthlySummary: React.FC<MonthlySummaryProps> = ({
         <Typography variant="h6">{t('dashboard.monthly.title')}</Typography>
         <Box sx={{ display: 'flex', gap: 2 }}>
           <FormControl size="small" sx={{ minWidth: 100 }}>
-            <InputLabel>{isEnglish ? 'Year' : '年'}</InputLabel>
+            <InputLabel>{t('dashboard.monthly.year')}</InputLabel>
             <Select
               value={selectedYear}
-              label={isEnglish ? 'Year' : '年'}
+              label={t('dashboard.monthly.year')}
               onChange={(e) => setSelectedYear(Number(e.target.value))}
             >
               {years.map((year) => (
                 <MenuItem key={year} value={year}>
                   {year}
-                  {isEnglish ? '' : '年'}
+                  {isEnglish ? '' : t('dashboard.monthly.year')}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
           <FormControl size="small" sx={{ minWidth: 120 }}>
-            <InputLabel>{isEnglish ? 'Month' : '月'}</InputLabel>
+            <InputLabel>{t('dashboard.monthly.month')}</InputLabel>
             <Select
               value={selectedMonth}
-              label={isEnglish ? 'Month' : '月'}
+              label={t('dashboard.monthly.month')}
               onChange={(e) => setSelectedMonth(Number(e.target.value))}
             >
               {months.map((month, index) => (
@@ -205,11 +205,8 @@ export const MonthlySummary: React.FC<MonthlySummaryProps> = ({
           onChange={(_, newValue) => setActiveTab(newValue)}
           variant="fullWidth"
         >
-          <Tab
-            label={isEnglish ? 'Project Distribution' : 'プロジェクト分布'}
-            value="projects"
-          />
-          <Tab label={isEnglish ? 'Weekly Trend' : '週別推移'} value="weekly" />
+          <Tab label={t('dashboard.monthly.tab.projects')} value="projects" />
+          <Tab label={t('dashboard.monthly.tab.weekly')} value="weekly" />
         </Tabs>
       </Box>
 
@@ -223,7 +220,7 @@ export const MonthlySummary: React.FC<MonthlySummaryProps> = ({
                 <XAxis
                   dataKey="week"
                   label={{
-                    value: isEnglish ? 'Week' : '週',
+                    value: t('dashboard.monthly.week'),
                     position: 'insideBottom',
                     offset: -5,
                   }}
@@ -235,7 +232,7 @@ export const MonthlySummary: React.FC<MonthlySummaryProps> = ({
                     t('timer.title'),
                   ]}
                   labelFormatter={(week) =>
-                    isEnglish ? `Week ${week}` : `第${week}週`
+                    t('dashboard.monthly.week.nth', { n: String(week) })
                   }
                 />
                 <Line
@@ -259,9 +256,7 @@ export const MonthlySummary: React.FC<MonthlySummaryProps> = ({
               }}
             >
               <Typography variant="body1" color="text.secondary">
-                {isEnglish
-                  ? 'No activity data for this month'
-                  : 'この月の稼働データがありません'}
+                {t('dashboard.monthly.no.activity')}
               </Typography>
             </Box>
           )}
@@ -319,9 +314,7 @@ export const MonthlySummary: React.FC<MonthlySummaryProps> = ({
               }}
             >
               <Typography variant="body1" color="text.secondary">
-                {isEnglish
-                  ? 'No project data for this month'
-                  : 'この月のプロジェクトデータがありません'}
+                {t('dashboard.monthly.no.projects')}
               </Typography>
             </Box>
           )}

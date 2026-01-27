@@ -54,6 +54,29 @@ const mockTranslations: Record<string, string> = {
   'dashboard.monthly.total': '合計',
   'units.hours': '時間',
   'timer.title': '作業時間',
+  'dashboard.monthly.year': '年',
+  'dashboard.monthly.month': '月',
+  'dashboard.monthly.tab.projects': 'プロジェクト分布',
+  'dashboard.monthly.tab.weekly': '週別推移',
+  'dashboard.monthly.week': '週',
+  'dashboard.monthly.week.nth': '第{n}週',
+  'dashboard.monthly.no.activity': 'この月の稼働データがありません',
+  'dashboard.monthly.no.projects': 'この月のプロジェクトデータがありません',
+};
+
+const mockTranslationsEn: Record<string, string> = {
+  'dashboard.monthly.title': 'Monthly Summary',
+  'dashboard.monthly.total': 'Total',
+  'units.hours': 'hours',
+  'timer.title': 'Timer',
+  'dashboard.monthly.year': 'Year',
+  'dashboard.monthly.month': 'Month',
+  'dashboard.monthly.tab.projects': 'Project Distribution',
+  'dashboard.monthly.tab.weekly': 'Weekly Trend',
+  'dashboard.monthly.week': 'Week',
+  'dashboard.monthly.week.nth': 'Week {n}',
+  'dashboard.monthly.no.activity': 'No activity data for this month',
+  'dashboard.monthly.no.projects': 'No project data for this month',
 };
 
 const renderWithProviders = (
@@ -232,7 +255,7 @@ describe('MonthlySummary', () => {
       const languageContextValue = {
         language: 'en' as const,
         setLanguage: jest.fn(),
-        t: (key: string) => mockTranslations[key] || key,
+        t: (key: string) => mockTranslationsEn[key] || key,
       };
 
       render(

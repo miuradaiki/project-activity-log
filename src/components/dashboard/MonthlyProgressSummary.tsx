@@ -285,8 +285,7 @@ export const MonthlyProgressSummary: React.FC<MonthlyProgressSummaryProps> = ({
                       {t('dashboard.monthly.summary.remaining.days')}
                     </Typography>
                     <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                      {remainingDays}
-                      {isEnglish ? ' days' : '日'}
+                      {remainingDays} {t('units.days')}
                     </Typography>
                   </Box>
                 </Box>

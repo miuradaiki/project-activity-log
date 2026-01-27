@@ -59,12 +59,28 @@ export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({
     new Date(`${startDate}T${startTime}`)
   );
 
+  const formatDuration = (totalMinutes: number): string => {
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+
+    if (hours === 0) {
+      return t('format.duration.minutes', { minutes: String(minutes) });
+    } else if (minutes === 0) {
+      return t('format.duration.hours', { hours: String(hours) });
+    } else {
+      return t('format.duration.hours.minutes', {
+        hours: String(hours),
+        minutes: String(minutes),
+      });
+    }
+  };
+
   return (
     <>
       {/* Date Fields */}
       <Box sx={{ display: 'flex', gap: 2 }}>
         <TextField
-          label={t('timer.start.date') || '開始日'}
+          label={t('timer.start.date')}
           type="date"
           value={startDate}
           onChange={(e) => onStartDateChange(e.target.value)}
@@ -81,7 +97,7 @@ export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({
         />
 
         <TextField
-          label={t('timer.end.date') || '終了日'}
+          label={t('timer.end.date')}
           type="date"
           value={endDate}
           onChange={(e) => {
@@ -107,9 +123,11 @@ export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({
       {isMultiDay && (
         <Alert severity="info" sx={{ mb: 1 }}>
           <Typography variant="body2">
-            {formatHoursAndMinutes(durationMinutes)} (
-            {format(new Date(startDate), 'M/d')} -{' '}
-            {format(new Date(endDate), 'M/d')}) の記録になります。
+            {t('timer.multiday.notice', {
+              duration: formatDuration(durationMinutes),
+              startDate: format(new Date(startDate), 'M/d'),
+              endDate: format(new Date(endDate), 'M/d'),
+            })}
           </Typography>
         </Alert>
       )}
