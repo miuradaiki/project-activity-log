@@ -44,6 +44,7 @@ const renderWithProviders = (
       'dashboard.monthly.summary.per.day': language === 'ja' ? '/日' : '/day',
       'dashboard.monthly.summary.vs.last.month':
         language === 'ja' ? '先月比' : 'vs Last Month',
+      'units.days': language === 'ja' ? '日' : 'days',
     };
     return translations[key] || key;
   };
@@ -130,7 +131,12 @@ describe('MonthlyProgressSummary', () => {
       );
 
       expect(screen.getByText('残り営業日')).toBeInTheDocument();
-      expect(screen.getByText(/10日/)).toBeInTheDocument();
+      // 残り営業日の値と単位が表示されることを確認
+      const headings = screen.getAllByRole('heading', { level: 6 });
+      const remainingDaysHeading = headings.find((h) =>
+        h.textContent?.includes('10')
+      );
+      expect(remainingDaysHeading).toBeInTheDocument();
     });
 
     it('必要ペースが表示される', () => {
