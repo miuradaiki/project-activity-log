@@ -461,9 +461,37 @@ i18n対応調査中に発見されたデッドコードを削除しました。
 
 ### P4-2: i18n キー整理
 
-1. 未使用のi18nキーを特定・削除
-2. キー命名規則の統一
-3. ネームスペースの整理
+#### P4-2-1: 未使用のi18nキーを特定・削除 ✅ 完了
+
+**完了日**: 2026年1月31日
+
+**削除したキー（26個）**:
+
+| カテゴリ       | 削除キー                                                                                                                                                                                                                                                   |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ダッシュボード | `dashboard.title`, `dashboard.subtitle`, `dashboard.daily.projects`, `dashboard.daily.most`, `dashboard.weekly.subtitle`, `dashboard.weekly.byday`, `dashboard.monthly.subtitle`, `dashboard.monthly.summary.on.track`, `dashboard.monthly.summary.behind` |
+| プロジェクト   | `projects.title`, `projects.save`                                                                                                                                                                                                                          |
+| タイマー       | `timer.date`, `timer.filter.project`                                                                                                                                                                                                                       |
+| 設定           | `settings.subtitle`, `settings.hours`                                                                                                                                                                                                                      |
+| アクション     | `actions.cancel`, `actions.close`, `actions.confirm`, `actions.delete`, `actions.import`                                                                                                                                                                   |
+| 単位（単数形） | `units.hour`, `units.minute`, `units.second`, `units.day`                                                                                                                                                                                                  |
+| 時間           | `time.today`, `time.last.month`                                                                                                                                                                                                                            |
+
+**結果**:
+
+- キー数: 161 → 135（26キー削減）
+- ファイルサイズ: 391行 → 335行（-56行）
+- 全テスト通過: 469テスト
+- ビルド成功
+- Lintエラー: 0
+
+#### P4-2-2: キー命名規則の統一
+
+1. キー命名規則の整理・統一
+
+#### P4-2-3: ネームスペースの整理
+
+1. ネームスペースの整理
 
 ---
 
