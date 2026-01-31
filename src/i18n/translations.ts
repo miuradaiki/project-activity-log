@@ -14,26 +14,18 @@ export const translations = {
     'nav.settings': '設定',
 
     // ダッシュボード
-    'dashboard.title': 'ダッシュボード',
-    'dashboard.subtitle': '作業状況の概要と分析',
     'dashboard.daily.title': '本日の活動',
     'dashboard.daily.total': '合計時間',
-    'dashboard.daily.projects': 'プロジェクト数',
-    'dashboard.daily.most': '最も作業したプロジェクト',
     'dashboard.daily.longest': '最も長い作業時間',
     'dashboard.daily.average': '平均作業時間',
     'dashboard.weekly.title': '週間サマリー',
-    'dashboard.weekly.subtitle': '過去7日間の活動状況',
-    'dashboard.weekly.byday': '日別作業時間',
     'dashboard.weekly.byproject': 'プロジェクト別時間',
     'dashboard.monthly.title': '月間サマリー',
-    'dashboard.monthly.subtitle': '今月の活動集計',
     'dashboard.monthly.total': '合計時間',
     'dashboard.progress.title': 'プロジェクト進捗',
     'dashboard.progress.subtitle': '月間目標に対する進捗状況',
 
     // プロジェクト
-    'projects.title': 'プロジェクト',
     'projects.new': '新しいプロジェクト',
     'projects.edit': 'プロジェクトを編集',
     'projects.name': 'プロジェクト名',
@@ -41,7 +33,6 @@ export const translations = {
     'projects.description': '説明',
     'projects.utilization': '稼働率',
     'projects.monthly.target': '月間目標時間',
-    'projects.save': '保存',
     'projects.cancel': 'キャンセル',
     'projects.delete': '削除',
     'projects.archive': 'アーカイブ',
@@ -71,7 +62,6 @@ export const translations = {
     'timer.now.start': '現在時刻を開始時刻にセット',
     'timer.now.end': '現在時刻を終了時刻にセット',
     'timer.project': 'プロジェクト',
-    'timer.date': '日付',
     'timer.start.date': '開始日',
     'timer.end.date': '終了日',
     'timer.start.time': '開始時間',
@@ -80,7 +70,6 @@ export const translations = {
     'timer.history': '作業履歴',
     'timer.history.timeline': 'タイムライン',
     'timer.import.csv': 'CSVインポート',
-    'timer.filter.project': 'プロジェクト',
     'timer.search': '検索...',
     'timer.no.entries': 'タイマーを開始してください',
     'timer.delete.confirm': '作業記録の削除',
@@ -92,11 +81,9 @@ export const translations = {
 
     // 設定
     'settings.title': '設定',
-    'settings.subtitle': 'アプリケーション設定',
     'settings.monthly.hours': '月間基準時間',
     'settings.monthly.hours.description':
       '月間の基準作業時間を設定します。プロジェクトの稼働率計算に使用されます。',
-    'settings.hours': '時間',
     'settings.reset': 'デフォルトに戻す',
     'settings.save': '保存',
     'settings.language': '言語設定',
@@ -117,27 +104,18 @@ export const translations = {
     // 共通アクション
     'actions.save': '保存',
     'actions.update': '更新',
-    'actions.cancel': 'キャンセル',
-    'actions.delete': '削除',
-    'actions.confirm': '確認',
     'actions.edit': '編集',
     'actions.search': '検索',
     'actions.add': '追加',
-    'actions.import': 'インポート',
     'actions.export': 'エクスポート',
 
     // 単位と時間
-    'units.hour': '時間',
     'units.hours': '時間',
-    'units.minute': '分',
     'units.minutes': '分',
-    'units.second': '秒',
     'units.seconds': '秒',
-    'time.today': '今日',
     'time.yesterday': '昨日',
     'time.this.week': '今週',
     'time.this.month': '今月',
-    'time.last.month': '先月',
     'timer.export.success': '作業記録のエクスポートが完了しました',
     'timer.export.error': 'エクスポートに失敗しました',
 
@@ -149,8 +127,6 @@ export const translations = {
     'dashboard.monthly.summary.required.pace': '必要ペース',
     'dashboard.monthly.summary.vs.last.month': '先月比',
     'dashboard.monthly.summary.per.day': '/日',
-    'dashboard.monthly.summary.on.track': '順調',
-    'dashboard.monthly.summary.behind': '遅れ',
 
     // Activity Heatmap
     'dashboard.heatmap.title': '活動ヒートマップ',
@@ -179,11 +155,7 @@ export const translations = {
     'dashboard.previous.total': '合計時間:',
     'dashboard.previous.no.data': '先月の稼働データがありません',
 
-    // Actions Extended
-    'actions.close': '閉じる',
-
     // Units Extended
-    'units.day': '日',
     'units.days': '日',
 
     // Format
@@ -207,26 +179,18 @@ export const translations = {
     'nav.settings': 'Settings',
 
     // Dashboard
-    'dashboard.title': 'Dashboard',
-    'dashboard.subtitle': 'Overview and analysis of work activities',
     'dashboard.daily.title': "Today's Activity",
     'dashboard.daily.total': 'Total Time',
-    'dashboard.daily.projects': 'Projects',
-    'dashboard.daily.most': 'Most Worked Project',
     'dashboard.daily.longest': 'Longest Work Session',
     'dashboard.daily.average': 'Average Work Session',
     'dashboard.weekly.title': 'Weekly Summary',
-    'dashboard.weekly.subtitle': 'Activity for the past 7 days',
-    'dashboard.weekly.byday': 'Working Hours by Day',
     'dashboard.weekly.byproject': 'Hours by Project',
     'dashboard.monthly.title': 'Monthly Summary',
-    'dashboard.monthly.subtitle': "This month's activity totals",
     'dashboard.monthly.total': 'Total Hours',
     'dashboard.progress.title': 'Project Progress',
     'dashboard.progress.subtitle': 'Progress against monthly targets',
 
     // Projects
-    'projects.title': 'Projects',
     'projects.new': 'New Project',
     'projects.edit': 'Edit Project',
     'projects.name': 'Project Name',
@@ -234,7 +198,6 @@ export const translations = {
     'projects.description': 'Description',
     'projects.utilization': 'Utilization Rate',
     'projects.monthly.target': 'Monthly Target Hours',
-    'projects.save': 'Save',
     'projects.cancel': 'Cancel',
     'projects.delete': 'Delete',
     'projects.archive': 'Archive',
@@ -264,7 +227,6 @@ export const translations = {
     'timer.now.start': 'Set current time as start time',
     'timer.now.end': 'Set current time as end time',
     'timer.project': 'Project',
-    'timer.date': 'Date',
     'timer.start.date': 'Start Date',
     'timer.end.date': 'End Date',
     'timer.start.time': 'Start Time',
@@ -273,7 +235,6 @@ export const translations = {
     'timer.history': 'Work History',
     'timer.history.timeline': 'Timeline',
     'timer.import.csv': 'Import CSV',
-    'timer.filter.project': 'Project',
     'timer.search': 'Search...',
     'timer.no.entries': 'No work records found',
     'timer.delete.confirm': 'Delete Work Record',
@@ -285,11 +246,9 @@ export const translations = {
 
     // Settings
     'settings.title': 'Settings',
-    'settings.subtitle': 'Application Settings',
     'settings.monthly.hours': 'Monthly Base Hours',
     'settings.monthly.hours.description':
       'Set the standard working hours per month. This is used to calculate project utilization rates.',
-    'settings.hours': 'hours',
     'settings.reset': 'Reset to Default',
     'settings.save': 'Save',
     'settings.language': 'Language Settings',
@@ -311,27 +270,18 @@ export const translations = {
     // Common Actions
     'actions.save': 'Save',
     'actions.update': 'Update',
-    'actions.cancel': 'Cancel',
-    'actions.delete': 'Delete',
-    'actions.confirm': 'Confirm',
     'actions.edit': 'Edit',
     'actions.search': 'Search',
     'actions.add': 'Add',
-    'actions.import': 'Import',
     'actions.export': 'Export',
 
     // Units and Time
-    'units.hour': 'hour',
     'units.hours': 'hours',
-    'units.minute': 'minute',
     'units.minutes': 'minutes',
-    'units.second': 'second',
     'units.seconds': 'seconds',
-    'time.today': 'Today',
     'time.yesterday': 'Yesterday',
     'time.this.week': 'This Week',
     'time.this.month': 'This Month',
-    'time.last.month': 'Last Month',
     'timer.export.success': 'Time entries exported successfully',
     'timer.export.error': 'Failed to export time entries',
 
@@ -343,8 +293,6 @@ export const translations = {
     'dashboard.monthly.summary.required.pace': 'Required Pace',
     'dashboard.monthly.summary.vs.last.month': 'vs Last Month',
     'dashboard.monthly.summary.per.day': '/day',
-    'dashboard.monthly.summary.on.track': 'On Track',
-    'dashboard.monthly.summary.behind': 'Behind',
 
     // Activity Heatmap
     'dashboard.heatmap.title': 'Activity Heatmap',
@@ -373,11 +321,7 @@ export const translations = {
     'dashboard.previous.total': 'Total Hours:',
     'dashboard.previous.no.data': 'No activity data for the previous month',
 
-    // Actions Extended
-    'actions.close': 'Close',
-
     // Units Extended
-    'units.day': 'day',
     'units.days': 'days',
 
     // Format
