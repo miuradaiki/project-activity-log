@@ -1,19 +1,46 @@
-// 翻訳リソース
+/**
+ * 翻訳リソース
+ *
+ * ## ネームスペース命名規則
+ *
+ * ### 画面別ネームスペース
+ * - `nav.*`        - ナビゲーションメニュー
+ * - `dashboard.*`  - ダッシュボード画面
+ * - `projects.*`   - プロジェクト管理画面
+ * - `timer.*`      - タイマー画面
+ * - `settings.*`   - 設定画面
+ * - `calendar.*`   - カレンダーコンポーネント
+ *
+ * ### 機能別ネームスペース
+ * - `actions.*`    - 共通アクション（ボタンラベルなど）
+ * - `units.*`      - 単位（時間、分、秒など）
+ * - `time.*`       - 時間表現（昨日、今週など）
+ * - `format.*`     - フォーマット文字列
+ *
+ * ### その他
+ * - `app.*`        - アプリケーション全般
+ * - `language.*`   - 言語設定
+ *
+ * ## キー命名規則
+ * - すべてのキーはドット区切りを使用: `namespace.category.name`
+ * - 小文字とドットのみ使用（キャメルケース禁止）
+ * - 階層は最大3レベルまで推奨
+ */
 export const translations = {
   ja: {
-    // 共通
+    // ===== 共通 =====
     'app.name': 'プロジェクト活動ログ',
-    language: '言語',
+    'language.label': '言語',
     'language.japanese': '日本語',
     'language.english': '英語',
 
-    // ナビゲーション
+    // ===== ナビゲーション =====
     'nav.dashboard': 'ダッシュボード',
     'nav.projects': 'プロジェクト',
     'nav.timer': 'タイマー',
     'nav.settings': '設定',
 
-    // ダッシュボード
+    // ===== ダッシュボード =====
     'dashboard.daily.title': '本日の活動',
     'dashboard.daily.total': '合計時間',
     'dashboard.daily.longest': '最も長い作業時間',
@@ -25,7 +52,7 @@ export const translations = {
     'dashboard.progress.title': 'プロジェクト進捗',
     'dashboard.progress.subtitle': '月間目標に対する進捗状況',
 
-    // プロジェクト
+    // ===== プロジェクト =====
     'projects.new': '新しいプロジェクト',
     'projects.edit': 'プロジェクトを編集',
     'projects.name': 'プロジェクト名',
@@ -52,7 +79,7 @@ export const translations = {
     'projects.tracking.cumulative': '今月の累計時間',
     'projects.tracking.label': '追跡のみ - 今月の累計時間',
 
-    // タイマー
+    // ===== タイマー =====
     'timer.title': ' ',
     'timer.start': '開始',
     'timer.stop': '停止',
@@ -78,8 +105,12 @@ export const translations = {
     'timer.notification.maxtime': '作業時間が8時間を超過しました',
     'timer.notification.maxtime.body':
       'タイマーを自動停止しました。必要に応じて新しいセッションを開始してください。',
+    'timer.export.success': '作業記録のエクスポートが完了しました',
+    'timer.export.error': 'エクスポートに失敗しました',
+    'timer.multiday.notice':
+      '{duration} ({startDate} - {endDate}) の記録になります。',
 
-    // 設定
+    // ===== 設定 =====
     'settings.title': '設定',
     'settings.monthly.hours': '月間基準時間',
     'settings.monthly.hours.description':
@@ -101,7 +132,7 @@ export const translations = {
     'settings.darkmode.description': '画面の配色を切り替えます',
     'settings.monthly.hours.label': '月間時間',
 
-    // 共通アクション
+    // ===== 共通アクション =====
     'actions.save': '保存',
     'actions.update': '更新',
     'actions.edit': '編集',
@@ -109,17 +140,18 @@ export const translations = {
     'actions.add': '追加',
     'actions.export': 'エクスポート',
 
-    // 単位と時間
+    // ===== 単位 =====
     'units.hours': '時間',
     'units.minutes': '分',
     'units.seconds': '秒',
+    'units.days': '日',
+
+    // ===== 時間表現 =====
     'time.yesterday': '昨日',
     'time.this.week': '今週',
     'time.this.month': '今月',
-    'timer.export.success': '作業記録のエクスポートが完了しました',
-    'timer.export.error': 'エクスポートに失敗しました',
 
-    // Monthly Progress Summary
+    // ===== ダッシュボード（追加） =====
     'dashboard.monthly.summary.title': '月間進捗サマリー',
     'dashboard.monthly.summary.worked': '作業時間',
     'dashboard.monthly.summary.target': '目標時間',
@@ -127,20 +159,10 @@ export const translations = {
     'dashboard.monthly.summary.required.pace': '必要ペース',
     'dashboard.monthly.summary.vs.last.month': '先月比',
     'dashboard.monthly.summary.per.day': '/日',
-
-    // Activity Heatmap
     'dashboard.heatmap.title': '活動ヒートマップ',
     'dashboard.heatmap.less': '少ない',
     'dashboard.heatmap.more': '多い',
     'dashboard.heatmap.hours': '{hours}時間',
-
-    // Calendar
-    'calendar.title': '活動カレンダー',
-    'calendar.subtitle': '作業時間の分布を視覚化',
-    'calendar.total': '合計: {hours}時間',
-    'calendar.activity.level': '活動レベル:',
-
-    // Dashboard Monthly Extended
     'dashboard.monthly.year': '年',
     'dashboard.monthly.month': '月',
     'dashboard.monthly.tab.projects': 'プロジェクト分布',
@@ -149,36 +171,35 @@ export const translations = {
     'dashboard.monthly.week.nth': '第{n}週',
     'dashboard.monthly.no.activity': 'この月の稼働データがありません',
     'dashboard.monthly.no.projects': 'この月のプロジェクトデータがありません',
-
-    // Previous Month
     'dashboard.previous.title': '先月の稼働状況',
     'dashboard.previous.total': '合計時間:',
     'dashboard.previous.no.data': '先月の稼働データがありません',
 
-    // Units Extended
-    'units.days': '日',
+    // ===== カレンダー =====
+    'calendar.title': '活動カレンダー',
+    'calendar.subtitle': '作業時間の分布を視覚化',
+    'calendar.total': '合計: {hours}時間',
+    'calendar.activity.level': '活動レベル:',
 
-    // Format
+    // ===== フォーマット =====
     'format.duration.hours.minutes': '{hours}時間{minutes}分',
     'format.duration.hours': '{hours}時間',
     'format.duration.minutes': '{minutes}分',
-    'timer.multiday.notice':
-      '{duration} ({startDate} - {endDate}) の記録になります。',
   },
   en: {
-    // Common
+    // ===== Common =====
     'app.name': 'Project Activity Log',
-    language: 'Language',
+    'language.label': 'Language',
     'language.japanese': 'Japanese',
     'language.english': 'English',
 
-    // Navigation
+    // ===== Navigation =====
     'nav.dashboard': 'Dashboard',
     'nav.projects': 'Projects',
     'nav.timer': 'Timer',
     'nav.settings': 'Settings',
 
-    // Dashboard
+    // ===== Dashboard =====
     'dashboard.daily.title': "Today's Activity",
     'dashboard.daily.total': 'Total Time',
     'dashboard.daily.longest': 'Longest Work Session',
@@ -190,7 +211,7 @@ export const translations = {
     'dashboard.progress.title': 'Project Progress',
     'dashboard.progress.subtitle': 'Progress against monthly targets',
 
-    // Projects
+    // ===== Projects =====
     'projects.new': 'New Project',
     'projects.edit': 'Edit Project',
     'projects.name': 'Project Name',
@@ -217,7 +238,7 @@ export const translations = {
     'projects.tracking.cumulative': 'Cumulative Hours This Month',
     'projects.tracking.label': 'Tracking Only - Cumulative Hours This Month',
 
-    // Timer
+    // ===== Timer =====
     'timer.title': ' ',
     'timer.start': 'Start',
     'timer.stop': 'Stop',
@@ -243,8 +264,12 @@ export const translations = {
     'timer.notification.maxtime': 'Working time exceeded 8 hours',
     'timer.notification.maxtime.body':
       'Timer has been automatically stopped. Start a new session if needed.',
+    'timer.export.success': 'Time entries exported successfully',
+    'timer.export.error': 'Failed to export time entries',
+    'timer.multiday.notice':
+      'This will be a {duration} entry ({startDate} - {endDate}).',
 
-    // Settings
+    // ===== Settings =====
     'settings.title': 'Settings',
     'settings.monthly.hours': 'Monthly Base Hours',
     'settings.monthly.hours.description':
@@ -267,7 +292,7 @@ export const translations = {
     'settings.darkmode.description': 'Switch the color scheme of the screen',
     'settings.monthly.hours.label': 'Monthly Hours',
 
-    // Common Actions
+    // ===== Common Actions =====
     'actions.save': 'Save',
     'actions.update': 'Update',
     'actions.edit': 'Edit',
@@ -275,17 +300,18 @@ export const translations = {
     'actions.add': 'Add',
     'actions.export': 'Export',
 
-    // Units and Time
+    // ===== Units =====
     'units.hours': 'hours',
     'units.minutes': 'minutes',
     'units.seconds': 'seconds',
+    'units.days': 'days',
+
+    // ===== Time Expressions =====
     'time.yesterday': 'Yesterday',
     'time.this.week': 'This Week',
     'time.this.month': 'This Month',
-    'timer.export.success': 'Time entries exported successfully',
-    'timer.export.error': 'Failed to export time entries',
 
-    // Monthly Progress Summary
+    // ===== Dashboard (Extended) =====
     'dashboard.monthly.summary.title': 'Monthly Progress Summary',
     'dashboard.monthly.summary.worked': 'Hours Worked',
     'dashboard.monthly.summary.target': 'Target Hours',
@@ -293,20 +319,10 @@ export const translations = {
     'dashboard.monthly.summary.required.pace': 'Required Pace',
     'dashboard.monthly.summary.vs.last.month': 'vs Last Month',
     'dashboard.monthly.summary.per.day': '/day',
-
-    // Activity Heatmap
     'dashboard.heatmap.title': 'Activity Heatmap',
     'dashboard.heatmap.less': 'Less',
     'dashboard.heatmap.more': 'More',
     'dashboard.heatmap.hours': '{hours} hours',
-
-    // Calendar
-    'calendar.title': 'Activity Calendar',
-    'calendar.subtitle': 'Visualize work time distribution',
-    'calendar.total': 'Total: {hours} hours',
-    'calendar.activity.level': 'Activity Level:',
-
-    // Dashboard Monthly Extended
     'dashboard.monthly.year': 'Year',
     'dashboard.monthly.month': 'Month',
     'dashboard.monthly.tab.projects': 'Project Distribution',
@@ -315,20 +331,19 @@ export const translations = {
     'dashboard.monthly.week.nth': 'Week {n}',
     'dashboard.monthly.no.activity': 'No activity data for this month',
     'dashboard.monthly.no.projects': 'No project data for this month',
-
-    // Previous Month
     'dashboard.previous.title': 'Previous Month Activity',
     'dashboard.previous.total': 'Total Hours:',
     'dashboard.previous.no.data': 'No activity data for the previous month',
 
-    // Units Extended
-    'units.days': 'days',
+    // ===== Calendar =====
+    'calendar.title': 'Activity Calendar',
+    'calendar.subtitle': 'Visualize work time distribution',
+    'calendar.total': 'Total: {hours} hours',
+    'calendar.activity.level': 'Activity Level:',
 
-    // Format
+    // ===== Format =====
     'format.duration.hours.minutes': '{hours}h {minutes}m',
     'format.duration.hours': '{hours}h',
     'format.duration.minutes': '{minutes}m',
-    'timer.multiday.notice':
-      'This will be a {duration} entry ({startDate} - {endDate}).',
   },
 };

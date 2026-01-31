@@ -49,7 +49,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
   if (variant === 'icon') {
     return (
       <>
-        <Tooltip title={t('language')}>
+        <Tooltip title={t('language.label')}>
           <IconButton
             onClick={handleClick}
             color="inherit"
@@ -105,7 +105,9 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
         startIcon={<LanguageIcon />}
         size={showText ? 'medium' : 'small'}
       >
-        {showText && <Typography variant="body2">{t('language')}</Typography>}
+        {showText && (
+          <Typography variant="body2">{t('language.label')}</Typography>
+        )}
       </Button>
       <Menu
         id="language-menu"
