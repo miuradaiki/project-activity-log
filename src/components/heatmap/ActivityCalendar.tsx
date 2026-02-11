@@ -225,7 +225,6 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
           {t('calendar.subtitle')}
         </Typography>
       </Box>
-
       {/* カレンダーヘッダー */}
       <Box
         sx={{
@@ -283,13 +282,12 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
           {t('calendar.total', { hours: totalHoursInMonth.toFixed(1) })}
         </Typography>
       </Box>
-
       {/* カレンダーグリッド */}
       <Box>
         {/* 曜日ヘッダー */}
         <Grid container spacing={1}>
           {weekdays.map((day, index) => (
-            <Grid item xs={12 / 7} key={index}>
+            <Grid key={index} size={12 / 7}>
               <Box
                 sx={{
                   textAlign: 'center',
@@ -311,7 +309,7 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
         {calendarData.map((week, rowIndex) => (
           <Grid container spacing={1} key={`week-${rowIndex}`}>
             {week.map((day, colIndex) => (
-              <Grid item xs={12 / 7} key={`day-${rowIndex}-${colIndex}`}>
+              <Grid key={`day-${rowIndex}-${colIndex}`} size={12 / 7}>
                 {day ? (
                   <Tooltip
                     title={
@@ -369,7 +367,6 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
           </Grid>
         ))}
       </Box>
-
       {/* 凡例 */}
       <Box
         sx={{

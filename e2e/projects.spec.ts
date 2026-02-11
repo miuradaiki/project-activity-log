@@ -26,8 +26,8 @@ test.beforeAll(async () => {
   await window.waitForLoadState('domcontentloaded');
   await window.waitForTimeout(2000);
 
-  // プロジェクト画面（ListAltアイコン）に遷移
-  const projectsIcon = window.locator('[data-testid="ListAltIcon"]').first();
+  // プロジェクト画面に遷移
+  const projectsIcon = window.locator('[data-testid="nav-projects"]').first();
   await expect(projectsIcon).toBeVisible({ timeout: 10000 });
   await projectsIcon.click();
   await window.waitForTimeout(1000);
@@ -72,20 +72,24 @@ test.describe('Project Management', () => {
     test('should have play button for starting timer', async () => {
       // プロジェクトカードの再生ボタンが表示されていることを確認
       const playButton = window
-        .locator('[data-testid="PlayArrowIcon"]')
+        .locator('[data-testid="project-play-button"]')
         .first();
       await expect(playButton).toBeVisible({ timeout: 10000 });
     });
 
     test('should have more options menu', async () => {
       // プロジェクトカードの3点メニューが表示されていることを確認
-      const moreButton = window.locator('[data-testid="MoreVertIcon"]').first();
+      const moreButton = window
+        .locator('[data-testid="project-more-button"]')
+        .first();
       await expect(moreButton).toBeVisible({ timeout: 10000 });
     });
 
     test('should open menu when more button clicked', async () => {
       // 3点メニューをクリック
-      const moreButton = window.locator('[data-testid="MoreVertIcon"]').first();
+      const moreButton = window
+        .locator('[data-testid="project-more-button"]')
+        .first();
       await expect(moreButton).toBeVisible({ timeout: 10000 });
       await moreButton.click();
       await window.waitForTimeout(300);

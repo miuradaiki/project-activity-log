@@ -145,7 +145,12 @@ export const MonthlyProgressSummary: React.FC<MonthlyProgressSummaryProps> = ({
 
         <Grid container spacing={3} alignItems="center">
           {/* 大きなプログレスリング */}
-          <Grid item xs={12} md={4}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 4,
+            }}
+          >
             <Box
               sx={{
                 display: 'flex',
@@ -232,10 +237,15 @@ export const MonthlyProgressSummary: React.FC<MonthlyProgressSummaryProps> = ({
           </Grid>
 
           {/* 統計情報 */}
-          <Grid item xs={12} md={8}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 8,
+            }}
+          >
             <Grid container spacing={2}>
               {/* 作業時間 / 目標時間 */}
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <Box
                   sx={{
                     p: 2,
@@ -265,7 +275,7 @@ export const MonthlyProgressSummary: React.FC<MonthlyProgressSummaryProps> = ({
               </Grid>
 
               {/* 残り営業日 */}
-              <Grid item xs={6}>
+              <Grid size={6}>
                 <Box
                   sx={{
                     p: 2,
@@ -292,7 +302,7 @@ export const MonthlyProgressSummary: React.FC<MonthlyProgressSummaryProps> = ({
               </Grid>
 
               {/* 必要ペース */}
-              <Grid item xs={6}>
+              <Grid size={6}>
                 <Box
                   sx={{
                     p: 2,
@@ -319,7 +329,7 @@ export const MonthlyProgressSummary: React.FC<MonthlyProgressSummaryProps> = ({
               </Grid>
 
               {/* 先月比 */}
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <Box
                   sx={{
                     p: 2,

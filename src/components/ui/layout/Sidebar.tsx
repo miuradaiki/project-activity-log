@@ -175,6 +175,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <ListItem disablePadding>
         <Tooltip title={!open ? item.text : ''} placement="right" arrow>
           <StyledListItemButton
+            data-testid={`nav-${item.id}`}
             selected={activePage === item.id}
             onClick={() => onNavigate(item.id)}
             sx={{
