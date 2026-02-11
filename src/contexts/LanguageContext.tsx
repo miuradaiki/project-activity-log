@@ -5,6 +5,8 @@ import React, {
   ReactNode,
   useCallback,
 } from 'react';
+import { STORAGE_KEYS } from '../constants/storageKeys';
+import { translations } from '../i18n/translations';
 
 type Language = 'ja' | 'en';
 
@@ -29,14 +31,9 @@ export const LanguageContext = createContext<LanguageContextType>(
 // 言語コンテキストへのアクセス用フック
 export const useLanguage = () => useContext(LanguageContext);
 
-import { STORAGE_KEYS } from '../constants/storageKeys';
-
 interface LanguageProviderProps {
   children: ReactNode;
 }
-
-// 言語翻訳リソースをインポート
-import { translations } from '../i18n/translations';
 
 export const LanguageProvider: React.FC<LanguageProviderProps> = ({
   children,

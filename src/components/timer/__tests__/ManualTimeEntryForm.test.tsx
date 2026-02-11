@@ -374,14 +374,14 @@ describe('ManualTimeEntryForm', () => {
 
       // First entry: 18:33 on Jan 15 to 23:59:59.999 on Jan 15
       const firstEntry = allSavedEntries[0];
-      expect(new Date(firstEntry.startTime).getDate()).toBe(15);
-      expect(new Date(firstEntry.endTime).getDate()).toBe(15);
+      expect(new Date(firstEntry.startTime as string).getDate()).toBe(15);
+      expect(new Date(firstEntry.endTime as string).getDate()).toBe(15);
 
       // Second entry: 00:00 on Jan 16 to 00:09 on Jan 16
       const secondEntry = allSavedEntries[1];
-      expect(new Date(secondEntry.startTime).getDate()).toBe(16);
-      expect(new Date(secondEntry.endTime).getDate()).toBe(16);
-      expect(new Date(secondEntry.endTime).getMinutes()).toBe(9);
+      expect(new Date(secondEntry.startTime as string).getDate()).toBe(16);
+      expect(new Date(secondEntry.endTime as string).getDate()).toBe(16);
+      expect(new Date(secondEntry.endTime as string).getMinutes()).toBe(9);
     });
 
     it('現在時刻ボタンで開始・終了の日時が現在時刻に更新される', async () => {
