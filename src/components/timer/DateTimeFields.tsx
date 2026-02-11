@@ -150,6 +150,7 @@ export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({
                     onClick={() => onSetCurrentTime('start')}
                     edge="end"
                     size="small"
+                    aria-label={t('aria.time.set.start')}
                     sx={{ mr: -0.5, color: 'primary.main' }}
                   >
                     <Update fontSize="small" />
@@ -176,6 +177,7 @@ export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({
                     onClick={() => onSetCurrentTime('end')}
                     edge="end"
                     size="small"
+                    aria-label={t('aria.time.set.end')}
                     sx={{ mr: -0.5, color: 'primary.main' }}
                   >
                     <Update fontSize="small" />

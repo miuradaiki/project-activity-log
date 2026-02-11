@@ -173,7 +173,12 @@ export const TimeEntryList: React.FC<TimeEntryListProps> = ({
             endAdornment={
               searchTerm && (
                 <InputAdornment position="end">
-                  <IconButton size="small" onClick={clearSearch} edge="end">
+                  <IconButton
+                    size="small"
+                    onClick={clearSearch}
+                    edge="end"
+                    aria-label={t('aria.search.clear')}
+                  >
                     <CloseIcon fontSize="small" />
                   </IconButton>
                 </InputAdornment>

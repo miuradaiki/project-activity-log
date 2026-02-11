@@ -2,6 +2,7 @@ import React from 'react';
 import { IconButton } from '@mui/material';
 import { PlayArrow, Stop } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface TimerControlsProps {
   isRunning: boolean;
@@ -14,6 +15,7 @@ export const TimerControls: React.FC<TimerControlsProps> = ({
   onStart,
   onStop,
 }) => {
+  const { t } = useLanguage();
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -27,7 +29,7 @@ export const TimerControls: React.FC<TimerControlsProps> = ({
       >
         <IconButton
           onClick={isRunning ? onStop : onStart}
-          aria-label={isRunning ? 'タイマーを停止' : 'タイマーを開始'}
+          aria-label={isRunning ? t('aria.timer.stop') : t('aria.timer.start')}
           sx={{
             width: 64,
             height: 64,

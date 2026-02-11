@@ -53,6 +53,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
           <IconButton
             onClick={handleClick}
             color="inherit"
+            aria-label={t('aria.language.switch')}
             aria-controls={open ? 'language-menu' : undefined}
             aria-haspopup="true"
             aria-expanded={open ? 'true' : undefined}

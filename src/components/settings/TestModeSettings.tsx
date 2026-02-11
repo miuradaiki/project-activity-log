@@ -58,6 +58,7 @@ export const TestModeSettings: React.FC<TestModeSettingsProps> = ({
               onClick={onToggleTestMode}
               color={isTestMode ? 'warning' : 'default'}
               size="large"
+              aria-label="テストモードの切り替え"
             >
               {isTestMode ? (
                 <ToggleOnIcon fontSize="large" />
