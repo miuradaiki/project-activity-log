@@ -78,6 +78,7 @@ export const ProjectCardActions: React.FC<ProjectCardActionsProps> = ({
               arrow
             >
               <IconButton
+                data-testid="project-play-button"
                 onClick={() => onStartTimer(project)}
                 sx={{
                   background: isActive
