@@ -23,6 +23,7 @@ import {
   Stop as StopIcon,
 } from '@mui/icons-material';
 import { Project, TimeEntry } from '../types';
+import { formatHours } from '../utils/formatters/timeFormatters';
 
 interface ProjectListProps {
   projects: Project[];
@@ -163,7 +164,9 @@ export const ProjectList: React.FC<ProjectListProps> = ({
                 {!project.isArchived && (
                   <IconButton
                     edge="end"
-                    aria-label={isActive ? 'stop timer' : 'start timer'}
+                    aria-label={
+                      isActive ? t('aria.timer.stop') : t('aria.timer.start')
+                    }
                     onClick={() => onStartTimer(project)}
                     color={isActive ? 'secondary' : 'primary'}
                   >
@@ -172,7 +175,7 @@ export const ProjectList: React.FC<ProjectListProps> = ({
                 )}
                 <IconButton
                   edge="end"
-                  aria-label="more"
+                  aria-label={t('aria.project.menu')}
                   onClick={(e) => handleMenuClick(e, project)}
                 >
                   <MoreVertIcon />
@@ -194,7 +197,7 @@ export const ProjectList: React.FC<ProjectListProps> = ({
                   {t('projects.tracking.label')}
                 </Typography>
                 <Typography variant="h6" color="primary" fontWeight="bold">
-                  {monthlyTime.toFixed(1)} {t('units.hours')}
+                  {formatHours(monthlyTime)} {t('units.hours')}
                 </Typography>
               </Box>
             ) : (
@@ -211,8 +214,8 @@ export const ProjectList: React.FC<ProjectListProps> = ({
                     {(project.monthlyCapacity * 100).toFixed(1)}%
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    {monthlyTime.toFixed(1)} {t('units.hours')} /{' '}
-                    {monthlyTarget.toFixed(1)} {t('units.hours')} (
+                    {formatHours(monthlyTime)} {t('units.hours')} /{' '}
+                    {formatHours(monthlyTarget)} {t('units.hours')} (
                     {progress.toFixed(1)}%)
                   </Typography>
                 </Box>

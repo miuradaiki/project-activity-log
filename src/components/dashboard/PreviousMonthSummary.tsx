@@ -12,6 +12,7 @@ import {
 import { Project, TimeEntry } from '../../types';
 import { getPreviousMonthProjectDistribution } from '../../utils/analytics';
 import { projectColorManager } from '../../utils/colorUtils';
+import { formatHours } from '../../utils/formatters/timeFormatters';
 
 interface PreviousMonthSummaryProps {
   projects: Project[];
@@ -123,7 +124,7 @@ export const PreviousMonthSummary: React.FC<PreviousMonthSummaryProps> = ({
             {payload[0].name}
           </Typography>
           <Typography variant="body2">
-            {payload[0].value.toFixed(1)} {t('units.hours')} (
+            {formatHours(payload[0].value)} {t('units.hours')} (
             {payload[0].payload.percentage}%)
           </Typography>
         </Box>
@@ -149,7 +150,7 @@ export const PreviousMonthSummary: React.FC<PreviousMonthSummaryProps> = ({
       </Box>
 
       <Typography variant="subtitle1" gutterBottom>
-        {t('dashboard.previous.total')} {totalHours.toFixed(1)}{' '}
+        {t('dashboard.previous.total')} {formatHours(totalHours)}{' '}
         {t('units.hours')}
       </Typography>
 

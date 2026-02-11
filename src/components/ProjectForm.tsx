@@ -13,6 +13,7 @@ import {
   Alert,
 } from '@mui/material';
 import { Project } from '../types';
+import { formatHours } from '../utils/formatters/timeFormatters';
 
 interface ProjectFormProps {
   open: boolean;
@@ -154,7 +155,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
             />
             <Typography color="text.secondary" variant="body2" sx={{ mt: 1 }}>
               {t('projects.monthly.target')}:{' '}
-              {(monthlyCapacity * BASE_MONTHLY_HOURS).toFixed(1)}{' '}
+              {formatHours(monthlyCapacity * BASE_MONTHLY_HOURS)}{' '}
               {t('units.hours')}/{t('time.this.month')}
             </Typography>
           </Box>

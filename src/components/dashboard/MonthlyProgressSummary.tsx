@@ -24,6 +24,7 @@ import {
   calculateMonthOverMonthChange,
 } from '../../utils/analytics';
 import { getDailyWorkHours } from '../../utils/analytics';
+import { formatHours } from '../../utils/formatters/timeFormatters';
 
 interface MonthlyProgressSummaryProps {
   projects: Project[];
@@ -262,13 +263,13 @@ export const MonthlyProgressSummary: React.FC<MonthlyProgressSummaryProps> = ({
                     {t('dashboard.monthly.summary.target')}
                   </Typography>
                   <Typography variant="h5" sx={{ fontWeight: 600 }}>
-                    {monthlyData.toFixed(1)}h{' '}
+                    {formatHours(monthlyData)}h{' '}
                     <Typography
                       component="span"
                       variant="body1"
                       color="text.secondary"
                     >
-                      / {totalTargetHours.toFixed(1)}h
+                      / {formatHours(totalTargetHours)}h
                     </Typography>
                   </Typography>
                 </Box>

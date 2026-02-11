@@ -2,11 +2,16 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material';
 import { TimerControls } from '../TimerControls';
+import { LanguageProvider } from '../../../../contexts/LanguageContext';
 
 const theme = createTheme();
 
 const renderWithTheme = (ui: React.ReactElement) => {
-  return render(<ThemeProvider theme={theme}>{ui}</ThemeProvider>);
+  return render(
+    <ThemeProvider theme={theme}>
+      <LanguageProvider>{ui}</LanguageProvider>
+    </ThemeProvider>
+  );
 };
 
 describe('TimerControls', () => {

@@ -233,8 +233,9 @@ export const GlobalTimer: React.FC<GlobalTimerProps> = ({
               <IconButton
                 color="error"
                 size="small"
+                aria-label={t('aria.timer.stop')}
                 onClick={(e) => {
-                  e.stopPropagation(); // クリックイベントの伝播を止める
+                  e.stopPropagation();
                   onStop();
                 }}
                 sx={{

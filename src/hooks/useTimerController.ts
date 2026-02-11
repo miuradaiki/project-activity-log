@@ -1,8 +1,8 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Project, TimeEntry } from '../types';
 import { createTimerEntries } from '../utils/timeEntryUtils';
+import { STORAGE_KEYS } from '../constants/storageKeys';
 
-const TIMER_STATE_STORAGE_KEY = 'project_activity_log_timer_state';
 const MIN_DURATION_MS = 60000; // 1分
 const MAX_DURATION_MS = 8 * 60 * 60 * 1000; // 8時間
 
@@ -36,7 +36,7 @@ export const useTimerController = (
   useEffect(() => {
     if (isRestored || projects.length === 0) return;
 
-    const stored = localStorage.getItem(TIMER_STATE_STORAGE_KEY);
+    const stored = localStorage.getItem(STORAGE_KEYS.TIMER_STATE);
     if (stored) {
       try {
         const parsed: TimerStateStorage = JSON.parse(stored);
@@ -46,7 +46,7 @@ export const useTimerController = (
           parsed.startTime &&
           new Date(parsed.startTime).getTime() < Date.now() - MAX_DURATION_MS
         ) {
-          localStorage.removeItem(TIMER_STATE_STORAGE_KEY);
+          localStorage.removeItem(STORAGE_KEYS.TIMER_STATE);
           setIsRestored(true);
           return;
         }
@@ -63,11 +63,11 @@ export const useTimerController = (
               window.electronAPI.timerStart(project.name);
             }
           } else {
-            localStorage.removeItem(TIMER_STATE_STORAGE_KEY);
+            localStorage.removeItem(STORAGE_KEYS.TIMER_STATE);
           }
         }
       } catch {
-        localStorage.removeItem(TIMER_STATE_STORAGE_KEY);
+        localStorage.removeItem(STORAGE_KEYS.TIMER_STATE);
       }
     }
     setIsRestored(true);
@@ -83,9 +83,12 @@ export const useTimerController = (
         isRunning,
         startTime,
       };
-      localStorage.setItem(TIMER_STATE_STORAGE_KEY, JSON.stringify(timerState));
+      localStorage.setItem(
+        STORAGE_KEYS.TIMER_STATE,
+        JSON.stringify(timerState)
+      );
     } else {
-      localStorage.removeItem(TIMER_STATE_STORAGE_KEY);
+      localStorage.removeItem(STORAGE_KEYS.TIMER_STATE);
     }
   }, [activeProject, isRunning, startTime, isRestored]);
 

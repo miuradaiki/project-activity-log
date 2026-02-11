@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AnimatedProgressBar } from '../modern/StyledComponents';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { Project } from '../../../types';
+import { formatHours } from '../../../utils/formatters/timeFormatters';
 
 interface ProjectProgressSectionProps {
   project: Project;
@@ -52,7 +53,7 @@ export const ProjectProgressSection: React.FC<ProjectProgressSectionProps> = ({
             mb: 2,
           }}
         >
-          {monthlyTime.toFixed(1)} {t('units.hours')}
+          {formatHours(monthlyTime)} {t('units.hours')}
         </Typography>
         <AnimatePresence>
           {(project.isArchived || isActive) && (
@@ -113,8 +114,8 @@ export const ProjectProgressSection: React.FC<ProjectProgressSectionProps> = ({
             backgroundClip: 'text',
           }}
         >
-          {monthlyTime.toFixed(1)} {t('units.hours')} /{' '}
-          {monthlyTarget.toFixed(1)} {t('units.hours')}
+          {formatHours(monthlyTime)} {t('units.hours')} /{' '}
+          {formatHours(monthlyTarget)} {t('units.hours')}
         </Typography>
       </Box>
 

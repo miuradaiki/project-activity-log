@@ -8,6 +8,7 @@ import React, {
 import { AppSettings, DEFAULT_SETTINGS } from '../types/settings';
 import { loadSettings, updateSettings } from '../utils/settingsUtils';
 import { isTestDataEnabled } from '../utils/env';
+import { STORAGE_KEYS } from '../constants/storageKeys';
 
 // コンテキストの型定義
 interface SettingsContextType {
@@ -31,9 +32,6 @@ interface SettingsProviderProps {
   children: ReactNode;
 }
 
-// テストモードの設定キー
-const TEST_SETTINGS_KEY = 'project_activity_log_test_settings';
-
 export const SettingsProvider: React.FC<SettingsProviderProps> = ({
   children,
 }) => {
@@ -43,7 +41,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({
 
   // テストモード用の設定
   const [testSettings, setTestSettings] = useState<AppSettings>(() => {
-    const saved = localStorage.getItem(TEST_SETTINGS_KEY);
+    const saved = localStorage.getItem(STORAGE_KEYS.TEST_SETTINGS);
     return saved ? JSON.parse(saved) : DEFAULT_SETTINGS;
   });
 
@@ -102,7 +100,10 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({
   // テストモード用の設定を保存
   useEffect(() => {
     if (isTestMode) {
-      localStorage.setItem(TEST_SETTINGS_KEY, JSON.stringify(testSettings));
+      localStorage.setItem(
+        STORAGE_KEYS.TEST_SETTINGS,
+        JSON.stringify(testSettings)
+      );
     }
   }, [isTestMode, testSettings]);
 

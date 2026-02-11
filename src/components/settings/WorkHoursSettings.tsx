@@ -22,6 +22,7 @@ import {
 } from '@mui/icons-material';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { APP_CONSTANTS } from '../../constants';
+import { formatHours } from '../../utils/formatters/timeFormatters';
 
 interface WorkHoursSettingsProps {
   baseMonthlyHours: number;
@@ -63,7 +64,11 @@ export const WorkHoursSettings: React.FC<WorkHoursSettingsProps> = ({
               {t('settings.monthly.hours')}
             </Typography>
             <Tooltip title={t('settings.monthly.hours.description')}>
-              <IconButton size="small" sx={{ ml: 1 }}>
+              <IconButton
+                size="small"
+                sx={{ ml: 1 }}
+                aria-label={t('aria.settings.info')}
+              >
                 <InfoIcon fontSize="small" />
               </IconButton>
             </Tooltip>
@@ -128,7 +133,7 @@ export const WorkHoursSettings: React.FC<WorkHoursSettingsProps> = ({
 
           <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
             {t('settings.monthly.hours.example', {
-              hours: (baseMonthlyHours * 0.5).toFixed(1),
+              hours: formatHours(baseMonthlyHours * 0.5),
             })}
           </Typography>
         </Box>

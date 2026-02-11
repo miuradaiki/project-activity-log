@@ -5,6 +5,8 @@ import React, {
   ReactNode,
   useCallback,
 } from 'react';
+import { STORAGE_KEYS } from '../constants/storageKeys';
+import { translations } from '../i18n/translations';
 
 type Language = 'ja' | 'en';
 
@@ -29,15 +31,9 @@ export const LanguageContext = createContext<LanguageContextType>(
 // 言語コンテキストへのアクセス用フック
 export const useLanguage = () => useContext(LanguageContext);
 
-// 言語のローカルストレージキー
-const LANGUAGE_STORAGE_KEY = 'project_activity_log_language';
-
 interface LanguageProviderProps {
   children: ReactNode;
 }
-
-// 言語翻訳リソースをインポート
-import { translations } from '../i18n/translations';
 
 export const LanguageProvider: React.FC<LanguageProviderProps> = ({
   children,
@@ -45,7 +41,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
   // 初期言語設定（ローカルストレージから取得、なければブラウザの言語設定、それもなければ日本語）
   const getInitialLanguage = (): Language => {
     const storedLanguage = localStorage.getItem(
-      LANGUAGE_STORAGE_KEY
+      STORAGE_KEYS.LANGUAGE
     ) as Language | null;
     if (
       storedLanguage &&
@@ -63,7 +59,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
   // 言語変更と保存
   const setLanguage = useCallback((newLanguage: Language) => {
     // 言語設定を保存
-    localStorage.setItem(LANGUAGE_STORAGE_KEY, newLanguage);
+    localStorage.setItem(STORAGE_KEYS.LANGUAGE, newLanguage);
     // ステートを更新
     setLanguageState(newLanguage);
     // 言語切り替え時に現在のページを維持するため、ページリロードは行わない

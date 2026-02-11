@@ -156,6 +156,7 @@ export const TimerFocus: React.FC<TimerFocusProps> = ({
               onClick={() => setIsEditing(true)}
               color="primary"
               size="small"
+              aria-label={t('aria.note.edit')}
               sx={{
                 position: 'absolute',
                 right: 16,

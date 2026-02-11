@@ -232,6 +232,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
                           <IconButton
                             size="small"
                             onClick={() => onEdit(entry)}
+                            aria-label={t('aria.entry.edit')}
                             sx={{ ml: 1 }}
                           >
                             <EditIcon fontSize="small" />
@@ -241,6 +242,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
                           <IconButton
                             size="small"
                             onClick={() => onDelete(entry)}
+                            aria-label={t('aria.entry.delete')}
                             sx={{ ml: 0.5 }}
                           >
                             <DeleteIcon fontSize="small" />
