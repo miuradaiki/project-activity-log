@@ -47,9 +47,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       <Typography variant="h5" fontWeight="medium" sx={{ mb: 3 }}>
         {t('settings.title')}
       </Typography>
-
       <Grid container spacing={3}>
-        <Grid item xs={12}>
+        <Grid size={12}>
           <WorkHoursSettings
             baseMonthlyHours={baseMonthlyHours}
             onBaseMonthlyHoursChange={setBaseMonthlyHours}
@@ -58,7 +57,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           />
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid size={12}>
           <AppearanceSettings
             isDarkMode={isDarkMode}
             onToggleTheme={onToggleTheme}
@@ -67,7 +66,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </Grid>
 
         {testDataFeatureEnabled && (
-          <Grid item xs={12}>
+          <Grid size={12}>
             <TestModeSettings
               isTestMode={isTestMode}
               testDataStats={testDataStats}
@@ -77,7 +76,6 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           </Grid>
         )}
       </Grid>
-
       <Snackbar
         open={notification.open}
         autoHideDuration={4000}

@@ -227,7 +227,6 @@ export const ProjectsGrid: React.FC<ProjectsGridProps> = ({
           </Select>
         </FormControl>
       </Box>
-
       {/* タブ */}
       <Paper sx={{ borderRadius: 2, mb: 3 }}>
         <Tabs
@@ -253,13 +252,20 @@ export const ProjectsGrid: React.FC<ProjectsGridProps> = ({
           />
         </Tabs>
       </Paper>
-
       {/* プロジェクトグリッド */}
       <TabPanel value={tabValue} index={0}>
         {allProjects.length > 0 ? (
           <Grid container spacing={3}>
             {allProjects.map((project) => (
-              <Grid item xs={12} sm={6} md={4} lg={4} key={project.id}>
+              <Grid
+                key={project.id}
+                size={{
+                  xs: 12,
+                  sm: 6,
+                  md: 4,
+                  lg: 4,
+                }}
+              >
                 <ProjectCard
                   project={project}
                   isActive={project.id === activeProjectId}
@@ -282,12 +288,19 @@ export const ProjectsGrid: React.FC<ProjectsGridProps> = ({
           </Box>
         )}
       </TabPanel>
-
       <TabPanel value={tabValue} index={1}>
         {filteredActiveProjects.length > 0 ? (
           <Grid container spacing={3}>
             {filteredActiveProjects.map((project) => (
-              <Grid item xs={12} sm={6} md={4} lg={4} key={project.id}>
+              <Grid
+                key={project.id}
+                size={{
+                  xs: 12,
+                  sm: 6,
+                  md: 4,
+                  lg: 4,
+                }}
+              >
                 <ProjectCard
                   project={project}
                   isActive={project.id === activeProjectId}
@@ -310,12 +323,19 @@ export const ProjectsGrid: React.FC<ProjectsGridProps> = ({
           </Box>
         )}
       </TabPanel>
-
       <TabPanel value={tabValue} index={2}>
         {filteredArchivedProjects.length > 0 ? (
           <Grid container spacing={3}>
             {filteredArchivedProjects.map((project) => (
-              <Grid item xs={12} sm={6} md={4} lg={4} key={project.id}>
+              <Grid
+                key={project.id}
+                size={{
+                  xs: 12,
+                  sm: 6,
+                  md: 4,
+                  lg: 4,
+                }}
+              >
                 <ProjectCard
                   project={project}
                   isActive={false}

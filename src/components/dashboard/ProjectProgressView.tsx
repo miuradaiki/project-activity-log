@@ -195,7 +195,6 @@ export const ProjectProgressView: React.FC<ProjectProgressViewProps> = ({
           {t('dashboard.progress.subtitle')}
         </Typography>
       </Box>
-
       {/* フィルターとツールバー */}
       <Box sx={{ mb: 3 }}>
         <Box
@@ -261,12 +260,18 @@ export const ProjectProgressView: React.FC<ProjectProgressViewProps> = ({
           <Tab label={t('projects.filter.completed')} value="completed" />
         </Tabs>
       </Box>
-
       {/* プロジェクトカードグリッド */}
       {sortedProjects.length > 0 ? (
         <Grid container spacing={3}>
           {sortedProjects.map(({ project, currentHours, targetHours }) => (
-            <Grid item xs={12} sm={6} md={4} key={project.id}>
+            <Grid
+              key={project.id}
+              size={{
+                xs: 12,
+                sm: 6,
+                md: 4,
+              }}
+            >
               <ProjectProgressCard
                 project={project}
                 currentHours={currentHours}

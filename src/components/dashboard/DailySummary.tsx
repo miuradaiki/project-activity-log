@@ -87,7 +87,12 @@ export const DailySummary: React.FC<DailySummaryProps> = ({
       </Typography>
       <Grid container spacing={3}>
         {/* 合計作業時間 */}
-        <Grid item xs={12} md={4}>
+        <Grid
+          size={{
+            xs: 12,
+            md: 4,
+          }}
+        >
           <KPICard
             title={t('dashboard.daily.total')}
             value={`${totalHoursToday.toFixed(1)} ${t('units.hours')}`}
@@ -100,7 +105,12 @@ export const DailySummary: React.FC<DailySummaryProps> = ({
         </Grid>
 
         {/* 最も長い作業時間 */}
-        <Grid item xs={12} md={4}>
+        <Grid
+          size={{
+            xs: 12,
+            md: 4,
+          }}
+        >
           <KPICard
             title={t('dashboard.daily.longest')}
             value={`${longestWorkTime} ${t('units.minutes')}`}
@@ -114,7 +124,12 @@ export const DailySummary: React.FC<DailySummaryProps> = ({
         </Grid>
 
         {/* 平均作業時間 */}
-        <Grid item xs={12} md={4}>
+        <Grid
+          size={{
+            xs: 12,
+            md: 4,
+          }}
+        >
           <KPICard
             title={t('dashboard.daily.average')}
             value={`${averageWorkTime} ${t('units.minutes')}`}

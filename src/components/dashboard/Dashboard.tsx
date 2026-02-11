@@ -56,16 +56,19 @@ export const Dashboard: React.FC<DashboardProps> = ({
       <Box sx={{ mb: 3 }}>
         <MonthlyProgressSummary projects={projects} timeEntries={timeEntries} />
       </Box>
-
       {/* 活動ヒートマップ */}
       <Box sx={{ mb: 3 }}>
         <ActivityHeatmap timeEntries={timeEntries} />
       </Box>
-
       {/* ウィジェット領域 */}
       <Grid container spacing={3}>
         {/* 週次サマリー */}
-        <Grid item xs={12} md={6}>
+        <Grid
+          size={{
+            xs: 12,
+            md: 6,
+          }}
+        >
           <Paper
             elevation={1}
             sx={{
@@ -83,7 +86,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </Grid>
 
         {/* 月次サマリー */}
-        <Grid item xs={12} md={6}>
+        <Grid
+          size={{
+            xs: 12,
+            md: 6,
+          }}
+        >
           <Paper
             elevation={1}
             sx={{
@@ -101,7 +109,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </Grid>
 
         {/* プロジェクト進捗カード */}
-        <Grid item xs={12} lg={12}>
+        <Grid
+          size={{
+            xs: 12,
+            lg: 12,
+          }}
+        >
           <Paper
             elevation={1}
             sx={{
