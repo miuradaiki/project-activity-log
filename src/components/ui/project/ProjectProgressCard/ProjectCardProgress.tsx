@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Typography, LinearProgress, useTheme } from '@mui/material';
 import { useLanguage } from '../../../../contexts/LanguageContext';
 import { ProjectCardProgressProps } from './types';
+import { formatHours } from '../../../../utils/formatters/timeFormatters';
 
 export const ProjectCardProgress: React.FC<ProjectCardProgressProps> = ({
   isTrackingOnly,
@@ -21,7 +22,7 @@ export const ProjectCardProgress: React.FC<ProjectCardProgressProps> = ({
           {t('projects.tracking.cumulative')}
         </Typography>
         <Typography variant="h5" fontWeight="bold" color="primary">
-          {currentHours.toFixed(1)} {t('units.hours')}
+          {formatHours(currentHours)} {t('units.hours')}
         </Typography>
       </Box>
     );
@@ -71,11 +72,11 @@ export const ProjectCardProgress: React.FC<ProjectCardProgressProps> = ({
         }}
       >
         <Typography variant="body2" color="text.secondary">
-          {currentHours.toFixed(1)} {t('units.hours')} /{' '}
-          {targetHours.toFixed(1)} {t('units.hours')}
+          {formatHours(currentHours)} {t('units.hours')} /{' '}
+          {formatHours(targetHours)} {t('units.hours')}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          {t('projects.sort.remaining')} {remainingHours.toFixed(1)}{' '}
+          {t('projects.sort.remaining')} {formatHours(remainingHours)}{' '}
           {t('units.hours')}
         </Typography>
       </Box>

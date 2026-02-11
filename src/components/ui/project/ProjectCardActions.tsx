@@ -79,6 +79,9 @@ export const ProjectCardActions: React.FC<ProjectCardActionsProps> = ({
             >
               <IconButton
                 data-testid="project-play-button"
+                aria-label={
+                  isActive ? t('aria.timer.stop') : t('aria.timer.start')
+                }
                 onClick={() => onStartTimer(project)}
                 sx={{
                   background: isActive

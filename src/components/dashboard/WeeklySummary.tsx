@@ -30,6 +30,7 @@ import {
   getProjectDistribution,
 } from '../../utils/analytics';
 import { projectColorManager } from '../../utils/colorUtils';
+import { formatHours } from '../../utils/formatters/timeFormatters';
 
 interface WeeklySummaryProps {
   projects: Project[];
@@ -145,7 +146,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({
               item.value > 0 && (
                 <Box key={index} sx={{ mt: 0.5 }}>
                   <Typography variant="body2" sx={{ color: item.color }}>
-                    {item.name}: {item.value.toFixed(1)} {t('units.hours')}
+                    {item.name}: {formatHours(item.value)} {t('units.hours')}
                   </Typography>
                 </Box>
               )
@@ -159,7 +160,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({
               borderColor: 'divider',
             }}
           >
-            {t('dashboard.daily.total')}: {totalHours.toFixed(1)}{' '}
+            {t('dashboard.daily.total')}: {formatHours(totalHours)}{' '}
             {t('units.hours')}
           </Typography>
         </Box>
@@ -184,7 +185,10 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({
             size="small"
             aria-label={isEnglish ? 'Week navigation' : '週の移動'}
           >
-            <IconButton onClick={handlePrevWeek}>
+            <IconButton
+              onClick={handlePrevWeek}
+              aria-label={t('aria.week.previous')}
+            >
               <ChevronLeftIcon />
             </IconButton>
             <Button
@@ -193,7 +197,10 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({
             >
               {t('time.this.week')}
             </Button>
-            <IconButton onClick={handleNextWeek}>
+            <IconButton
+              onClick={handleNextWeek}
+              aria-label={t('aria.week.next')}
+            >
               <ChevronRightIcon />
             </IconButton>
           </ButtonGroup>
@@ -271,7 +278,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({
                     (p: { projectName: string; hours: number }) =>
                       p.projectName === value
                   );
-                  return `${value} (${projectData?.hours?.toFixed(1) || 0}h)`;
+                  return `${value} (${projectData?.hours ? formatHours(projectData.hours) : 0}h)`;
                 }}
               />
               <Tooltip content={<CustomTooltip />} />
