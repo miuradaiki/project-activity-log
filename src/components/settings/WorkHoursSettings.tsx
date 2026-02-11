@@ -70,7 +70,12 @@ export const WorkHoursSettings: React.FC<WorkHoursSettingsProps> = ({
           </Box>
 
           <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} md={8}>
+            <Grid
+              size={{
+                xs: 12,
+                md: 8,
+              }}
+            >
               <Slider
                 value={baseMonthlyHours}
                 onChange={(_, newValue) =>
@@ -88,7 +93,12 @@ export const WorkHoursSettings: React.FC<WorkHoursSettingsProps> = ({
                 max={APP_CONSTANTS.PROJECT.MAX_MONTHLY_HOURS}
               />
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid
+              size={{
+                xs: 12,
+                md: 4,
+              }}
+            >
               <TextField
                 label={t('settings.monthly.hours.label')}
                 type="number"

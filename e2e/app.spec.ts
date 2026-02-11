@@ -46,7 +46,7 @@ test.describe('Application Launch', () => {
 
   test('should display the main content area with projects', async () => {
     // プロジェクト画面に遷移
-    const projectsIcon = window.locator('[data-testid="ListAltIcon"]').first();
+    const projectsIcon = window.locator('[data-testid="nav-projects"]').first();
     await expect(projectsIcon).toBeVisible({ timeout: 10000 });
     await projectsIcon.click();
     await window.waitForTimeout(1000);
@@ -61,7 +61,7 @@ test.describe('Navigation', () => {
   test('should navigate using sidebar icons', async () => {
     // ダッシュボードアイコン（グリッドアイコン）をクリック
     const dashboardIcon = window
-      .locator('[data-testid="DashboardIcon"]')
+      .locator('[data-testid="nav-dashboard"]')
       .first();
     await expect(dashboardIcon).toBeVisible({ timeout: 10000 });
     await dashboardIcon.click();

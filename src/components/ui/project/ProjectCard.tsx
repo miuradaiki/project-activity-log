@@ -138,6 +138,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
 
             <IconButton
               aria-label="more"
+              data-testid="project-more-button"
               size="small"
               onClick={handleMenuClick}
               sx={{ mt: -0.5, mr: -0.5 }}

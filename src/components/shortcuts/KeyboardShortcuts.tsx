@@ -214,26 +214,45 @@ export const KeyboardShortcutsDialog: React.FC<KeyboardShortcutsProps> = ({
           </IconButton>
         </Box>
       </DialogTitle>
-
       <DialogContent sx={{ pt: 0 }}>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
           以下のキーボードショートカットを使用して、より効率的に作業できます。
         </Typography>
 
         <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 6,
+            }}
+          >
             <ShortcutCard category="navigation" />
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 6,
+            }}
+          >
             <ShortcutCard category="timer" />
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 6,
+            }}
+          >
             <ShortcutCard category="project" />
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 6,
+            }}
+          >
             <ShortcutCard category="general" />
           </Grid>
         </Grid>

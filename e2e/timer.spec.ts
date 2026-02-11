@@ -26,8 +26,8 @@ test.beforeAll(async () => {
   await window.waitForLoadState('domcontentloaded');
   await window.waitForTimeout(2000);
 
-  // プロジェクト画面（ListAltアイコン）に遷移
-  const projectsIcon = window.locator('[data-testid="ListAltIcon"]').first();
+  // プロジェクト画面に遷移
+  const projectsIcon = window.locator('[data-testid="nav-projects"]').first();
   await expect(projectsIcon).toBeVisible({ timeout: 10000 });
   await projectsIcon.click();
   await window.waitForTimeout(1000);
@@ -39,7 +39,9 @@ test.afterAll(async () => {
 
 test.describe('Timer Functionality', () => {
   test('should have play button on project card', async () => {
-    const playButton = window.locator('[data-testid="PlayArrowIcon"]').first();
+    const playButton = window
+      .locator('[data-testid="project-play-button"]')
+      .first();
     await expect(playButton).toBeVisible({ timeout: 10000 });
   });
 });

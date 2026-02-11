@@ -34,7 +34,7 @@ test.afterAll(async () => {
 test.describe('Settings', () => {
   test.beforeEach(async () => {
     // 設定アイコンをクリックして設定画面に移動
-    const settingsIcon = window.locator('[data-testid="SettingsIcon"]').first();
+    const settingsIcon = window.locator('[data-testid="nav-settings"]').first();
     await expect(settingsIcon).toBeVisible({ timeout: 10000 });
     await settingsIcon.click();
     await window.waitForTimeout(1000);
@@ -50,7 +50,7 @@ test.describe('Settings', () => {
     test('should display settings icon in sidebar', async () => {
       // サイドバーに設定アイコンが表示されていることを確認
       const settingsIcon = window
-        .locator('[data-testid="SettingsIcon"]')
+        .locator('[data-testid="nav-settings"]')
         .first();
       await expect(settingsIcon).toBeVisible({ timeout: 10000 });
     });

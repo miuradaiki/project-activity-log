@@ -68,9 +68,9 @@ Pre-commit hooks are configured via Husky + lint-staged to automatically lint an
 
 ### Tech Stack
 
-- **Electron 29.0**: Cross-platform desktop application
-- **React 18.2 + TypeScript**: UI framework with strict type checking
-- **Material-UI (MUI) 5.11**: Component library
+- **Electron 40.0**: Cross-platform desktop application
+- **React 19 + TypeScript**: UI framework with strict type checking
+- **Material-UI (MUI) 7**: Component library (Grid v2 API)
 - **Vite 5.0**: Build tool
 - **Recharts 2.15.1**: Data visualization
 - **State Management**: React Context API (no Redux/Zustand)
