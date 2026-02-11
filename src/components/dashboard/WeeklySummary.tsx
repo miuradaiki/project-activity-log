@@ -181,10 +181,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({
       >
         <Typography variant="h6">{t('dashboard.weekly.title')}</Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <ButtonGroup
-            size="small"
-            aria-label={isEnglish ? 'Week navigation' : '週の移動'}
-          >
+          <ButtonGroup size="small" aria-label={t('aria.week.navigation')}>
             <IconButton
               onClick={handlePrevWeek}
               aria-label={t('aria.week.previous')}

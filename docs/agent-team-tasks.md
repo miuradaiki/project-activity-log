@@ -2,7 +2,7 @@
 
 **作成日**: 2026年2月11日
 **基準ドキュメント**: [技術的負債レポート 2026-02-01](reports/technical-debt-report-2026-02-01.md), [段階的リファクタリング計画](refactoring/phased-refactoring-plan-2026.md)
-**現在のブランチ**: `feat/phase6-react19-mui7-upgrade` (React 19 + MUI 7 移行完了)
+**現在のブランチ**: `feat/phase5-code-cleanup`
 
 ---
 
@@ -11,15 +11,15 @@
 | 項目                    | 現在値       | 目標値 |
 | ----------------------- | ------------ | ------ |
 | テストカバレッジ(Lines) | 65.30%       | 80%    |
-| テスト数                | 469          | 500+   |
+| テスト数                | 477          | 500+   |
 | セキュリティ脆弱性      | 9件(4中/5高) | 0      |
 | 300行超ファイル数       | 10           | 4      |
-| aria-labelカバー率      | 6.6%         | 80%+   |
+| aria-labelカバー率      | 100%         | 80%+   |
 | ESLint警告              | 0            | 0      |
 
 **完了済みフェーズ**: Phase 0〜4, Phase 6 (React 19, MUI 7, Electron 40)
-**未着手フェーズ**: Phase 5 (アクセシビリティ改善)
-**未適用の成果物**: Phase 1 で作成済みヘルパーの全ファイル適用
+**未着手フェーズ**: Phase 5 残り (キーボードナビゲーション、コントラスト比検証)
+**適用済み**: Phase 1 ヘルパー (timeFormatters) 全ファイル適用完了
 
 ---
 
@@ -50,10 +50,10 @@
 
 **完了条件**:
 
-- [ ] 4ファイルが削除されている
-- [ ] 全テスト通過
-- [ ] ビルド成功
-- [ ] Lintエラー 0
+- [x] 4ファイルが削除されている
+- [x] 全テスト通過
+- [x] ビルド成功
+- [x] Lintエラー 0
 
 ---
 
@@ -67,13 +67,13 @@
 
 **現状の分散箇所**:
 
-| 定数名                    | ファイル                                |
-| ------------------------- | --------------------------------------- |
-| `ACTIVE_PAGE_STORAGE_KEY` | `src/App.tsx`                           |
-| `LANGUAGE_STORAGE_KEY`    | `src/contexts/LanguageContext.tsx`      |
-| `TEST_SETTINGS_KEY`       | `src/contexts/SettingsContext.tsx`      |
-| `TIMER_STATE_STORAGE_KEY` | `src/hooks/timer/useTimerController.ts` |
-| `TIMER_STORAGE_KEY`       | `src/hooks/useTimer.ts`                 |
+| 定数名                    | ファイル                           |
+| ------------------------- | ---------------------------------- |
+| `ACTIVE_PAGE_STORAGE_KEY` | `src/App.tsx`                      |
+| `LANGUAGE_STORAGE_KEY`    | `src/contexts/LanguageContext.tsx` |
+| `TEST_SETTINGS_KEY`       | `src/contexts/SettingsContext.tsx` |
+| `TIMER_STATE_STORAGE_KEY` | `src/hooks/useTimerController.ts`  |
+| `TIMER_STORAGE_KEY`       | `src/hooks/useTimer.ts`            |
 
 **手順**:
 
@@ -85,10 +85,10 @@
 
 **完了条件**:
 
-- [ ] `src/constants/storageKeys.ts` が存在する
-- [ ] 5箇所の定数が集約されている
-- [ ] 全テスト通過
-- [ ] Lintエラー 0
+- [x] `src/constants/storageKeys.ts` が存在する
+- [x] 5箇所の定数が集約されている
+- [x] 全テスト通過
+- [x] Lintエラー 0
 
 ---
 
@@ -130,9 +130,9 @@ formatHours(weeklyHours);
 
 **完了条件**:
 
-- [ ] `toFixed` による時間フォーマットのインライン処理が 0 件
-- [ ] 全テスト通過
-- [ ] Lintエラー 0
+- [x] `toFixed` による時間フォーマットのインライン処理が 0 件
+- [x] 全テスト通過
+- [x] Lintエラー 0
 
 ---
 
@@ -253,9 +253,9 @@ getModeValue(theme, darkValue, lightValue);
 
 **完了条件**:
 
-- [ ] aria-label カバー率 80% 以上
-- [ ] i18n キーとして管理されている
-- [ ] 全テスト通過
+- [x] aria-label カバー率 80% 以上 (100% 達成)
+- [x] i18n キーとして管理されている
+- [x] 全テスト通過
 
 ---
 
@@ -353,9 +353,9 @@ getModeValue(theme, darkValue, lightValue);
 
 **完了条件**:
 
-- [ ] 再現テストが存在する
-- [ ] バグが修正されている
-- [ ] 全テスト通過
+- [x] 再現テストが存在する
+- [x] バグが修正されている
+- [x] 全テスト通過
 
 ---
 
