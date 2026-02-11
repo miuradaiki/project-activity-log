@@ -337,6 +337,53 @@ describe('ManualTimeEntryForm', () => {
       expect(mockAlert).not.toHaveBeenCalled();
     });
 
+    it('日跨ぎエントリ作成時にonSaveが既存エントリのデータで呼ばれない（Bug #4）', async () => {
+      const onSave = jest.fn();
+      renderManualTimeEntryForm({ onSave });
+
+      const projectSelect = screen.getByRole('combobox');
+      await userEvent.click(projectSelect);
+      await userEvent.click(screen.getByText('Project 1'));
+
+      const startDateInput = screen.getByLabelText(/Start Date/i);
+      const endDateInput = screen.getByLabelText(/End Date/i);
+      const startTimeInput = getTimeInputByLabel(/Start Time/i);
+      const endTimeInput = getTimeInputByLabel(/End Time/i);
+
+      fireEvent.change(startDateInput, { target: { value: '2025-01-15' } });
+      fireEvent.change(endDateInput, { target: { value: '2025-01-16' } });
+      fireEvent.change(startTimeInput, { target: { value: '18:33' } });
+      fireEvent.change(endTimeInput, { target: { value: '00:09' } });
+
+      const saveButton = getSaveButton();
+      await userEvent.click(saveButton);
+
+      // onSave should be called exactly twice (one for each split day)
+      expect(onSave).toHaveBeenCalledTimes(2);
+
+      // Verify that all onSave calls contain only new split entries
+      const allSavedEntries = onSave.mock.calls.map(
+        (call: unknown[]) => call[0] as Record<string, unknown>
+      );
+      for (const entry of allSavedEntries) {
+        expect(entry.projectId).toBe('project-1');
+        // All entries should have unique IDs (not matching any existing entry)
+        expect(entry.id).toBeDefined();
+        expect(entry.id).not.toBe('');
+      }
+
+      // First entry: 18:33 on Jan 15 to 23:59:59.999 on Jan 15
+      const firstEntry = allSavedEntries[0];
+      expect(new Date(firstEntry.startTime).getDate()).toBe(15);
+      expect(new Date(firstEntry.endTime).getDate()).toBe(15);
+
+      // Second entry: 00:00 on Jan 16 to 00:09 on Jan 16
+      const secondEntry = allSavedEntries[1];
+      expect(new Date(secondEntry.startTime).getDate()).toBe(16);
+      expect(new Date(secondEntry.endTime).getDate()).toBe(16);
+      expect(new Date(secondEntry.endTime).getMinutes()).toBe(9);
+    });
+
     it('現在時刻ボタンで開始・終了の日時が現在時刻に更新される', async () => {
       jest.useFakeTimers();
       const user = userEvent.setup({

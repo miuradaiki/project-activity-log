@@ -241,6 +241,82 @@ describe('useProjectOperations', () => {
       expect(entries[1]).toEqual(newEntry);
     });
 
+    it('日跨ぎ分割エントリを連続保存しても既存エントリが複製されない（Bug #4）', () => {
+      const props = createDefaultProps();
+      const { result } = renderHook(() => useProjectOperations(props));
+
+      const existingEntries: TimeEntry[] = [
+        {
+          id: 'existing-1',
+          projectId: 'project-1',
+          description: 'Morning work',
+          startTime: '2024-01-15T05:40:00.000Z',
+          endTime: '2024-01-15T06:50:00.000Z',
+          createdAt: '2024-01-15T06:50:00.000Z',
+          updatedAt: '2024-01-15T06:50:00.000Z',
+        },
+        {
+          id: 'existing-2',
+          projectId: 'project-1',
+          description: 'Afternoon work',
+          startTime: '2024-01-15T07:27:00.000Z',
+          endTime: '2024-01-15T08:59:00.000Z',
+          createdAt: '2024-01-15T08:59:00.000Z',
+          updatedAt: '2024-01-15T08:59:00.000Z',
+        },
+      ];
+
+      // Simulate saving two split entries from a multi-day entry
+      const splitEntry1: TimeEntry = {
+        id: 'split-1',
+        projectId: 'project-1',
+        description: 'Night work',
+        startTime: '2024-01-15T09:33:00.000Z',
+        endTime: '2024-01-15T14:59:59.999Z',
+        createdAt: '2024-01-15T15:09:00.000Z',
+        updatedAt: '2024-01-15T15:09:00.000Z',
+      };
+
+      const splitEntry2: TimeEntry = {
+        id: 'split-2',
+        projectId: 'project-1',
+        description: 'Night work (2日目)',
+        startTime: '2024-01-16T00:00:00.000Z',
+        endTime: '2024-01-15T15:09:00.000Z',
+        createdAt: '2024-01-15T15:09:00.000Z',
+        updatedAt: '2024-01-15T15:09:00.000Z',
+      };
+
+      // Save first split entry
+      act(() => {
+        result.current.saveTimeEntry(splitEntry1, false);
+      });
+
+      // Save second split entry
+      act(() => {
+        result.current.saveTimeEntry(splitEntry2, false);
+      });
+
+      // Verify setTimeEntries was called twice
+      expect(props.setTimeEntries).toHaveBeenCalledTimes(2);
+
+      // Simulate the state updates sequentially
+      const updater1 = (props.setTimeEntries as jest.Mock).mock.calls[0][0];
+      const afterFirst = updater1(existingEntries);
+      expect(afterFirst).toHaveLength(3);
+      expect(afterFirst[0]).toEqual(existingEntries[0]);
+      expect(afterFirst[1]).toEqual(existingEntries[1]);
+      expect(afterFirst[2]).toEqual(splitEntry1);
+
+      const updater2 = (props.setTimeEntries as jest.Mock).mock.calls[1][0];
+      const afterSecond = updater2(afterFirst);
+      expect(afterSecond).toHaveLength(4);
+      expect(afterSecond[0]).toEqual(existingEntries[0]);
+      expect(afterSecond[1]).toEqual(existingEntries[1]);
+      expect(afterSecond[2]).toEqual(splitEntry1);
+      expect(afterSecond[3]).toEqual(splitEntry2);
+    });
+
     it('既存の時間エントリを編集できる', () => {
       const props = createDefaultProps();
       const { result } = renderHook(() => useProjectOperations(props));
