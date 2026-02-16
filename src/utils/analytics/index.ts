@@ -20,7 +20,6 @@ export {
   getPreviousMonthProjectDistribution,
   calculateTotalMonthlyTarget,
   calculateRemainingWorkingDays,
-  calculateMonthOverMonthChange,
 } from './monthly';
 
 // Predictions

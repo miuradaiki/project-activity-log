@@ -129,9 +129,11 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({
             borderRadius: 1,
           }}
         >
-          <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-            {isEnglish ? label : `${label}曜日`}
-          </Typography>
+          {label && (
+            <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+              {isEnglish ? label : `${label}曜日`}
+            </Typography>
+          )}
           {payload.map(
             (
               item: {

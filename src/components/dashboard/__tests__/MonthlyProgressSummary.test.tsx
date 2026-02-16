@@ -15,11 +15,6 @@ jest.mock('../../../utils/analytics', () => ({
   getDailyWorkHours: jest.fn(() => 0),
   calculateTotalMonthlyTarget: jest.fn(() => 100),
   calculateRemainingWorkingDays: jest.fn(() => 10),
-  calculateMonthOverMonthChange: jest.fn(() => ({
-    trend: 'flat',
-    hoursChange: 0,
-    percentageChange: 0,
-  })),
 }));
 
 const theme = createTheme();
@@ -42,8 +37,6 @@ const renderWithProviders = (
       'dashboard.monthly.summary.required.pace':
         language === 'ja' ? '必要ペース' : 'Required Pace',
       'dashboard.monthly.summary.per.day': language === 'ja' ? '/日' : '/day',
-      'dashboard.monthly.summary.vs.last.month':
-        language === 'ja' ? '先月比' : 'vs Last Month',
       'units.days': language === 'ja' ? '日' : 'days',
     };
     return translations[key] || key;
@@ -149,17 +142,6 @@ describe('MonthlyProgressSummary', () => {
 
       expect(screen.getByText('必要ペース')).toBeInTheDocument();
     });
-
-    it('先月比が表示される', () => {
-      renderWithProviders(
-        <MonthlyProgressSummary
-          projects={mockProjects}
-          timeEntries={mockTimeEntries}
-        />
-      );
-
-      expect(screen.getByText('先月比')).toBeInTheDocument();
-    });
   });
 
   describe('進捗率計算', () => {
@@ -185,61 +167,6 @@ describe('MonthlyProgressSummary', () => {
       );
 
       expect(screen.getByText('0')).toBeInTheDocument();
-    });
-  });
-
-  describe('トレンド表示', () => {
-    it('増加トレンドの表示', () => {
-      (analytics.calculateMonthOverMonthChange as jest.Mock).mockReturnValue({
-        trend: 'up',
-        hoursChange: 10,
-        percentageChange: 20,
-      });
-
-      renderWithProviders(
-        <MonthlyProgressSummary
-          projects={mockProjects}
-          timeEntries={mockTimeEntries}
-        />
-      );
-
-      expect(screen.getByText(/\+10h/)).toBeInTheDocument();
-      expect(screen.getByText(/\+20%/)).toBeInTheDocument();
-    });
-
-    it('減少トレンドの表示', () => {
-      (analytics.calculateMonthOverMonthChange as jest.Mock).mockReturnValue({
-        trend: 'down',
-        hoursChange: -5,
-        percentageChange: -10,
-      });
-
-      renderWithProviders(
-        <MonthlyProgressSummary
-          projects={mockProjects}
-          timeEntries={mockTimeEntries}
-        />
-      );
-
-      expect(screen.getByText(/-5h/)).toBeInTheDocument();
-      expect(screen.getByText(/-10%/)).toBeInTheDocument();
-    });
-
-    it('横ばいトレンドの表示', () => {
-      (analytics.calculateMonthOverMonthChange as jest.Mock).mockReturnValue({
-        trend: 'flat',
-        hoursChange: 0,
-        percentageChange: 0,
-      });
-
-      renderWithProviders(
-        <MonthlyProgressSummary
-          projects={mockProjects}
-          timeEntries={mockTimeEntries}
-        />
-      );
-
-      expect(screen.getByText('—')).toBeInTheDocument();
     });
   });
 

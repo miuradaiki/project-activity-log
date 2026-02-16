@@ -6,13 +6,7 @@ import {
   Grid,
   useTheme,
 } from '@mui/material';
-import {
-  TrendingUp,
-  TrendingDown,
-  TrendingFlat,
-  CalendarToday,
-  Speed,
-} from '@mui/icons-material';
+import { CalendarToday, Speed } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { Project, TimeEntry } from '../../types';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -21,7 +15,6 @@ import { GlassCard } from '../ui/modern/StyledComponents';
 import {
   calculateTotalMonthlyTarget,
   calculateRemainingWorkingDays,
-  calculateMonthOverMonthChange,
 } from '../../utils/analytics';
 import { getDailyWorkHours } from '../../utils/analytics';
 import { formatHours } from '../../utils/formatters/timeFormatters';
@@ -84,28 +77,11 @@ export const MonthlyProgressSummary: React.FC<MonthlyProgressSummaryProps> = ({
     return Number((remainingHours / remainingDays).toFixed(1));
   }, [totalTargetHours, monthlyData, remainingDays]);
 
-  // 先月比
-  const monthOverMonth = useMemo(() => {
-    return calculateMonthOverMonthChange(timeEntries);
-  }, [timeEntries]);
-
   // 進捗バーの色を決定
   const getProgressColor = () => {
     if (progressPercentage >= 100) return theme.palette.success.main;
     if (progressPercentage >= 90) return theme.palette.warning.main;
     return theme.palette.primary.main;
-  };
-
-  // トレンドアイコンを取得
-  const getTrendIcon = () => {
-    switch (monthOverMonth.trend) {
-      case 'up':
-        return <TrendingUp sx={{ color: theme.palette.success.main }} />;
-      case 'down':
-        return <TrendingDown sx={{ color: theme.palette.error.main }} />;
-      default:
-        return <TrendingFlat sx={{ color: theme.palette.text.secondary }} />;
-    }
   };
 
   // 月の表示
@@ -326,49 +302,6 @@ export const MonthlyProgressSummary: React.FC<MonthlyProgressSummaryProps> = ({
                       {requiredPace}h{t('dashboard.monthly.summary.per.day')}
                     </Typography>
                   </Box>
-                </Box>
-              </Grid>
-
-              {/* 先月比 */}
-              <Grid size={12}>
-                <Box
-                  sx={{
-                    p: 2,
-                    borderRadius: 1,
-                    border: `1px solid ${theme.palette.divider}`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    {getTrendIcon()}
-                    <Typography variant="body2" color="text.secondary">
-                      {t('dashboard.monthly.summary.vs.last.month')}
-                    </Typography>
-                  </Box>
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      fontWeight: 600,
-                      color:
-                        monthOverMonth.trend === 'up'
-                          ? theme.palette.success.main
-                          : monthOverMonth.trend === 'down'
-                            ? theme.palette.error.main
-                            : theme.palette.text.secondary,
-                    }}
-                  >
-                    {monthOverMonth.trend !== 'flat' && (
-                      <>
-                        {monthOverMonth.hoursChange > 0 ? '+' : ''}
-                        {monthOverMonth.hoursChange}h (
-                        {monthOverMonth.percentageChange > 0 ? '+' : ''}
-                        {monthOverMonth.percentageChange}%)
-                      </>
-                    )}
-                    {monthOverMonth.trend === 'flat' && '—'}
-                  </Typography>
                 </Box>
               </Grid>
             </Grid>
