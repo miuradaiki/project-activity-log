@@ -15,6 +15,7 @@ import {
   ToggleOn as ToggleOnIcon,
   ToggleOff as ToggleOffIcon,
 } from '@mui/icons-material';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface TestModeSettingsProps {
   isTestMode: boolean;
@@ -30,6 +31,7 @@ export const TestModeSettings: React.FC<TestModeSettingsProps> = ({
   onRegenerateTestData,
 }) => {
   const theme = useTheme();
+  const { t } = useLanguage();
 
   return (
     <Card
@@ -58,6 +60,7 @@ export const TestModeSettings: React.FC<TestModeSettingsProps> = ({
               onClick={onToggleTestMode}
               color={isTestMode ? 'warning' : 'default'}
               size="large"
+              aria-label={t('aria.testmode.toggle')}
             >
               {isTestMode ? (
                 <ToggleOnIcon fontSize="large" />

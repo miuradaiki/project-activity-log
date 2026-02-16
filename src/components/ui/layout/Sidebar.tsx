@@ -242,6 +242,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </AnimatePresence>
           <IconButton
             onClick={onToggle}
+            aria-label={t('aria.sidebar.toggle')}
             sx={{
               color: 'primary.main',
               '&:hover': {
@@ -294,7 +295,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <>
         <IconButton
           color="inherit"
-          aria-label="open drawer"
+          aria-label={t('aria.sidebar.open')}
           onClick={onToggle}
           sx={{
             position: 'fixed',

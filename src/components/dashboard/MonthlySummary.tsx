@@ -31,6 +31,7 @@ import {
 } from '../../utils/analytics';
 import { projectColorManager } from '../../utils/colorUtils';
 import { MONTH_NAMES } from '../../constants/dateConstants';
+import { formatHours } from '../../utils/formatters/timeFormatters';
 
 interface MonthlySummaryProps {
   projects: Project[];
@@ -136,7 +137,7 @@ export const MonthlySummary: React.FC<MonthlySummaryProps> = ({
             {payload[0].name}
           </Typography>
           <Typography variant="body2">
-            {payload[0].value.toFixed(1)} {t('units.hours')} (
+            {formatHours(payload[0].value)} {t('units.hours')} (
             {payload[0].payload.percentage}%)
           </Typography>
         </Box>
@@ -194,7 +195,7 @@ export const MonthlySummary: React.FC<MonthlySummaryProps> = ({
       </Typography>
 
       <Typography variant="subtitle1" gutterBottom>
-        {t('dashboard.monthly.total')}: {totalHours.toFixed(1)}{' '}
+        {t('dashboard.monthly.total')}: {formatHours(totalHours)}{' '}
         {t('units.hours')}
       </Typography>
 
@@ -228,7 +229,7 @@ export const MonthlySummary: React.FC<MonthlySummaryProps> = ({
                 <YAxis unit="h" />
                 <Tooltip
                   formatter={(value: number) => [
-                    `${value.toFixed(1)} ${t('units.hours')}`,
+                    `${formatHours(value)} ${t('units.hours')}`,
                     t('timer.title'),
                   ]}
                   labelFormatter={(week) =>

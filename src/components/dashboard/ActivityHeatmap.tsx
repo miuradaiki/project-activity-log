@@ -9,6 +9,7 @@ import {
   getRolling12MonthRange,
   HeatmapDay,
 } from '../../utils/analytics/heatmap';
+import { formatHours } from '../../utils/formatters/timeFormatters';
 
 interface ActivityHeatmapProps {
   timeEntries: TimeEntry[];
@@ -130,7 +131,7 @@ export const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({
   const getTooltipContent = (day: HeatmapDay): string => {
     const dateStr = formatDate(day.date);
     const hoursStr = t('dashboard.heatmap.hours', {
-      hours: day.hours.toFixed(1),
+      hours: formatHours(day.hours),
     });
     return `${dateStr}: ${hoursStr}`;
   };
@@ -311,7 +312,7 @@ export const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({
                           }}
                           aria-label={
                             day
-                              ? `${formatDate(day.date)}: ${t('dashboard.heatmap.hours', { hours: day.hours.toFixed(1) })}`
+                              ? `${formatDate(day.date)}: ${t('dashboard.heatmap.hours', { hours: formatHours(day.hours) })}`
                               : undefined
                           }
                         />
