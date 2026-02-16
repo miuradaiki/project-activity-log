@@ -137,7 +137,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
             </Typography>
 
             <IconButton
-              aria-label="more"
+              aria-label={t('aria.project.menu')}
               data-testid="project-more-button"
               size="small"
               onClick={handleMenuClick}

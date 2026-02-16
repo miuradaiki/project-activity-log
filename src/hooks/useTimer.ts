@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
 import { TimerState } from '../types/timer';
-
-const TIMER_STORAGE_KEY = 'project-activity-timer-state';
+import { STORAGE_KEYS } from '../constants/storageKeys';
 
 export const useTimer = () => {
   const [timerState, setTimerState] = useState<TimerState>(() => {
-    const stored = localStorage.getItem(TIMER_STORAGE_KEY);
+    const stored = localStorage.getItem(STORAGE_KEYS.TIMER);
     if (stored) {
       const parsed = JSON.parse(stored);
       // 保存された開始時刻が8時間以上前の場合はリセット
@@ -22,7 +21,7 @@ export const useTimer = () => {
 
   // タイマー状態の変更を永続化
   useEffect(() => {
-    localStorage.setItem(TIMER_STORAGE_KEY, JSON.stringify(timerState));
+    localStorage.setItem(STORAGE_KEYS.TIMER, JSON.stringify(timerState));
   }, [timerState]);
 
   const startTimer = (projectId: string) => {

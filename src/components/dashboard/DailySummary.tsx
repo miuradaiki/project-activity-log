@@ -13,6 +13,7 @@ import {
   getAverageWorkSession,
 } from '../../utils/analytics';
 import { KPICard } from '../ui/KPICard';
+import { formatHours } from '../../utils/formatters/timeFormatters';
 
 interface DailySummaryProps {
   projects: Project[];
@@ -95,7 +96,7 @@ export const DailySummary: React.FC<DailySummaryProps> = ({
         >
           <KPICard
             title={t('dashboard.daily.total')}
-            value={`${totalHoursToday.toFixed(1)} ${t('units.hours')}`}
+            value={`${formatHours(totalHoursToday)} ${t('units.hours')}`}
             icon={<AccessTimeIcon />}
             trend={{
               value: hoursTrend,

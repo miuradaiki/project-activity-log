@@ -97,7 +97,7 @@ describe('ProjectCard', () => {
   describe('メニュー操作', () => {
     test('メニューボタンをクリックするとメニューが表示される', async () => {
       renderWithProviders();
-      const menuButton = screen.getByRole('button', { name: /more/i });
+      const menuButton = screen.getByTestId('project-more-button');
       fireEvent.click(menuButton);
 
       await waitFor(() => {
@@ -107,7 +107,7 @@ describe('ProjectCard', () => {
 
     test('編集メニューをクリックするとonEditProjectが呼ばれる', async () => {
       renderWithProviders();
-      const menuButton = screen.getByRole('button', { name: /more/i });
+      const menuButton = screen.getByTestId('project-more-button');
       fireEvent.click(menuButton);
 
       await waitFor(() => {

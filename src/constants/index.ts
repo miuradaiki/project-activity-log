@@ -1,4 +1,5 @@
 export * from './dateConstants';
+export { STORAGE_KEYS } from './storageKeys';
 
 export const APP_CONSTANTS = {
   TIMER: {

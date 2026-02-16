@@ -104,7 +104,7 @@ export const Layout: React.FC<LayoutProps> = ({
           <Tooltip title={addButtonTooltip || t('actions.add')}>
             <Fab
               color="primary"
-              aria-label="add"
+              aria-label={t('aria.project.add')}
               onClick={onAddButtonClick}
               sx={{
                 position: 'fixed',

@@ -18,6 +18,7 @@ import {
 } from '@mui/icons-material';
 import { TimeEntry, Project } from '../../types';
 import { getDailyWorkHours } from '../../utils/analytics';
+import { formatHours } from '../../utils/formatters/timeFormatters';
 import { useLanguage } from '../../contexts/LanguageContext';
 
 interface ActivityCalendarProps {
@@ -235,7 +236,11 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <IconButton onClick={goToPreviousMonth} size="small">
+          <IconButton
+            onClick={goToPreviousMonth}
+            size="small"
+            aria-label={t('aria.calendar.previous.month')}
+          >
             <ChevronLeftIcon />
           </IconButton>
 
@@ -273,13 +278,17 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
             </FormControl>
           </Box>
 
-          <IconButton onClick={goToNextMonth} size="small">
+          <IconButton
+            onClick={goToNextMonth}
+            size="small"
+            aria-label={t('aria.calendar.next.month')}
+          >
             <ChevronRightIcon />
           </IconButton>
         </Box>
 
         <Typography variant="body2" fontWeight="medium">
-          {t('calendar.total', { hours: totalHoursInMonth.toFixed(1) })}
+          {t('calendar.total', { hours: formatHours(totalHoursInMonth) })}
         </Typography>
       </Box>
       {/* カレンダーグリッド */}
@@ -314,8 +323,8 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
                   <Tooltip
                     title={
                       isEnglish
-                        ? `${new Date(year, month, day.day).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}: ${day.hoursWorked.toFixed(1)} hours`
-                        : `${year}年${month + 1}月${day.day}日: ${day.hoursWorked.toFixed(1)}時間`
+                        ? `${new Date(year, month, day.day).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}: ${formatHours(day.hoursWorked)} hours`
+                        : `${year}年${month + 1}月${day.day}日: ${formatHours(day.hoursWorked)}時間`
                     }
                     arrow
                   >

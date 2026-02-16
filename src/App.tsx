@@ -14,9 +14,7 @@ import { Layout } from './components/ui/layout/Layout';
 import { useThemeMode } from './components/ui/ThemeProvider';
 import { KeyboardShortcutsDialog } from './components/shortcuts/KeyboardShortcuts';
 import { PageRouter } from './components/PageRouter';
-
-// アクティブページをローカルストレージに保存するためのキー
-const ACTIVE_PAGE_STORAGE_KEY = 'project_activity_log_active_page';
+import { STORAGE_KEYS } from './constants/storageKeys';
 
 const App: React.FC = () => {
   // 多言語対応
@@ -26,7 +24,7 @@ const App: React.FC = () => {
 
   // アクティブページの初期値をローカルストレージから取得
   const getInitialActivePage = (): string => {
-    const storedPage = localStorage.getItem(ACTIVE_PAGE_STORAGE_KEY);
+    const storedPage = localStorage.getItem(STORAGE_KEYS.ACTIVE_PAGE);
     return storedPage || 'timer'; // デフォルトはタイマー画面
   };
 
@@ -77,10 +75,12 @@ const App: React.FC = () => {
     [projectFormModal, projectOps]
   );
 
+  // Modal closing is handled by the form's onClose callback (manualEntryModal.close),
+  // so handleSaveTimeEntry only saves data to avoid duplicate close calls during
+  // multi-day entry creation where onSave is called once per split entry.
   const handleSaveTimeEntry = useCallback(
     (timeEntry: TimeEntry) => {
       projectOps.saveTimeEntry(timeEntry, !!manualEntryModal.data);
-      manualEntryModal.close();
     },
     [manualEntryModal, projectOps]
   );
@@ -117,7 +117,7 @@ const App: React.FC = () => {
     // アクティブページを設定
     setActivePage(page);
     // ローカルストレージに保存
-    localStorage.setItem(ACTIVE_PAGE_STORAGE_KEY, page);
+    localStorage.setItem(STORAGE_KEYS.ACTIVE_PAGE, page);
   }, []);
 
   // ページタイトルの取得
