@@ -150,13 +150,17 @@ export const useTimerController = (
 
   const toggle = useCallback(
     async (project?: Project) => {
-      if (isRunning) {
-        await stop();
-      } else if (project) {
+      if (!isRunning) {
+        if (project) await start(project);
+        return;
+      }
+      await stop();
+      // 計測中に別プロジェクトが指定された場合は、記録を保存して切り替える
+      if (project && project.id !== activeProject?.id) {
         await start(project);
       }
     },
-    [isRunning, start, stop]
+    [isRunning, activeProject, start, stop]
   );
 
   return {

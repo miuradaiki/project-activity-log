@@ -57,12 +57,7 @@ const App: React.FC = () => {
   });
 
   const handleStartTimer = useCallback(
-    async (project: Project) => {
-      if (timer.isRunning) {
-        await timer.stop();
-      }
-      await timer.start(project);
-    },
+    (project: Project) => timer.toggle(project),
     [timer]
   );
 
