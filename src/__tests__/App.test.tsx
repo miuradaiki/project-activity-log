@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import App from '../App';
 import { ThemeProvider as CustomThemeProvider } from '../components/ui/ThemeProvider';
 import { LanguageProvider } from '../contexts/LanguageContext';
@@ -111,14 +111,17 @@ jest.mock('../hooks/useStorage', () => ({
   }),
 }));
 
+const mockTimer = {
+  isRunning: false,
+  activeProject: null as null | { id: string; name: string },
+  startTime: null as string | null,
+  start: jest.fn(),
+  stop: jest.fn(),
+  toggle: jest.fn(),
+};
+
 jest.mock('../hooks/useTimerController', () => ({
-  useTimerController: () => ({
-    isRunning: false,
-    activeProject: null,
-    startTime: null,
-    start: jest.fn(),
-    stop: jest.fn(),
-  }),
+  useTimerController: () => mockTimer,
 }));
 
 jest.mock('../hooks/useModal', () => ({
@@ -279,6 +282,26 @@ describe('App', () => {
 
       expect(screen.getByTestId('show-add-button')).toHaveTextContent('false');
     });
+  });
+});
+
+describe('キーボードショートカット', () => {
+  afterEach(() => {
+    mockTimer.isRunning = false;
+    mockTimer.activeProject = null;
+    mockTimer.startTime = null;
+    mockTimer.stop.mockClear();
+  });
+
+  it('計測中にEscapeを押してもタイマーは停止しない（メニュー等を閉じる操作と衝突するため）', () => {
+    mockTimer.isRunning = true;
+    mockTimer.activeProject = { id: 'project-1', name: 'Test Project' };
+    mockTimer.startTime = new Date().toISOString();
+    renderApp();
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+
+    expect(mockTimer.stop).not.toHaveBeenCalled();
   });
 });
 

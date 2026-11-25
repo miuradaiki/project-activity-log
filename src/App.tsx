@@ -186,7 +186,6 @@ const App: React.FC = () => {
       },
       disabled: activePage !== 'timer',
     },
-    { key: 'Escape', action: () => timer.stop(), disabled: !timer.isRunning },
   ];
 
   // キーボードショートカットの処理
