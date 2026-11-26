@@ -1,255 +1,118 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { ThemeProvider, createTheme } from '@mui/material';
-import { Sidebar, DRAWER_WIDTH, CLOSED_DRAWER_WIDTH } from '../Sidebar';
+import { render, screen, fireEvent, within } from '@testing-library/react';
+import { ThemeProvider } from '@mui/material';
+import { Sidebar, DRAWER_WIDTH } from '../Sidebar';
 import { LanguageProvider } from '../../../../contexts/LanguageContext';
+import { modernDarkTheme } from '../../../../styles/modernTheme';
+import { Project } from '../../../../types';
 
-const theme = createTheme();
-
-const renderWithProviders = (ui: React.ReactElement) => {
-  return render(
-    <ThemeProvider theme={theme}>
-      <LanguageProvider>{ui}</LanguageProvider>
-    </ThemeProvider>
-  );
+const project: Project = {
+  id: 'p1',
+  name: 'EC開発',
+  description: '',
+  monthlyCapacity: 0.4,
+  isArchived: false,
+  createdAt: '',
+  updatedAt: '',
 };
 
+const overview = {
+  actualHours: 97.4,
+  totalHours: 101.9,
+  targetHours: 126,
+  ratio: 97.4 / 126,
+  remainingWorkingDays: 3,
+  requiredDailyHours: 9.5,
+};
+
+const renderSidebar = (props: Partial<React.ComponentProps<typeof Sidebar>>) =>
+  render(
+    <ThemeProvider theme={modernDarkTheme}>
+      <LanguageProvider>
+        <Sidebar
+          activePage="timer"
+          onNavigate={jest.fn()}
+          monthOverview={overview}
+          activeProject={null}
+          elapsedMs={0}
+          onStopTimer={jest.fn()}
+          mobileOpen={false}
+          onMobileClose={jest.fn()}
+          {...props}
+        />
+      </LanguageProvider>
+    </ThemeProvider>
+  );
+
 describe('Sidebar', () => {
-  const defaultProps = {
-    open: true,
-    onToggle: jest.fn(),
-    activePage: 'dashboard',
-    onNavigate: jest.fn(),
-  };
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-    // matchMediaをデスクトップとしてモック
-    Object.defineProperty(window, 'matchMedia', {
-      writable: true,
-      value: jest.fn().mockImplementation((query: string) => ({
-        matches: !query.includes('max-width'),
-        media: query,
-        onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
-        addEventListener: jest.fn(),
-        removeEventListener: jest.fn(),
-        dispatchEvent: jest.fn(),
-      })),
+  beforeAll(() => {
+    Object.defineProperty(window.navigator, 'language', {
+      value: 'ja-JP',
+      configurable: true,
     });
   });
 
-  describe('基本レンダリング', () => {
-    it('ブランドロゴが表示される（開いた状態）', () => {
-      renderWithProviders(<Sidebar {...defaultProps} />);
-
-      expect(screen.getByText('Project Log')).toBeInTheDocument();
-    });
-
-    it('ナビゲーション項目が表示される', () => {
-      renderWithProviders(<Sidebar {...defaultProps} />);
-
-      // 日本語または英語のどちらかに対応
-      expect(
-        screen.getByText(/(?:ダッシュボード|Dashboard)/)
-      ).toBeInTheDocument();
-      expect(screen.getByText(/(?:プロジェクト|Projects)/)).toBeInTheDocument();
-      expect(screen.getByText(/(?:タイマー|Timer)/)).toBeInTheDocument();
-      expect(screen.getByText(/(?:設定|Settings)/)).toBeInTheDocument();
-    });
-
-    it('ナビゲーションアイコンが表示される', () => {
-      renderWithProviders(<Sidebar {...defaultProps} />);
-
-      expect(screen.getByTestId('DashboardIcon')).toBeInTheDocument();
-      expect(screen.getByTestId('ListAltIcon')).toBeInTheDocument();
-      expect(screen.getByTestId('TimerIcon')).toBeInTheDocument();
-      expect(screen.getByTestId('SettingsIcon')).toBeInTheDocument();
-    });
+  it('幅は 216px', () => {
+    expect(DRAWER_WIDTH).toBe(216);
   });
 
-  describe('ナビゲーション動作', () => {
-    it('ダッシュボードをクリックするとonNavigateが呼ばれる', () => {
-      renderWithProviders(<Sidebar {...defaultProps} />);
+  it('今日・プロジェクト・レポート・設定の順に遷移でき、それぞれのページを指定する', () => {
+    const onNavigate = jest.fn();
+    renderSidebar({ onNavigate });
 
-      const dashboardItem = screen
-        .getByText(/(?:ダッシュボード|Dashboard)/)
-        .closest('li');
-      const button = dashboardItem?.querySelector('div[role="button"]');
-
-      if (button) {
-        fireEvent.click(button);
-        expect(defaultProps.onNavigate).toHaveBeenCalledWith('dashboard');
-      }
-    });
-
-    it('プロジェクトをクリックするとonNavigateが呼ばれる', () => {
-      renderWithProviders(<Sidebar {...defaultProps} />);
-
-      const projectsItem = screen
-        .getByText(/(?:プロジェクト|Projects)/)
-        .closest('li');
-      const button = projectsItem?.querySelector('div[role="button"]');
-
-      if (button) {
-        fireEvent.click(button);
-        expect(defaultProps.onNavigate).toHaveBeenCalledWith('projects');
-      }
-    });
-
-    it('タイマーをクリックするとonNavigateが呼ばれる', () => {
-      renderWithProviders(<Sidebar {...defaultProps} />);
-
-      const timerItem = screen.getByText(/(?:タイマー|Timer)/).closest('li');
-      const button = timerItem?.querySelector('div[role="button"]');
-
-      if (button) {
-        fireEvent.click(button);
-        expect(defaultProps.onNavigate).toHaveBeenCalledWith('timer');
-      }
-    });
-
-    it('設定をクリックするとonNavigateが呼ばれる', () => {
-      renderWithProviders(<Sidebar {...defaultProps} />);
-
-      const settingsItem = screen.getByText(/(?:設定|Settings)/).closest('li');
-      const button = settingsItem?.querySelector('div[role="button"]');
-
-      if (button) {
-        fireEvent.click(button);
-        expect(defaultProps.onNavigate).toHaveBeenCalledWith('settings');
-      }
-    });
+    const nav = screen.getByRole('navigation');
+    const items = within(nav).getAllByRole('button');
+    expect(items.map((b) => b.textContent)).toEqual([
+      '今日',
+      'プロジェクト',
+      'レポート',
+      '設定',
+    ]);
+    items.forEach((b) => fireEvent.click(b));
+    expect(onNavigate.mock.calls.map((c) => c[0])).toEqual([
+      'timer',
+      'projects',
+      'dashboard',
+      'settings',
+    ]);
   });
 
-  describe('アクティブ状態表示', () => {
-    it('ダッシュボードがアクティブの場合、選択状態になる', () => {
-      renderWithProviders(<Sidebar {...defaultProps} activePage="dashboard" />);
+  it('現在のページに aria-current を付ける', () => {
+    renderSidebar({ activePage: 'projects' });
 
-      const dashboardItem = screen
-        .getByText(/(?:ダッシュボード|Dashboard)/)
-        .closest('li');
-      const button = dashboardItem?.querySelector('div[role="button"]');
-
-      expect(button).toHaveClass('Mui-selected');
-    });
-
-    it('プロジェクトがアクティブの場合、選択状態になる', () => {
-      renderWithProviders(<Sidebar {...defaultProps} activePage="projects" />);
-
-      const projectsItem = screen
-        .getByText(/(?:プロジェクト|Projects)/)
-        .closest('li');
-      const button = projectsItem?.querySelector('div[role="button"]');
-
-      expect(button).toHaveClass('Mui-selected');
-    });
-
-    it('タイマーがアクティブの場合、選択状態になる', () => {
-      renderWithProviders(<Sidebar {...defaultProps} activePage="timer" />);
-
-      const timerItem = screen.getByText(/(?:タイマー|Timer)/).closest('li');
-      const button = timerItem?.querySelector('div[role="button"]');
-
-      expect(button).toHaveClass('Mui-selected');
-    });
-
-    it('設定がアクティブの場合、選択状態になる', () => {
-      renderWithProviders(<Sidebar {...defaultProps} activePage="settings" />);
-
-      const settingsItem = screen.getByText(/(?:設定|Settings)/).closest('li');
-      const button = settingsItem?.querySelector('div[role="button"]');
-
-      expect(button).toHaveClass('Mui-selected');
-    });
+    expect(
+      screen.getByRole('button', { name: 'プロジェクト' })
+    ).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('button', { name: '今日' })).not.toHaveAttribute(
+      'aria-current'
+    );
   });
 
-  describe('開閉動作', () => {
-    it('トグルボタンをクリックするとonToggleが呼ばれる', () => {
-      renderWithProviders(<Sidebar {...defaultProps} />);
+  it('今月の進捗を 実績 / 目標 と割合で表示する', () => {
+    renderSidebar({});
 
-      // ChevronLeftIconを持つボタンを探す
-      const toggleButton = screen
-        .getByTestId('ChevronLeftIcon')
-        .closest('button');
-
-      if (toggleButton) {
-        fireEvent.click(toggleButton);
-        expect(defaultProps.onToggle).toHaveBeenCalled();
-      }
-    });
-
-    it('閉じた状態ではブランドテキストが非表示', async () => {
-      renderWithProviders(<Sidebar {...defaultProps} open={false} />);
-
-      await waitFor(() => {
-        expect(screen.queryByText('Project Log')).not.toBeInTheDocument();
-      });
-    });
-
-    it('閉じた状態ではMenuIconが表示される', () => {
-      renderWithProviders(<Sidebar {...defaultProps} open={false} />);
-
-      expect(screen.getByTestId('MenuIcon')).toBeInTheDocument();
-    });
+    expect(screen.getByText('97.4 / 126h · 77%')).toBeInTheDocument();
   });
 
-  describe('ドロワー幅', () => {
-    it('DRAWER_WIDTHが正しく定義されている', () => {
-      expect(DRAWER_WIDTH).toBe(240);
-    });
+  it('計測していないときは計測中の表示を出さない', () => {
+    renderSidebar({});
 
-    it('CLOSED_DRAWER_WIDTHが正しく定義されている', () => {
-      expect(CLOSED_DRAWER_WIDTH).toBe(60);
-    });
+    expect(
+      screen.queryByRole('button', { name: 'タイマーを停止' })
+    ).not.toBeInTheDocument();
   });
 
-  describe('モバイルレスポンシブ', () => {
-    beforeEach(() => {
-      // matchMediaをモバイルとしてモック
-      Object.defineProperty(window, 'matchMedia', {
-        writable: true,
-        value: jest.fn().mockImplementation((query: string) => ({
-          matches: query.includes('max-width'),
-          media: query,
-          onchange: null,
-          addListener: jest.fn(),
-          removeListener: jest.fn(),
-          addEventListener: jest.fn(),
-          removeEventListener: jest.fn(),
-          dispatchEvent: jest.fn(),
-        })),
-      });
+  it('計測中はプロジェクト名と経過時間を表示し、停止できる', () => {
+    const onStopTimer = jest.fn();
+    renderSidebar({
+      activeProject: project,
+      elapsedMs: (3600 + 24 * 60) * 1000,
+      onStopTimer,
     });
 
-    it('モバイルではハンバーガーボタンが表示される', () => {
-      renderWithProviders(<Sidebar {...defaultProps} open={false} />);
-
-      const menuButtons = screen.getAllByTestId('MenuIcon');
-      expect(menuButtons.length).toBeGreaterThan(0);
-    });
-
-    it('モバイルでハンバーガーボタンをクリックするとonToggleが呼ばれる', () => {
-      renderWithProviders(<Sidebar {...defaultProps} open={false} />);
-
-      const menuButton = screen.getAllByTestId('MenuIcon')[0].closest('button');
-
-      if (menuButton) {
-        fireEvent.click(menuButton);
-        expect(defaultProps.onToggle).toHaveBeenCalled();
-      }
-    });
-  });
-
-  describe('ツールチップ', () => {
-    it('閉じた状態でホバーするとツールチップが表示される準備ができている', () => {
-      renderWithProviders(<Sidebar {...defaultProps} open={false} />);
-
-      // ツールチップはMUIのTooltipコンポーネントで実装されているため、
-      // ツールチップのトリガー要素が存在することを確認
-      const navButtons = screen.getAllByRole('button');
-      expect(navButtons.length).toBeGreaterThan(0);
-    });
+    expect(screen.getByText('EC開発')).toBeInTheDocument();
+    expect(screen.getByText('1:24')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'タイマーを停止' }));
+    expect(onStopTimer).toHaveBeenCalledTimes(1);
   });
 });

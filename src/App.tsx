@@ -1,5 +1,4 @@
 import React, { useState, useCallback } from 'react';
-import { useLanguage } from './contexts/LanguageContext';
 import { Box, CircularProgress } from '@mui/material';
 import { Project, TimeEntry } from './types';
 
@@ -17,8 +16,6 @@ import { PageRouter } from './components/PageRouter';
 import { STORAGE_KEYS } from './constants/storageKeys';
 
 const App: React.FC = () => {
-  // 多言語対応
-  const { t } = useLanguage();
   // テーマとレイアウト管理
   const { isDarkMode, toggleThemeMode } = useThemeMode();
 
@@ -115,46 +112,6 @@ const App: React.FC = () => {
     localStorage.setItem(STORAGE_KEYS.ACTIVE_PAGE, page);
   }, []);
 
-  // ページタイトルの取得
-  const getPageTitle = useCallback(() => {
-    switch (activePage) {
-      case 'dashboard':
-        return t('nav.dashboard');
-      case 'projects':
-        return t('nav.projects');
-      case 'timer':
-        return t('nav.timer');
-      case 'settings':
-        return t('nav.settings');
-      default:
-        return t('app.name');
-    }
-  }, [activePage, t]);
-
-  // フローティングアクションボタンの設定
-  const getAddButtonConfig = useCallback(() => {
-    switch (activePage) {
-      case 'projects':
-        return {
-          show: true,
-          tooltip: t('projects.new'),
-          onClick: () => projectFormModal.open(),
-        };
-      case 'timer':
-        return {
-          show: true,
-          tooltip: t('timer.manual'),
-          onClick: () => manualEntryModal.open(),
-        };
-      default:
-        return {
-          show: false,
-          tooltip: '',
-          onClick: () => {},
-        };
-    }
-  }, [activePage, projectFormModal, manualEntryModal, t]);
-
   // モーダルが開いているかどうか
   const hasOpenModal =
     projectFormModal.isOpen || manualEntryModal.isOpen || shortcutsModal.isOpen;
@@ -207,22 +164,14 @@ const App: React.FC = () => {
     );
   }
 
-  // フローティングボタンの設定を取得
-  const addButtonConfig = getAddButtonConfig();
-
   return (
     <Layout
-      title={getPageTitle()}
       activePage={activePage}
       onNavigate={handleNavigate}
-      onToggleTheme={toggleThemeMode}
-      isDarkMode={isDarkMode}
       sidebarOpen={sidebarOpen}
       onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-      showAddButton={addButtonConfig.show}
-      onAddButtonClick={addButtonConfig.onClick}
-      addButtonTooltip={addButtonConfig.tooltip}
-      // グローバルタイマー関連のプロパティを渡す
+      projects={projects}
+      timeEntries={timeEntries}
       activeProject={timer.activeProject}
       isTimerRunning={timer.isRunning}
       startTime={timer.startTime}

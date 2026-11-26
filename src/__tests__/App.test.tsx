@@ -17,27 +17,12 @@ jest.mock('../components/ui/layout/Layout', () => ({
   Layout: ({
     children,
     activePage,
-    title,
-    showAddButton,
-    onAddButtonClick,
   }: {
     children: React.ReactNode;
     activePage: string;
-    title: string;
-    showAddButton: boolean;
-    onAddButtonClick: () => void;
   }) => (
     <div data-testid="layout">
       <div data-testid="active-page">{activePage}</div>
-      <div data-testid="page-title">{title}</div>
-      <div data-testid="show-add-button">
-        {showAddButton ? 'true' : 'false'}
-      </div>
-      {showAddButton && (
-        <button data-testid="add-button" onClick={onAddButtonClick}>
-          Add
-        </button>
-      )}
       {children}
     </div>
   ),
@@ -208,79 +193,6 @@ describe('App', () => {
       renderApp();
 
       expect(screen.getByTestId('page-router')).toBeInTheDocument();
-    });
-  });
-
-  describe('ページタイトル', () => {
-    it('timerページのタイトルが正しい', () => {
-      mockStorage['project_activity_log_active_page'] = 'timer';
-
-      renderApp();
-
-      // 日本語または英語のどちらかをチェック
-      const title = screen.getByTestId('page-title').textContent;
-      expect(title).toMatch(/(?:タイマー|Timer)/);
-    });
-
-    it('dashboardページのタイトルが正しい', () => {
-      mockStorage['project_activity_log_active_page'] = 'dashboard';
-
-      renderApp();
-
-      const title = screen.getByTestId('page-title').textContent;
-      expect(title).toMatch(/(?:ダッシュボード|Dashboard)/);
-    });
-
-    it('projectsページのタイトルが正しい', () => {
-      mockStorage['project_activity_log_active_page'] = 'projects';
-
-      renderApp();
-
-      const title = screen.getByTestId('page-title').textContent;
-      expect(title).toMatch(/(?:プロジェクト|Projects)/);
-    });
-
-    it('settingsページのタイトルが正しい', () => {
-      mockStorage['project_activity_log_active_page'] = 'settings';
-
-      renderApp();
-
-      const title = screen.getByTestId('page-title').textContent;
-      expect(title).toMatch(/(?:設定|Settings)/);
-    });
-  });
-
-  describe('フローティングアクションボタン', () => {
-    it('projectsページではAddボタンが表示される', () => {
-      mockStorage['project_activity_log_active_page'] = 'projects';
-
-      renderApp();
-
-      expect(screen.getByTestId('show-add-button')).toHaveTextContent('true');
-    });
-
-    it('timerページではAddボタンが表示される', () => {
-      mockStorage['project_activity_log_active_page'] = 'timer';
-
-      renderApp();
-
-      expect(screen.getByTestId('show-add-button')).toHaveTextContent('true');
-    });
-
-    it('dashboardページではAddボタンが表示されない', () => {
-      mockStorage['project_activity_log_active_page'] = 'dashboard';
-
-      renderApp();
-
-      expect(screen.getByTestId('show-add-button')).toHaveTextContent('false');
-    });
-
-    it('settingsページではAddボタンが表示されない', () => {
-      mockStorage['project_activity_log_active_page'] = 'settings';
-
-      renderApp();
-
-      expect(screen.getByTestId('show-add-button')).toHaveTextContent('false');
     });
   });
 });

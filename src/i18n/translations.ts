@@ -35,9 +35,9 @@ export const translations = {
     'language.english': '英語',
 
     // ===== ナビゲーション =====
-    'nav.dashboard': 'ダッシュボード',
+    'nav.dashboard': 'レポート',
     'nav.projects': 'プロジェクト',
-    'nav.timer': 'タイマー',
+    'nav.timer': '今日',
     'nav.settings': '設定',
 
     // ===== ダッシュボード =====
@@ -206,6 +206,8 @@ export const translations = {
     'aria.note.edit': 'メモを編集',
     'aria.project.menu': 'プロジェクトメニュー',
     'aria.project.add': 'プロジェクトを追加',
+    'sidebar.month.progress': '今月の進捗',
+    'sidebar.running': '計測中',
   },
   en: {
     // ===== Common =====
@@ -215,9 +217,9 @@ export const translations = {
     'language.english': 'English',
 
     // ===== Navigation =====
-    'nav.dashboard': 'Dashboard',
+    'nav.dashboard': 'Reports',
     'nav.projects': 'Projects',
-    'nav.timer': 'Timer',
+    'nav.timer': 'Today',
     'nav.settings': 'Settings',
 
     // ===== Dashboard =====
@@ -387,5 +389,7 @@ export const translations = {
     'aria.note.edit': 'Edit note',
     'aria.project.menu': 'Project menu',
     'aria.project.add': 'Add project',
+    'sidebar.month.progress': 'This month',
+    'sidebar.running': 'Tracking',
   },
 };

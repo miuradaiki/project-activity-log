@@ -1,4 +1,4 @@
-import { getProjectMonthProgress } from '../project-progress';
+import { getProjectMonthProgress, getMonthOverview } from '../project-progress';
 import { Project, TimeEntry } from '../../../types';
 
 const project = (monthlyCapacity: number): Project => ({
@@ -95,5 +95,30 @@ describe('getProjectMonthProgress', () => {
     expect(result.isTrackingOnly).toBe(true);
     expect(result.ratio).toBe(0);
     expect(result.actualHours).toBe(4.5);
+  });
+});
+
+describe('getMonthOverview', () => {
+  it('目標のあるプロジェクトの実績と目標を合計し、必要ペースを返す', () => {
+    const projects = [
+      { ...project(0.4), id: 'a' },
+      { ...project(0.3), id: 'b' },
+      { ...project(0), id: 'tracking' },
+      { ...project(0.2), id: 'archived', isArchived: true },
+    ];
+    const entries = [
+      entry('2026-11-02T09:00:00', 30, 'a'),
+      entry('2026-11-03T09:00:00', 10, 'b'),
+      entry('2026-11-04T09:00:00', 4, 'tracking'),
+    ];
+
+    const result = getMonthOverview(projects, entries, 140, NOW);
+
+    expect(result.targetHours).toBe(98);
+    expect(result.actualHours).toBe(40);
+    expect(result.totalHours).toBe(44);
+    expect(result.ratio).toBeCloseTo(40 / 98, 5);
+    expect(result.remainingWorkingDays).toBe(3);
+    expect(result.requiredDailyHours).toBe(19.3);
   });
 });

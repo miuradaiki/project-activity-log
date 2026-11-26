@@ -76,3 +76,48 @@ export const getProjectMonthProgress = (
     status,
   };
 };
+
+export interface MonthOverview {
+  /** 目標を持つプロジェクトの実績合計（目標に対する進捗の分子） */
+  actualHours: number;
+  /** 追跡のみも含めた今月の全作業時間 */
+  totalHours: number;
+  targetHours: number;
+  ratio: number;
+  remainingWorkingDays: number;
+  requiredDailyHours: number;
+}
+
+export const getMonthOverview = (
+  projects: Project[],
+  entries: TimeEntry[],
+  baseMonthlyHours: number,
+  now: Date = new Date()
+): MonthOverview => {
+  const active = projects.filter((p) => !p.isArchived);
+  let actual = 0;
+  let target = 0;
+  active.forEach((p) => {
+    const progress = getProjectMonthProgress(p, entries, baseMonthlyHours, now);
+    if (!progress.isTrackingOnly) {
+      actual += sumProjectHoursInMonth(entries, p.id, now);
+      target += progress.targetHours;
+    }
+  });
+  const total = projects.reduce(
+    (sum, p) => sum + sumProjectHoursInMonth(entries, p.id, now),
+    0
+  );
+  const remainingWorkingDays = calculateRemainingWorkingDays(now);
+  const remaining = Math.max(0, target - actual);
+
+  return {
+    actualHours: round1(actual),
+    totalHours: round1(total),
+    targetHours: round1(target),
+    ratio: target > 0 ? actual / target : 0,
+    remainingWorkingDays,
+    requiredDailyHours:
+      remainingWorkingDays > 0 ? round1(remaining / remainingWorkingDays) : 0,
+  };
+};

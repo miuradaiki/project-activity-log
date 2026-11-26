@@ -1,358 +1,288 @@
 import React from 'react';
 import {
   Box,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
+  ButtonBase,
   Drawer,
   IconButton,
+  Typography,
   useMediaQuery,
   useTheme,
-  Divider,
-  Tooltip,
-  Typography,
 } from '@mui/material';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Dashboard as DashboardIcon,
-  ListAlt as ProjectsIcon,
-  Timer as TimerIcon,
-  Settings as SettingsIcon,
-  Menu as MenuIcon,
-  ChevronLeft as ChevronLeftIcon,
+  AccessTime as TodayIcon,
+  FolderOutlined as ProjectsIcon,
+  BarChartOutlined as ReportsIcon,
+  SettingsOutlined as SettingsIcon,
 } from '@mui/icons-material';
-import { styled, alpha } from '@mui/material/styles';
 import { useLanguage } from '../../../contexts/LanguageContext';
-import { MotionBox } from '../modern/StyledComponents';
+import { Project } from '../../../types';
+import { MonthOverview } from '../../../utils/analytics';
+import { formatClock } from '../../../utils/formatters';
+import { projectColorManager } from '../../../utils/colorUtils';
+import { numberTypography } from '../../../styles/modernTheme';
 
-// ドロワーの幅設定
-export const DRAWER_WIDTH = 240;
-export const CLOSED_DRAWER_WIDTH = 60;
-
-// Modern styled components
-const ModernDrawer = styled(Drawer)(({ theme }) => ({
-  '& .MuiDrawer-paper': {
-    background:
-      theme.palette.mode === 'dark'
-        ? 'linear-gradient(180deg, #1A1F2E 0%, #0F1419 100%)'
-        : 'linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)',
-    backdropFilter: 'blur(20px)',
-    borderRight: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-    boxShadow:
-      theme.custom?.shadows?.medium || '0 10px 40px -15px rgba(0,0,0,0.15)',
-  },
-}));
-
-const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
-  borderRadius: theme.custom?.borderRadius?.sm || 8,
-  margin: theme.spacing(0.5, 1),
-  position: 'relative',
-  overflow: 'hidden',
-  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-  '&:hover': {
-    backgroundColor: alpha(theme.palette.primary.main, 0.08),
-    transform: 'translateX(8px)',
-    '&::before': {
-      transform: 'scaleX(1)',
-    },
-  },
-  '&::before': {
-    content: '""',
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-    width: 4,
-    background:
-      theme.custom?.gradients?.primary ||
-      'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    transform: 'scaleX(0)',
-    transformOrigin: 'left',
-    transition: 'transform 0.3s ease',
-  },
-  '&.Mui-selected': {
-    background:
-      theme.custom?.gradients?.primary ||
-      'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    color: '#FFFFFF',
-    boxShadow: theme.custom?.shadows?.soft || '0 2px 20px 0 rgba(0,0,0,0.1)',
-    transform: 'translateX(8px)',
-    '&:hover': {
-      background:
-        theme.custom?.gradients?.primary ||
-        'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      filter: 'brightness(1.1)',
-    },
-    '& .MuiListItemIcon-root': {
-      color: '#FFFFFF',
-    },
-    '& .MuiListItemText-primary': {
-      fontWeight: 600,
-    },
-    '&::before': {
-      transform: 'scaleX(1)',
-    },
-  },
-}));
-
-const ModernIconWrapper = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  width: 40,
-  height: 40,
-  borderRadius: theme.custom?.borderRadius?.sm || 8,
-  transition: 'all 0.3s ease',
-  position: 'relative',
-}));
-
-const SidebarHeader = styled(Box)(({ theme }) => ({
-  padding: theme.spacing(2),
-  borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-  background: alpha(theme.palette.primary.main, 0.05),
-  backdropFilter: 'blur(10px)',
-}));
-
-const BrandText = styled(Typography)(({ theme }) => ({
-  fontWeight: 800,
-  fontSize: '1.2rem',
-  background:
-    theme.custom?.gradients?.primary ||
-    'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-  WebkitBackgroundClip: 'text',
-  WebkitTextFillColor: 'transparent',
-  backgroundClip: 'text',
-  letterSpacing: '-0.02em',
-}));
+export const DRAWER_WIDTH = 216;
 
 export interface SidebarProps {
-  open: boolean;
-  onToggle: () => void;
   activePage: string;
   onNavigate: (page: string) => void;
+  monthOverview: MonthOverview;
+  activeProject: Project | null;
+  elapsedMs: number;
+  onStopTimer: () => void;
+  mobileOpen: boolean;
+  onMobileClose: () => void;
 }
 
+const MAIN_NAV = [
+  { page: 'timer', labelKey: 'nav.timer', Icon: TodayIcon },
+  { page: 'projects', labelKey: 'nav.projects', Icon: ProjectsIcon },
+  { page: 'dashboard', labelKey: 'nav.dashboard', Icon: ReportsIcon },
+];
+
+const NavItem: React.FC<{
+  label: string;
+  Icon: typeof TodayIcon;
+  active: boolean;
+  onClick: () => void;
+}> = ({ label, Icon, active, onClick }) => (
+  <ButtonBase
+    onClick={onClick}
+    aria-current={active ? 'page' : undefined}
+    sx={{
+      width: '100%',
+      justifyContent: 'flex-start',
+      gap: 1.25,
+      px: 1.25,
+      py: 1,
+      borderRadius: 2,
+      fontSize: 13.5,
+      color: active ? 'text.primary' : 'text.secondary',
+      fontWeight: active ? 500 : 400,
+      bgcolor: active ? 'action.selected' : 'transparent',
+      '&:hover': { bgcolor: 'action.hover', color: 'text.primary' },
+      '&.Mui-focusVisible': { outline: 2, outlineColor: 'primary.main' },
+    }}
+  >
+    <Icon sx={{ fontSize: 17 }} aria-hidden />
+    {label}
+  </ButtonBase>
+);
+
 export const Sidebar: React.FC<SidebarProps> = ({
-  open,
-  onToggle,
   activePage,
   onNavigate,
+  monthOverview,
+  activeProject,
+  elapsedMs,
+  onStopTimer,
+  mobileOpen,
+  onMobileClose,
 }) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const { t } = useLanguage();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  // ナビゲーションアイテム
-  const mainMenuItems = [
-    { id: 'dashboard', text: t('nav.dashboard'), icon: <DashboardIcon /> },
-    { id: 'projects', text: t('nav.projects'), icon: <ProjectsIcon /> },
-    { id: 'timer', text: t('nav.timer'), icon: <TimerIcon /> },
-  ];
-
-  // 設定メニュー項目
-  const settingsMenuItem = {
-    id: 'settings',
-    text: t('nav.settings'),
-    icon: <SettingsIcon />,
+  const go = (page: string) => {
+    onNavigate(page);
+    if (isMobile) onMobileClose();
   };
 
-  // Modern menu item rendering with animations
-  const renderMenuItem = (
-    item: {
-      id: string;
-      text: string;
-      icon: React.ReactNode;
-    },
-    index: number
-  ) => (
-    <motion.div
-      key={item.id}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1, duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+  const percent = Math.round(monthOverview.ratio * 100);
+
+  const content = (
+    <Box
+      sx={{
+        width: DRAWER_WIDTH,
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        px: 1.75,
+        py: 2.75,
+        bgcolor:
+          theme.palette.mode === 'dark' ? 'background.default' : '#F5F5F7',
+        borderRight: 1,
+        borderColor: 'divider',
+      }}
     >
-      <ListItem disablePadding>
-        <Tooltip title={!open ? item.text : ''} placement="right" arrow>
-          <StyledListItemButton
-            data-testid={`nav-${item.id}`}
-            selected={activePage === item.id}
-            onClick={() => onNavigate(item.id)}
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1.25,
+          px: 1.25,
+          pb: 2.75,
+        }}
+      >
+        <Box
+          aria-hidden
+          sx={{
+            width: 22,
+            height: 22,
+            borderRadius: '7px',
+            bgcolor: 'text.primary',
+            position: 'relative',
+            '&::after': {
+              content: '""',
+              position: 'absolute',
+              inset: 6,
+              borderRadius: '50%',
+              border: 2,
+              borderColor: 'background.default',
+              borderRightColor: 'transparent',
+            },
+          }}
+        />
+        <Typography sx={{ fontWeight: 600, fontSize: 14 }}>
+          {t('app.name')}
+        </Typography>
+      </Box>
+
+      <Box
+        component="nav"
+        sx={{ display: 'flex', flexDirection: 'column', gap: 0.25, flex: 1 }}
+      >
+        {MAIN_NAV.map(({ page, labelKey, Icon }) => (
+          <NavItem
+            key={page}
+            label={t(labelKey)}
+            Icon={Icon}
+            active={activePage === page}
+            onClick={() => go(page)}
+          />
+        ))}
+
+        <Box
+          sx={{ mt: 'auto', display: 'flex', flexDirection: 'column', gap: 1 }}
+        >
+          <Box
             sx={{
-              justifyContent: open ? 'initial' : 'center',
-              px: open ? 2 : 1.5,
-              py: 1.5,
+              p: 1.5,
+              borderRadius: 2.5,
+              border: 1,
+              borderColor: 'divider',
+              fontSize: 12,
+              color: 'text.secondary',
             }}
           >
-            <ModernIconWrapper
+            {t('sidebar.month.progress')}
+            <Box
+              component="b"
               sx={{
-                minWidth: open ? 40 : 'auto',
-                mr: open ? 2 : 'auto',
+                display: 'block',
+                color: 'text.primary',
+                fontWeight: 500,
+                fontSize: 13,
+                mt: 0.25,
               }}
             >
-              {item.icon}
-            </ModernIconWrapper>
-            <AnimatePresence>
-              {open && (
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.2 }}
-                  style={{ width: '100%' }}
-                >
-                  <ListItemText
-                    primary={item.text}
-                    primaryTypographyProps={{
-                      fontSize: '0.95rem',
-                      fontWeight: activePage === item.id ? 600 : 500,
-                    }}
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </StyledListItemButton>
-        </Tooltip>
-      </ListItem>
-    </motion.div>
-  );
+              {`${monthOverview.actualHours} / ${monthOverview.targetHours}h · ${percent}%`}
+            </Box>
+          </Box>
 
-  // Modern drawer content with animations
-  const drawer = (
-    <>
-      <SidebarHeader>
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: open ? 'space-between' : 'center',
-          }}
-        >
-          <AnimatePresence>
-            {open && (
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-              >
-                <BrandText variant="h6">Project Log</BrandText>
-              </motion.div>
-            )}
-          </AnimatePresence>
-          <IconButton
-            onClick={onToggle}
-            aria-label={t('aria.sidebar.toggle')}
-            sx={{
-              color: 'primary.main',
-              '&:hover': {
-                background: alpha(theme.palette.primary.main, 0.1),
-                transform: 'scale(1.1)',
-              },
-              transition: 'all 0.2s ease',
-            }}
-          >
-            <motion.div
-              animate={{ rotate: open ? 180 : 0 }}
-              transition={{ duration: 0.3 }}
+          {activeProject && (
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                pl: 1.5,
+                pr: 0.75,
+                py: 0.75,
+                borderRadius: 2.5,
+                border: 1,
+                borderColor: 'divider',
+                fontSize: 12,
+              }}
             >
-              {open ? <ChevronLeftIcon /> : <MenuIcon />}
-            </motion.div>
-          </IconButton>
+              <ButtonBase
+                onClick={() => go('timer')}
+                aria-label={`${t('sidebar.running')}: ${activeProject.name}`}
+                sx={{
+                  flex: 1,
+                  minWidth: 0,
+                  justifyContent: 'flex-start',
+                  gap: 1,
+                  borderRadius: 1,
+                }}
+              >
+                <Box
+                  aria-hidden
+                  sx={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: '3px',
+                    flex: 'none',
+                    bgcolor: projectColorManager.getColorById(activeProject.id),
+                  }}
+                />
+                <Box
+                  component="span"
+                  sx={{
+                    fontWeight: 500,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {activeProject.name}
+                </Box>
+                <Box
+                  component="span"
+                  sx={{ ...numberTypography(theme), ml: 'auto', fontSize: 15 }}
+                >
+                  {formatClock(elapsedMs, false)}
+                </Box>
+              </ButtonBase>
+              <IconButton
+                size="small"
+                onClick={onStopTimer}
+                aria-label={t('aria.timer.stop')}
+                sx={{ width: 26, height: 26 }}
+              >
+                <Box
+                  sx={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: '2px',
+                    bgcolor: 'error.main',
+                  }}
+                />
+              </IconButton>
+            </Box>
+          )}
+
+          <NavItem
+            label={t('nav.settings')}
+            Icon={SettingsIcon}
+            active={activePage === 'settings'}
+            onClick={() => go('settings')}
+          />
         </Box>
-      </SidebarHeader>
-
-      <MotionBox
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.3 }}
-        sx={{ flexGrow: 1, pt: 2 }}
-      >
-        <List>
-          {mainMenuItems.map((item, index) => renderMenuItem(item, index))}
-        </List>
-      </MotionBox>
-
-      <Divider
-        sx={{
-          mx: 2,
-          borderColor: alpha(theme.palette.divider, 0.1),
-          '&::before, &::after': {
-            borderColor: alpha(theme.palette.divider, 0.1),
-          },
-        }}
-      />
-
-      <List sx={{ pb: 2 }}>
-        {renderMenuItem(settingsMenuItem, mainMenuItems.length)}
-      </List>
-    </>
+      </Box>
+    </Box>
   );
 
-  // モバイル版レイアウト
   if (isMobile) {
     return (
-      <>
-        <IconButton
-          color="inherit"
-          aria-label={t('aria.sidebar.open')}
-          onClick={onToggle}
-          sx={{
-            position: 'fixed',
-            top: 14, // 位置を調整
-            left: 16, // 左余白を増やして位置を調整
-            zIndex: 1200,
-            bgcolor: 'primary.main',
-            color: 'primary.contrastText',
-            boxShadow: 3,
-            '&:hover': {
-              bgcolor: 'primary.dark',
-            },
-          }}
-        >
-          <MenuIcon />
-        </IconButton>
-        <ModernDrawer
-          variant="temporary"
-          open={open}
-          onClose={onToggle}
-          ModalProps={{ keepMounted: true }}
-          sx={{
-            display: { xs: 'block', md: 'none' },
-            '& .MuiDrawer-paper': {
-              width: DRAWER_WIDTH,
-              boxSizing: 'border-box',
-            },
-            zIndex: theme.zIndex.appBar + 100,
-          }}
-        >
-          {drawer}
-        </ModernDrawer>
-      </>
+      <Drawer variant="temporary" open={mobileOpen} onClose={onMobileClose}>
+        {content}
+      </Drawer>
     );
   }
 
-  // Modern desktop layout
   return (
-    <ModernDrawer
-      variant="permanent"
+    <Box
+      component="aside"
       sx={{
-        width: open ? DRAWER_WIDTH : CLOSED_DRAWER_WIDTH,
-        flexShrink: 0,
-        '& .MuiDrawer-paper': {
-          width: open ? DRAWER_WIDTH : CLOSED_DRAWER_WIDTH,
-          boxSizing: 'border-box',
-          transition: theme.transitions.create('width', {
-            easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
-            duration: theme.transitions.duration.complex,
-          }),
-          overflowX: 'hidden',
-          display: 'flex',
-          flexDirection: 'column',
-        },
+        width: DRAWER_WIDTH,
+        flex: 'none',
+        position: 'sticky',
+        top: 0,
+        height: '100vh',
       }}
     >
-      {drawer}
-    </ModernDrawer>
+      {content}
+    </Box>
   );
 };

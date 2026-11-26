@@ -1,35 +1,25 @@
-import React from 'react';
-import {
-  Box,
-  useTheme,
-  Fab,
-  Tooltip,
-  useMediaQuery,
-  CssBaseline,
-} from '@mui/material';
-import { motion } from 'framer-motion';
-import { Add as AddIcon } from '@mui/icons-material';
-import { Sidebar, DRAWER_WIDTH, CLOSED_DRAWER_WIDTH } from './Sidebar';
-import { GlobalTimer } from '../global/GlobalTimer';
-import { Project } from '../../../types';
+import React, { useMemo } from 'react';
+import { Box, IconButton, useMediaQuery, useTheme } from '@mui/material';
+import { Menu as MenuIcon } from '@mui/icons-material';
+import { Sidebar } from './Sidebar';
+import { Project, TimeEntry } from '../../../types';
 import { useLanguage } from '../../../contexts/LanguageContext';
+import { useSettingsContext } from '../../../contexts/SettingsContext';
+import { getMonthOverview } from '../../../utils/analytics';
+import { useElapsedTime } from '../timer/hooks/useElapsedTime';
 
 export interface LayoutProps {
   children: React.ReactNode;
-  title: string;
   activePage: string;
   onNavigate: (page: string) => void;
-  onToggleTheme: () => void;
-  isDarkMode: boolean;
   sidebarOpen: boolean;
   onToggleSidebar: () => void;
-  onAddButtonClick?: () => void;
-  showAddButton?: boolean;
-  addButtonTooltip?: string;
-  activeProject?: Project | null;
-  isTimerRunning?: boolean;
-  startTime?: string | null;
-  onStopTimer?: () => void;
+  projects: Project[];
+  timeEntries: TimeEntry[];
+  activeProject: Project | null;
+  isTimerRunning: boolean;
+  startTime: string | null;
+  onStopTimer: () => void;
 }
 
 export const Layout: React.FC<LayoutProps> = ({
@@ -38,95 +28,74 @@ export const Layout: React.FC<LayoutProps> = ({
   onNavigate,
   sidebarOpen,
   onToggleSidebar,
-  onAddButtonClick,
-  showAddButton = false,
-  addButtonTooltip,
-  activeProject = null,
-  isTimerRunning = false,
-  startTime = null,
-  onStopTimer = () => {},
+  projects,
+  timeEntries,
+  activeProject,
+  isTimerRunning,
+  startTime,
+  onStopTimer,
 }) => {
   const theme = useTheme();
   const { t } = useLanguage();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const currentDrawerWidth = sidebarOpen ? DRAWER_WIDTH : CLOSED_DRAWER_WIDTH;
+  const { settings } = useSettingsContext();
 
-  const handleTimerClick = () => {
-    if (activePage !== 'timer') {
-      onNavigate('timer');
-    }
-  };
+  // 8時間の自動停止はここ（常にマウントされる場所）でだけ監視する
+  const { elapsedMs } = useElapsedTime({
+    isRunning: isTimerRunning,
+    startTime,
+    onStop: onStopTimer,
+  });
+
+  const monthOverview = useMemo(
+    () =>
+      getMonthOverview(
+        projects,
+        timeEntries,
+        settings.workHours.baseMonthlyHours
+      ),
+    [projects, timeEntries, settings.workHours.baseMonthlyHours]
+  );
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      <CssBaseline />
-
-      {/* サイドバー */}
+    <Box
+      sx={{
+        display: 'flex',
+        minHeight: '100vh',
+        bgcolor: 'background.default',
+      }}
+    >
       <Sidebar
-        open={sidebarOpen}
-        onToggle={onToggleSidebar}
         activePage={activePage}
         onNavigate={onNavigate}
+        monthOverview={monthOverview}
+        activeProject={isTimerRunning ? activeProject : null}
+        elapsedMs={elapsedMs}
+        onStopTimer={onStopTimer}
+        mobileOpen={sidebarOpen}
+        onMobileClose={onToggleSidebar}
       />
 
-      {/* Modern main content with smooth transitions */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        style={{
-          flexGrow: 1,
-          width: isMobile ? '100%' : `calc(100% - ${currentDrawerWidth}px)`,
-          padding: 0,
+      <Box
+        component="main"
+        sx={{
+          flex: 1,
+          minWidth: 0,
+          px: { xs: 2.5, md: 5.5 },
+          py: { xs: 2, md: 4.25 },
         }}
       >
-        <Box
-          sx={{
-            p: { xs: 2, md: 3 },
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            width: '100%',
-          }}
-        >
-          <Box
-            sx={{
-              width: '100%',
-              maxWidth: 'lg',
-            }}
+        {isMobile && (
+          <IconButton
+            onClick={onToggleSidebar}
+            aria-label={t('aria.sidebar.open')}
+            sx={{ mb: 1, ml: -1 }}
           >
-            {children}
-          </Box>
-        </Box>
-
-        {/* フローティングアクションボタン */}
-        {showAddButton && onAddButtonClick && (
-          <Tooltip title={addButtonTooltip || t('actions.add')}>
-            <Fab
-              color="primary"
-              aria-label={t('aria.project.add')}
-              onClick={onAddButtonClick}
-              sx={{
-                position: 'fixed',
-                bottom: 24,
-                right: isTimerRunning ? 90 : 24, // タイマーが実行中の場合、タイマーとの干渉を避けるために位置を調整
-                boxShadow: theme.shadows[3],
-              }}
-            >
-              <AddIcon />
-            </Fab>
-          </Tooltip>
+            <MenuIcon />
+          </IconButton>
         )}
-
-        {/* グローバルタイマー */}
-        <GlobalTimer
-          project={activeProject}
-          isRunning={isTimerRunning}
-          startTime={startTime}
-          onStop={onStopTimer}
-          onClick={handleTimerClick}
-        />
-      </motion.div>
+        <Box sx={{ maxWidth: 1120, mx: 'auto' }}>{children}</Box>
+      </Box>
     </Box>
   );
 };
