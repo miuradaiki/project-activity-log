@@ -133,7 +133,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             },
           }}
         />
-        <Typography sx={{ fontWeight: 600, fontSize: 14 }}>
+        <Typography noWrap sx={{ fontWeight: 600, fontSize: 13.5 }}>
           {t('app.name')}
         </Typography>
       </Box>

@@ -1,7 +1,4 @@
 import React from 'react';
-import { Box, Button } from '@mui/material';
-import { CloudUpload as CloudUploadIcon } from '@mui/icons-material';
-import { useLanguage } from '../contexts/LanguageContext';
 import { Project, TimeEntry } from '../types';
 import { TimerController } from '../hooks/useTimerController';
 import { Modal } from '../hooks/useModal';
@@ -10,8 +7,7 @@ import { ProjectOperations } from '../hooks/useProjectOperations';
 import { Dashboard } from './dashboard/Dashboard';
 import { ProjectsView } from './ui/project/ProjectsView';
 import { SettingsView } from './settings/SettingsView';
-import { TimerFocus } from './ui/timer/TimerFocus';
-import { ProjectList } from './ProjectList';
+import { TodayView } from './today/TodayView';
 import { TimeEntryList } from './timer/TimeEntryList';
 
 export interface PageRouterProps {
@@ -41,8 +37,6 @@ export const PageRouter: React.FC<PageRouterProps> = ({
   isDarkMode,
   onToggleTheme,
 }) => {
-  const { t } = useLanguage();
-
   switch (activePage) {
     case 'dashboard':
       return (
@@ -76,50 +70,32 @@ export const PageRouter: React.FC<PageRouterProps> = ({
 
     case 'timer':
       return (
-        <Box sx={{ width: '100%', maxWidth: 1200, mx: 'auto' }}>
-          <Box sx={{ mb: 3, display: 'flex', justifyContent: 'flex-end' }}>
-            <Button
-              variant="outlined"
-              startIcon={<CloudUploadIcon />}
-              onClick={onImportCSV}
-            >
-              {t('timer.import.csv')}
-            </Button>
-          </Box>
-
-          <TimerFocus
-            project={timer.activeProject}
-            isRunning={timer.isRunning}
-            startTime={timer.startTime}
-            onStart={() =>
-              timer.activeProject && timer.start(timer.activeProject)
-            }
-            onStop={() => timer.stop()}
-          />
-
-          <ProjectList
-            projects={projects}
-            onEditProject={(project) => projectFormModal.open(project)}
-            onDeleteProject={projectOps.deleteProject}
-            onArchiveProject={projectOps.archiveProject}
-            onUnarchiveProject={projectOps.unarchiveProject}
-            onStartTimer={onStartTimer}
-            activeProjectId={timer.activeProject?.id || null}
-            timeEntries={timeEntries}
-          />
-
+        <TodayView
+          projects={projects}
+          timeEntries={timeEntries}
+          activeProject={timer.activeProject}
+          isRunning={timer.isRunning}
+          startTime={timer.startTime}
+          onToggleProject={onStartTimer}
+          onStop={() => timer.stop()}
+          onManualEntry={() => manualEntryModal.open()}
+        >
           <TimeEntryList
             timeEntries={timeEntries}
             projects={projects}
             onDeleteTimeEntry={projectOps.deleteTimeEntry}
             onEditTimeEntry={(entry) => manualEntryModal.open(entry)}
           />
-        </Box>
+        </TodayView>
       );
 
     case 'settings':
       return (
-        <SettingsView onToggleTheme={onToggleTheme} isDarkMode={isDarkMode} />
+        <SettingsView
+          onToggleTheme={onToggleTheme}
+          isDarkMode={isDarkMode}
+          onImportCSV={onImportCSV}
+        />
       );
 
     default:

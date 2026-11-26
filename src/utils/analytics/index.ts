@@ -54,3 +54,9 @@ export type {
   ProgressStatus,
   MonthOverview,
 } from './project-progress';
+export {
+  getTodaySegments,
+  getTodayProjectHours,
+  getRecentProjects,
+} from './today';
+export type { TimelineSegment } from './today';

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { Box, CircularProgress } from '@mui/material';
 import { Project, TimeEntry } from './types';
 
@@ -14,6 +14,7 @@ import { useThemeMode } from './components/ui/ThemeProvider';
 import { KeyboardShortcutsDialog } from './components/shortcuts/KeyboardShortcuts';
 import { PageRouter } from './components/PageRouter';
 import { STORAGE_KEYS } from './constants/storageKeys';
+import { projectColorManager } from './utils/colorUtils';
 
 const App: React.FC = () => {
   // テーマとレイアウト管理
@@ -32,6 +33,9 @@ const App: React.FC = () => {
   // データの読み込み
   const { projects, setProjects, timeEntries, setTimeEntries, isLoading } =
     useStorage();
+
+  // 色はどの画面から開いても同じになるよう、描画前にプロジェクト一覧から割り当てる
+  useMemo(() => projectColorManager.initializeColors(projects), [projects]);
 
   // モーダル管理
   const projectFormModal = useModal<Project>();

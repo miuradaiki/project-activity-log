@@ -6,15 +6,18 @@ import { useSettingsState } from './hooks/useSettingsState';
 import { WorkHoursSettings } from './WorkHoursSettings';
 import { AppearanceSettings } from './AppearanceSettings';
 import { TestModeSettings } from './TestModeSettings';
+import { DataSettings } from './DataSettings';
 
 interface SettingsViewProps {
   onToggleTheme: () => void;
   isDarkMode: boolean;
+  onImportCSV: () => void;
 }
 
 export const SettingsView: React.FC<SettingsViewProps> = ({
   onToggleTheme,
   isDarkMode,
+  onImportCSV,
 }) => {
   const { t } = useLanguage();
   const testDataFeatureEnabled = isTestDataEnabled();
@@ -63,6 +66,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             onToggleTheme={onToggleTheme}
             onLanguageChange={handleLanguageChange}
           />
+        </Grid>
+
+        <Grid size={12}>
+          <DataSettings onImportCSV={onImportCSV} />
         </Grid>
 
         {testDataFeatureEnabled && (

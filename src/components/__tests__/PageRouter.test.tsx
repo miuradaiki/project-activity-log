@@ -12,6 +12,12 @@ jest.mock('../ui/project/ProjectsView', () => ({
   ProjectsView: () => <div data-testid="projects-view">ProjectsView</div>,
 }));
 
+jest.mock('../today/TodayView', () => ({
+  TodayView: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="today-view">{children}</div>
+  ),
+}));
+
 jest.mock('../settings/SettingsView', () => ({
   SettingsView: () => <div data-testid="settings-view">SettingsView</div>,
 }));
@@ -98,7 +104,7 @@ describe('PageRouter', () => {
       render(<PageRouter {...defaultProps} activePage="timer" />);
 
       // タイマーページ固有のコンテンツがあることを確認
-      expect(screen.getByText('timer.import.csv')).toBeInTheDocument();
+      expect(screen.getByTestId('today-view')).toBeInTheDocument();
     });
 
     it('dashboardページをレンダリングする', () => {
