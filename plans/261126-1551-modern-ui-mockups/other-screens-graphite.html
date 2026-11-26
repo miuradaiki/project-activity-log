@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<title>Projects / Reports / Settings — Graphite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Noto+Sans+JP:wght@400;500;600&family=Manrope:wght@200;300&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { font-family: 'Inter', 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+  button { font: inherit; color: inherit; cursor: pointer; border: 0; background: none; }
+  .graphite {
+    --bg: #09090B; --sidebar: #09090B; --surface: #111114; --surface-2: #18181C; --border: rgba(255,255,255,.07); --border-2: rgba(255,255,255,.12);
+    --text: #EDEDEF; --text-2: #A0A0AB; --text-3: #5E5E68; --accent: #8E8CFF; --danger: #FF6B6B;
+    --p1: #8E8CFF; --p2: #3DD6A3; --p3: #F5A524; --p4: #5CB8FF; --track: rgba(255,255,255,.06); --nav-active: rgba(255,255,255,.06); --card-shadow: none;
+  }
+  .graphite-light {
+    --bg: #FBFBFC; --sidebar: #F5F5F7; --surface: #FFFFFF; --surface-2: #F4F4F6; --border: rgba(10,10,20,.08); --border-2: rgba(10,10,20,.14);
+    --text: #0B0B0F; --text-2: #5E5E6B; --text-3: #A1A1AB; --accent: #5652E0; --danger: #E5484D;
+    --p1: #6C68EE; --p2: #12A58A; --p3: #E08A0B; --p4: #2F8FE0; --track: rgba(10,10,20,.06); --nav-active: rgba(10,10,20,.06); --card-shadow: 0 1px 2px rgba(10,10,20,.03);
+  }
+  .num { font-family: 'Manrope', sans-serif; font-weight: 200; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+  .tab { font-variant-numeric: tabular-nums; }
+
+  .app { display: grid; grid-template-columns: 216px 1fr; width: 1280px; height: 800px; margin: 0 auto; overflow: hidden; }
+  aside { background: var(--sidebar); border-right: 1px solid var(--border); padding: 22px 14px; display: flex; flex-direction: column; gap: 2px; }
+  .brand { display: flex; align-items: center; gap: 10px; padding: 0 10px 22px; font-weight: 600; font-size: 14px; }
+  .logo { width: 22px; height: 22px; border-radius: 7px; background: var(--text); position: relative; }
+  .logo::after { content: ''; position: absolute; inset: 6px; border-radius: 50%; border: 2px solid var(--bg); border-right-color: transparent; }
+  .nav { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; font-size: 13.5px; color: var(--text-2); cursor: pointer; }
+  .nav.on { background: var(--nav-active); color: var(--text); font-weight: 500; }
+  .nav svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.6; }
+  .nav .k { margin-left: auto; font-size: 11px; color: var(--text-3); }
+  .mini { margin-top: auto; padding: 12px; border-radius: 10px; border: 1px solid var(--border); font-size: 12px; color: var(--text-2); }
+  .mini b { display: block; color: var(--text); font-weight: 500; font-size: 13px; margin-top: 2px; }
+  .running { display: flex; align-items: center; gap: 8px; padding: 10px 12px; margin-bottom: 8px; border-radius: 10px; border: 1px solid var(--border); font-size: 12px; color: var(--text-2); }
+  .running b { color: var(--text); font-weight: 500; }
+  .running .num { margin-left: auto; font-size: 15px; color: var(--text); }
+
+  main { padding: 34px 44px; overflow: hidden; display: none; flex-direction: column; gap: 20px; }
+  main.on { display: flex; }
+  header { display: flex; align-items: flex-end; justify-content: space-between; }
+  h1 { font-size: 26px; font-weight: 600; letter-spacing: -.02em; }
+  .sub { color: var(--text-2); font-size: 13px; margin-top: 4px; }
+  .actions { display: flex; gap: 8px; align-items: center; }
+  .search { display: flex; align-items: center; width: 220px; height: 34px; padding: 0 12px; border-radius: 9px; border: 1px solid var(--border); color: var(--text-3); font-size: 13px; background: var(--surface); }
+  .kbd { margin-left: auto; font-size: 11px; border: 1px solid var(--border-2); border-radius: 5px; padding: 1px 6px; color: var(--text-2); }
+  .btn { height: 34px; padding: 0 14px; border-radius: 9px; font-size: 13px; font-weight: 500; background: var(--text); color: var(--bg); }
+  .btn.ghost { background: var(--surface); color: var(--text); border: 1px solid var(--border-2); }
+  .seg-ctl { display: inline-flex; padding: 3px; border-radius: 9px; background: var(--track); gap: 2px; }
+  .seg-ctl button { padding: 5px 12px; border-radius: 7px; font-size: 12.5px; color: var(--text-2); }
+  .seg-ctl button.on { background: var(--surface); color: var(--text); font-weight: 500; box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+  .seg-ctl button small { color: var(--text-3); margin-left: 4px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--card-shadow); padding: 20px 22px; }
+  .eyebrow { font-size: 12px; color: var(--text-2); display: flex; align-items: center; gap: 8px; }
+  .dot { width: 8px; height: 8px; border-radius: 3px; flex: none; display: inline-block; }
+  .bar { height: 4px; border-radius: 4px; background: var(--track); overflow: hidden; display: flex; }
+  .tag { font-size: 11px; padding: 2px 7px; border-radius: 6px; font-weight: 500; white-space: nowrap; }
+  .tag.danger { background: color-mix(in srgb, var(--danger) 12%, transparent); color: var(--danger); }
+  .tag.muted { background: var(--track); color: var(--text-2); }
+  .over { color: var(--danger); }
+
+  /* Projects */
+  .toolbar { display: flex; justify-content: space-between; align-items: center; }
+  .ptable { padding: 4px 0; }
+  .ph, .prow { display: grid; grid-template-columns: 30px 1.6fr 1.2fr 110px 90px 36px; align-items: center; gap: 16px; padding: 0 22px; }
+  .ph { height: 38px; font-size: 11.5px; color: var(--text-3); border-bottom: 1px solid var(--border); }
+  .prow { min-height: 62px; border-top: 1px solid var(--border); font-size: 13.5px; }
+  .ph + .prow { border-top: 0; }
+  .prow.active { background: color-mix(in srgb, var(--accent) 5%, transparent); }
+  .pname { display: flex; flex-direction: column; gap: 3px; }
+  .pname b { font-weight: 500; display: flex; align-items: center; gap: 8px; }
+  .pname span { font-size: 12px; color: var(--text-3); }
+  .pmeta { font-size: 11.5px; color: var(--text-3); margin-top: 6px; display: flex; justify-content: space-between; }
+  .r { text-align: right; color: var(--text-2); font-size: 13px; }
+  .play { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--border-2); display: flex; align-items: center; justify-content: center; }
+  .play::after { content: ''; border-left: 7px solid var(--text-2); border-top: 4.5px solid transparent; border-bottom: 4.5px solid transparent; margin-left: 2px; }
+  .play.active { border-color: transparent; background: color-mix(in srgb, var(--danger) 14%, transparent); }
+  .play.active::after { border: 0; width: 8px; height: 8px; background: var(--danger); border-radius: 2px; margin: 0; }
+  .more { width: 28px; height: 28px; border-radius: 7px; color: var(--text-3); font-size: 16px; letter-spacing: 1px; }
+  .more:hover { background: var(--track); }
+  .archived { display: flex; align-items: center; gap: 8px; padding: 14px 22px; border-top: 1px solid var(--border); font-size: 12.5px; color: var(--text-3); }
+  .menu { position: absolute; right: 26px; top: 46px; width: 180px; padding: 5px; border-radius: 10px; background: var(--surface); border: 1px solid var(--border-2); box-shadow: 0 12px 32px rgba(0,0,0,.28); font-size: 13px; z-index: 2; }
+  .menu div { padding: 7px 10px; border-radius: 6px; display: flex; justify-content: space-between; }
+  .menu div:first-child { background: var(--track); }
+  .menu div.danger { color: var(--danger); }
+  .menu hr { border: 0; border-top: 1px solid var(--border); margin: 4px 0; }
+
+  /* Reports */
+  .kpis { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 0; padding: 0; }
+  .kpi { padding: 20px 22px; border-left: 1px solid var(--border); }
+  .kpi:first-child { border-left: 0; }
+  .kpi .l { font-size: 12px; color: var(--text-2); }
+  .kpi .v { font-size: 34px; line-height: 1.15; margin-top: 4px; }
+  .kpi .v small { font-family: 'Inter', sans-serif; font-size: 13px; color: var(--text-2); letter-spacing: 0; margin-left: 4px; font-weight: 400; }
+  .kpi .bar { margin-top: 12px; }
+  .kpi .note { font-size: 12px; color: var(--text-3); margin-top: 6px; }
+  .rgrid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; min-height: 0; flex: 1; }
+  .chart { display: flex; align-items: flex-end; gap: 18px; height: 190px; margin-top: 18px; padding: 0 4px; border-bottom: 1px solid var(--border); position: relative; }
+  .gl { position: absolute; left: 0; right: 0; border-top: 1px dashed var(--border); font-size: 10.5px; color: var(--text-3); }
+  .gl span { position: absolute; right: 0; top: -14px; }
+  .wk { flex: 1; display: flex; gap: 5px; align-items: flex-end; height: 100%; }
+  .day { flex: 1; display: flex; flex-direction: column-reverse; gap: 2px; }
+  .day i { display: block; border-radius: 3px; }
+  .day.today { outline: 1px solid var(--border-2); outline-offset: 3px; border-radius: 4px; }
+  .day.future { height: 100%; justify-content: flex-start; }
+  .day.future i { border: 1px dashed var(--border-2); background: none; flex: 1; }
+  .wklab { display: flex; gap: 18px; padding: 8px 4px 0; font-size: 11.5px; color: var(--text-3); }
+  .wklab span { flex: 1; white-space: nowrap; display: flex; justify-content: space-between; }
+  .wklab b { font-weight: 500; color: var(--text-2); }
+  .legend { display: flex; gap: 14px; font-size: 12px; color: var(--text-2); }
+  .legend span { display: flex; align-items: center; gap: 6px; }
+  .dist { display: flex; flex-direction: column; gap: 16px; margin-top: 18px; }
+  .drow { display: grid; grid-template-columns: 1fr auto; row-gap: 7px; font-size: 13px; }
+  .drow .bar { grid-column: 1 / -1; height: 6px; }
+  .drow .r b { color: var(--text); font-weight: 500; }
+
+  /* Settings */
+  .settings { max-width: 720px; display: flex; flex-direction: column; gap: 26px; }
+  .group h2 { font-size: 13px; font-weight: 600; color: var(--text-2); margin-bottom: 10px; }
+  .group .card { padding: 0; }
+  .srow { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 16px 20px; border-top: 1px solid var(--border); }
+  .srow:first-child { border-top: 0; }
+  .srow .t { font-size: 13.5px; font-weight: 500; }
+  .srow .d { font-size: 12.5px; color: var(--text-2); margin-top: 3px; line-height: 1.5; }
+  .stepper { display: flex; align-items: center; height: 34px; border: 1px solid var(--border-2); border-radius: 9px; overflow: hidden; }
+  .stepper button { width: 32px; height: 100%; color: var(--text-2); }
+  .stepper .num { width: 64px; text-align: center; font-size: 20px; font-weight: 300; border-left: 1px solid var(--border); border-right: 1px solid var(--border); line-height: 32px; }
+  .unit { font-size: 12.5px; color: var(--text-2); margin-left: 8px; }
+  .saved { font-size: 12px; color: var(--text-3); display: flex; align-items: center; gap: 6px; }
+  .saved::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--p2); }
+  .toggle { width: 34px; height: 20px; border-radius: 999px; background: var(--track); border: 1px solid var(--border-2); position: relative; flex: none; }
+  .toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: var(--text-3); }
+
+  /* Switchers */
+  .switch { position: fixed; z-index: 10; left: 50%; transform: translateX(-50%); display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: rgba(120,120,128,.18); backdrop-filter: blur(20px); white-space: nowrap; }
+  .switch.theme { top: 14px; }
+  .switch.screens { bottom: 14px; }
+  .switch button { padding: 6px 14px; border-radius: 999px; font-size: 12px; font-weight: 500; color: var(--text-2); }
+  .switch button.on { background: var(--text); color: var(--bg); }
+</style>
+</head>
+<body class="graphite">
+<div class="switch theme" aria-label="テーマ">
+  <button class="on" data-t="graphite">Dark</button>
+  <button data-t="graphite-light">Light</button>
+</div>
+<div class="switch screens" aria-label="画面">
+  <button class="on" data-s="projects">プロジェクト</button>
+  <button data-s="reports">レポート</button>
+  <button data-s="settings">設定</button>
+</div>
+
+<div class="app">
+  <aside>
+    <div class="brand"><span class="logo" aria-hidden="true"></span>Activity Log</div>
+    <a class="nav"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>今日<span class="k">⌘1</span></a>
+    <a class="nav" data-s="projects"><svg viewBox="0 0 24 24"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg>プロジェクト<span class="k">⌘2</span></a>
+    <a class="nav" data-s="reports"><svg viewBox="0 0 24 24"><path d="M5 19V11M12 19V5M19 19v-6"/></svg>レポート<span class="k">⌘3</span></a>
+    <div class="mini" style="margin-bottom:8px">今月の進捗<b>97.4 / 126h · 77%</b></div>
+    <div class="running"><span class="dot" style="background:var(--p1)"></span><b>EC開発</b><span class="num">1:24</span></div>
+    <a class="nav" data-s="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg>設定<span class="k">⌘,</span></a>
+  </aside>
+
+  <!-- ============ プロジェクト ============ -->
+  <main id="projects" class="on">
+    <header>
+      <div><h1>プロジェクト</h1><div class="sub">4件 · 月間基準 140h のうち 90% を割り当て済み</div></div>
+      <div class="actions">
+        <div class="search">検索<span class="kbd">/</span></div>
+        <button class="btn">＋ 新しいプロジェクト</button>
+      </div>
+    </header>
+    <div class="toolbar">
+      <div class="seg-ctl">
+        <button class="on">すべて<small>4</small></button><button>進行中<small>2</small></button><button>超過<small>1</small></button><button>追跡のみ<small>1</small></button>
+      </div>
+      <div class="seg-ctl"><button class="on">進捗順</button><button>残り時間順</button><button>名前順</button></div>
+    </div>
+    <section class="card ptable" style="position:relative;padding:0">
+      <div class="ph"><span></span><span>プロジェクト</span><span>今月の進捗</span><span style="text-align:right">実績 / 目標</span><span style="text-align:right">残り</span><span></span></div>
+      <div class="prow">
+        <span class="play" aria-label="開始"></span>
+        <div class="pname"><b><span class="dot" style="background:var(--p3)"></span>顧客管理基盤<span class="tag danger">+6.7h 超過</span></b><span>稼働率 20%</span></div>
+        <div><div class="bar"><span style="width:80.6%;background:var(--p3)"></span><span style="width:19.4%;background:var(--danger)"></span></div><div class="pmeta"><span>124%</span></div></div>
+        <span class="r tab over">34.7 / 28h</span><span class="r tab over">−6.7h</span><button class="more" aria-label="メニュー">···</button>
+      </div>
+      <div class="prow">
+        <span class="play" aria-label="開始"></span>
+        <div class="pname"><b><span class="dot" style="background:var(--p2)"></span>在庫管理システム改修</b><span>稼働率 30%</span></div>
+        <div><div class="bar"><span style="width:73%;background:var(--p2)"></span></div><div class="pmeta"><span>73%</span><span>あと 3.8h / 日</span></div></div>
+        <span class="r tab">30.6 / 42h</span><span class="r tab">11.4h</span><button class="more" aria-label="メニュー">···</button>
+      </div>
+      <div class="prow active">
+        <span class="play active" aria-label="停止"></span>
+        <div class="pname"><b><span class="dot" style="background:var(--p1)"></span>EC開発<span class="tag muted">計測中</span></b><span>稼働率 40%</span></div>
+        <div><div class="bar"><span style="width:57%;background:var(--p1)"></span></div><div class="pmeta"><span>57%</span><span>あと 8.1h / 日</span></div></div>
+        <span class="r tab">31.8 / 56h</span><span class="r tab">24.2h</span><button class="more" aria-label="メニュー">···</button>
+      </div>
+      <div class="prow">
+        <span class="play" aria-label="開始"></span>
+        <div class="pname"><b><span class="dot" style="background:var(--p4)"></span>社内勉強会</b><span>追跡のみ · 目標なし</span></div>
+        <div style="font-size:12px;color:var(--text-3)">目標を設定していません</div>
+        <span class="r tab">4.5h</span><span class="r">—</span><button class="more" aria-label="メニュー">···</button>
+      </div>
+      <div class="archived">› アーカイブ済み 2件</div>
+      <div class="menu" style="top:104px">
+        <div>編集<span class="kbd">E</span></div><div>アーカイブ</div><hr><div class="danger">削除…</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ レポート ============ -->
+  <main id="reports">
+    <header>
+      <div><h1>レポート</h1><div class="sub">月間の進捗と週ごとの推移</div></div>
+      <div class="actions">
+        <button class="btn ghost" aria-label="前の月">‹</button>
+        <div class="seg-ctl"><button class="on">2026年11月</button></div>
+        <button class="btn ghost" aria-label="次の月">›</button>
+      </div>
+    </header>
+    <section class="card kpis">
+      <div class="kpi"><div class="l">今月の作業時間</div><div class="v num">97.4<small>/ 126h</small></div>
+        <div class="bar"><span style="width:77%;background:var(--text)"></span></div><div class="note">目標の 77% · 先月同日比 +8.2h</div></div>
+      <div class="kpi"><div class="l">残り営業日</div><div class="v num">3<small>日</small></div><div class="note">11/30 まで</div></div>
+      <div class="kpi"><div class="l">必要ペース</div><div class="v num">9.5<small>h / 日</small></div><div class="note over">平均 5.1h / 日 より多い</div></div>
+      <div class="kpi"><div class="l">今週</div><div class="v num">21.3<small>h</small></div><div class="note">月〜金 · 先週 24.0h</div></div>
+    </section>
+    <div class="rgrid">
+      <section class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div class="eyebrow">週ごとの作業時間（平日のみ）</div>
+          <div class="legend"><span><i class="dot" style="background:var(--p1)"></i>EC開発</span><span><i class="dot" style="background:var(--p2)"></i>在庫管理</span><span><i class="dot" style="background:var(--p3)"></i>顧客管理</span></div>
+        </div>
+        <div class="chart" id="chart">
+          <div class="gl" style="bottom:66.6%"><span>8h</span></div>
+          <div class="gl" style="bottom:33.3%"><span>4h</span></div>
+        </div>
+        <div class="wklab" id="wklab"></div>
+      </section>
+      <section class="card">
+        <div class="eyebrow">プロジェクト別</div>
+        <div class="dist">
+          <div class="drow"><span><span class="dot" style="background:var(--p3)"></span>&nbsp; 顧客管理基盤</span><span class="r tab"><b>34.7h</b> · 36%</span><div class="bar"><span style="width:36%;background:var(--p3)"></span></div></div>
+          <div class="drow"><span><span class="dot" style="background:var(--p1)"></span>&nbsp; EC開発</span><span class="r tab"><b>31.8h</b> · 33%</span><div class="bar"><span style="width:33%;background:var(--p1)"></span></div></div>
+          <div class="drow"><span><span class="dot" style="background:var(--p2)"></span>&nbsp; 在庫管理システム改修</span><span class="r tab"><b>30.6h</b> · 31%</span><div class="bar"><span style="width:31%;background:var(--p2)"></span></div></div>
+          <div class="drow" style="color:var(--text-2)"><span><span class="dot" style="background:var(--p4)"></span>&nbsp; 社内勉強会 <span style="color:var(--text-3)">（追跡のみ）</span></span><span class="r tab">4.5h</span></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- ============ 設定 ============ -->
+  <main id="settings">
+    <header><div><h1>設定</h1><div class="sub">変更はすぐに保存されます</div></div></header>
+    <div class="settings">
+      <div class="group"><h2>稼働時間</h2><div class="card">
+        <div class="srow"><div><div class="t">月間基準時間</div><div class="d">プロジェクトの目標時間は「基準時間 × 稼働率」で決まります。<br>例: 140h × 40% = 56h</div></div>
+          <div style="display:flex;align-items:center;gap:14px"><span class="saved">保存済み</span><div class="stepper"><button aria-label="減らす">−</button><span class="num">140</span><button aria-label="増やす">＋</button></div><span class="unit">h / 月</span></div></div>
+      </div></div>
+      <div class="group"><h2>外観と言語</h2><div class="card">
+        <div class="srow"><div><div class="t">テーマ</div><div class="d">⌥L でも切り替えられます</div></div><div class="seg-ctl" id="theme-seg"><button>ライト</button><button class="on">ダーク</button><button>システム</button></div></div>
+        <div class="srow"><div><div class="t">言語</div></div><div class="seg-ctl"><button class="on">日本語</button><button>English</button></div></div>
+      </div></div>
+      <div class="group"><h2>データ</h2><div class="card">
+        <div class="srow"><div><div class="t">CSV から取り込む</div><div class="d">取り込む前に自動でバックアップします。結果は件数で表示します。</div></div><button class="btn ghost">ファイルを選ぶ…</button></div>
+        <div class="srow"><div><div class="t">保存場所</div><div class="d tab">~/Library/Application Support/Activity Log/data</div></div><button class="btn ghost">Finder で開く</button></div>
+      </div></div>
+    </div>
+  </main>
+</div>
+
+<script>
+  const themeBtns = document.querySelectorAll('.theme button');
+  themeBtns.forEach(b => b.onclick = () => { document.body.className = b.dataset.t; themeBtns.forEach(x => x.classList.toggle('on', x === b)); document.querySelectorAll('#theme-seg button').forEach((x, i) => x.classList.toggle('on', i === (b.dataset.t === 'graphite' ? 1 : 0))); });
+  const show = s => {
+    document.querySelectorAll('main').forEach(m => m.classList.toggle('on', m.id === s));
+    document.querySelectorAll('[data-s]').forEach(x => x.classList.toggle('on', x.dataset.s === s));
+  };
+  document.querySelectorAll('[data-s]').forEach(b => b.onclick = () => show(b.dataset.s));
+
+  // 週別チャート（平日のみ、プロジェクト別積み上げ、最大12h）
+  const weeks = [
+    ['11/2 週', [[3,2,2],[4,2,1.5],[2,3,2.5],[3,2.5,2],[1,3,3]]],
+    ['11/9 週', [[2,3,2],[3,2,2],[3,1,3],[2,3,2],[2,2,2]]],
+    ['11/16 週', [[3,2,1],[2,2,3],[3,2,2],[2,1,3],[2,2,2]]],
+    ['11/23 週', [[0,0,0],[3,2,2],[2,3,2],[2,2,1.5],[1.5,1,0]]],
+  ];
+  const chart = document.getElementById('chart'), lab = document.getElementById('wklab');
+  weeks.forEach(([label, days], wi) => {
+    const wk = document.createElement('div'); wk.className = 'wk';
+    let total = 0;
+    days.forEach((d, di) => {
+      const day = document.createElement('div'); day.className = 'day';
+      const sum = d.reduce((a, b) => a + b, 0); total += sum;
+      if (wi === 3 && di === 0) { day.style.height = '3px'; day.innerHTML = '<i style="height:3px;background:var(--track)"></i>'; day.title = '祝日'; }
+      else d.forEach((h, pi) => { if (h) day.insertAdjacentHTML('beforeend', `<i style="height:${h / 12 * 190}px;background:var(--p${pi + 1})"></i>`); });
+      if (wi === 3 && di === 4) day.classList.add('today');
+      wk.appendChild(day);
+    });
+    chart.appendChild(wk);
+    lab.insertAdjacentHTML('beforeend', `<span>${label}<b>${total.toFixed(1)}h</b></span>`);
+  });
+</script>
+</body>
+</html>

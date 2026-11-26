@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<title>Today screen — style directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Noto+Sans+JP:wght@400;500;600&family=Instrument+Serif&family=Shippori+Mincho:wght@500&family=Geist:wght@200;300;400&family=Geist+Mono:wght@300;400&family=JetBrains+Mono:wght@200;300&family=Space+Grotesk:wght@300;400&family=Manrope:wght@200;300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+  button { font: inherit; color: inherit; cursor: pointer; border: 0; background: none; }
+
+  /* ---------- Themes ---------- */
+  .graphite {
+    --font: 'Inter', 'Noto Sans JP', sans-serif; --font-num: 'Manrope', sans-serif; --num-weight: 200; --num-track: -0.04em;
+    --bg: #09090B; --sidebar: #09090B; --surface: #111114; --surface-2: #18181C; --border: rgba(255,255,255,.07); --border-2: rgba(255,255,255,.12);
+    --text: #EDEDEF; --text-2: #A0A0AB; --text-3: #5E5E68; --accent: #8E8CFF; --danger: #FF6B6B;
+    --p1: #8E8CFF; --p2: #3DD6A3; --p3: #F5A524; --track: rgba(255,255,255,.06);
+    --radius: 12px; --shadow: none; --nav-active: rgba(255,255,255,.06); --glow: rgba(142,140,255,.10);
+  }
+  .graphite-light {
+    --font: 'Inter', 'Noto Sans JP', sans-serif; --font-num: 'Manrope', sans-serif; --num-weight: 200; --num-track: -0.04em;
+    --bg: #FBFBFC; --sidebar: #F5F5F7; --surface: #FFFFFF; --surface-2: #F4F4F6; --border: rgba(10,10,20,.08); --border-2: rgba(10,10,20,.14);
+    --text: #0B0B0F; --text-2: #5E5E6B; --text-3: #A1A1AB; --accent: #5652E0; --danger: #E5484D;
+    --p1: #6C68EE; --p2: #12A58A; --p3: #E08A0B; --track: rgba(10,10,20,.06);
+    --radius: 12px; --shadow: none; --nav-active: rgba(10,10,20,.06); --glow: rgba(108,104,238,.07);
+  }
+  .paper {
+    --font: 'Noto Sans JP', 'Inter', sans-serif; --font-num: 'Instrument Serif', 'Shippori Mincho', serif; --num-weight: 400; --num-track: -0.01em;
+    --bg: #F6F4EF; --sidebar: #F6F4EF; --surface: transparent; --surface-2: #EEEBE4; --border: rgba(28,27,25,.10); --border-2: rgba(28,27,25,.18);
+    --text: #1C1B19; --text-2: #6E6B63; --text-3: #A7A399; --accent: #1F5C4D; --danger: #B5462A;
+    --p1: #1F5C4D; --p2: #4F5BD5; --p3: #C27A2C; --track: rgba(28,27,25,.08);
+    --radius: 2px; --shadow: none; --nav-active: rgba(28,27,25,.06);
+  }
+  .native {
+    --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Hiragino Sans', sans-serif; --font-num: -apple-system, 'SF Pro Display', sans-serif; --num-weight: 600; --num-track: -0.03em;
+    --bg: #F2F2F5; --sidebar: rgba(236,236,240,.85); --surface: #FFFFFF; --surface-2: #F4F4F7; --border: rgba(0,0,0,.06); --border-2: rgba(0,0,0,.1);
+    --text: #1D1D1F; --text-2: #6E6E73; --text-3: #AEAEB2; --accent: #0A84FF; --danger: #FF3B30;
+    --p1: #0A84FF; --p2: #30C35F; --p3: #FF9500; --track: rgba(0,0,0,.06);
+    --radius: 18px; --shadow: 0 1px 2px rgba(0,0,0,.04), 0 10px 30px rgba(0,0,0,.05); --nav-active: rgba(0,0,0,.07);
+  }
+
+  /* ---------- Layout ---------- */
+  .app { display: grid; grid-template-columns: 216px 1fr; width: 1280px; height: 800px; margin: 0 auto; overflow: hidden; }
+  aside { background: var(--sidebar); border-right: 1px solid var(--border); padding: 22px 14px; display: flex; flex-direction: column; gap: 2px; }
+  .brand { display: flex; align-items: center; gap: 10px; padding: 0 10px 22px; font-weight: 600; font-size: 14px; letter-spacing: -.01em; }
+  .logo { width: 22px; height: 22px; border-radius: 7px; background: var(--text); position: relative; }
+  .logo::after { content: ''; position: absolute; inset: 6px; border-radius: 50%; border: 2px solid var(--bg); border-right-color: transparent; }
+  .nav { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; font-size: 13.5px; color: var(--text-2); }
+  .nav.on { background: var(--nav-active); color: var(--text); font-weight: 500; }
+  .nav svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.6; }
+  .nav .k { margin-left: auto; font-size: 11px; color: var(--text-3); }
+  .mini { margin-top: auto; padding: 12px; border-radius: 10px; border: 1px solid var(--border); font-size: 12px; color: var(--text-2); }
+  .mini b { display: block; color: var(--text); font-weight: 500; font-size: 13px; margin-top: 2px; }
+
+  main { padding: 34px 44px; overflow: hidden; display: flex; flex-direction: column; gap: 22px; }
+  header { display: flex; align-items: flex-end; justify-content: space-between; }
+  h1 { font-size: 26px; font-weight: 600; letter-spacing: -.02em; }
+  .date { color: var(--text-2); font-size: 13px; margin-top: 4px; }
+  .actions { display: flex; gap: 8px; }
+  .search { display: flex; align-items: center; gap: 10px; width: 260px; height: 34px; padding: 0 12px; border-radius: 9px; border: 1px solid var(--border); color: var(--text-3); font-size: 13px; background: var(--surface); }
+  .kbd { margin-left: auto; font-size: 11px; border: 1px solid var(--border-2); border-radius: 5px; padding: 1px 6px; color: var(--text-2); font-family: 'Inter', sans-serif; }
+  .btn { height: 34px; padding: 0 14px; border-radius: 9px; border: 1px solid var(--border-2); font-size: 13px; font-weight: 500; background: var(--surface); }
+
+  .grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 16px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; }
+  .eyebrow { font-size: 12px; color: var(--text-2); display: flex; align-items: center; gap: 8px; }
+  .live { width: 7px; height: 7px; border-radius: 50%; background: var(--danger); box-shadow: 0 0 0 4px color-mix(in srgb, var(--danger) 18%, transparent); }
+  .proj { display: inline-flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 500; margin-top: 14px; }
+  .dot { width: 8px; height: 8px; border-radius: 3px; flex: none; }
+  .timer { font-family: var(--font-num); font-weight: var(--num-weight); letter-spacing: var(--num-track); font-size: 76px; line-height: 1; margin: 10px 0 18px; font-variant-numeric: tabular-nums; }
+  .row { display: flex; align-items: center; gap: 10px; }
+  .note { flex: 1; color: var(--text-3); font-size: 13px; border-bottom: 1px dashed var(--border-2); padding: 6px 0; }
+  .stop { height: 40px; padding: 0 18px 0 14px; border-radius: 999px; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; background: var(--danger); color: #fff; }
+  .stop i { width: 10px; height: 10px; border-radius: 2px; background: currentColor; }
+
+  .stats { display: flex; flex-direction: column; justify-content: space-between; gap: 18px; }
+  .stat .v { font-family: var(--font-num); font-weight: var(--num-weight); letter-spacing: var(--num-track); font-size: 34px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .stat .v small { font-family: var(--font); font-size: 13px; color: var(--text-2); letter-spacing: 0; margin-left: 4px; }
+  .stat .l { font-size: 12px; color: var(--text-2); margin-bottom: 4px; }
+  .bar { height: 4px; border-radius: 4px; background: var(--track); margin-top: 10px; overflow: hidden; display: flex; }
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  .timeline { position: relative; height: 30px; border-radius: 8px; background: var(--track); margin: 14px 0 8px; }
+  .seg { position: absolute; top: 4px; bottom: 4px; border-radius: 5px; }
+  .now { position: absolute; top: -5px; bottom: -5px; width: 2px; border-radius: 2px; background: var(--danger); }
+  .axis { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-3); font-family: 'Inter', sans-serif; }
+
+  .plist { display: flex; flex-direction: column; }
+  .pr { display: grid; grid-template-columns: 30px 1fr 220px 120px; align-items: center; gap: 14px; padding: 12px 4px; border-top: 1px solid var(--border); font-size: 13.5px; }
+  .pr:first-child { border-top: 0; }
+  .play { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--border-2); display: flex; align-items: center; justify-content: center; }
+  .play::after { content: ''; border-left: 7px solid var(--text-2); border-top: 4.5px solid transparent; border-bottom: 4.5px solid transparent; margin-left: 2px; }
+  .play.active { border-color: transparent; background: color-mix(in srgb, var(--danger) 14%, transparent); }
+  .play.active::after { border: 0; width: 8px; height: 8px; background: var(--danger); border-radius: 2px; margin: 0; }
+  .hrs { text-align: right; color: var(--text-2); font-variant-numeric: tabular-nums; font-family: 'Inter', var(--font); font-size: 13px; }
+  .over { color: var(--danger); }
+  .tag { font-size: 11px; padding: 2px 7px; border-radius: 6px; margin-left: 8px; background: color-mix(in srgb, var(--danger) 12%, transparent); color: var(--danger); font-weight: 500; }
+
+  /* ---------- Theme-specific component treatments ---------- */
+  .paper .card { border: 0; border-top: 1px solid var(--text); padding: 18px 0 0; }
+  .paper .grid .card:last-child { border-top-color: var(--border-2); }
+  .paper h1 { font-family: 'Shippori Mincho', serif; font-weight: 500; font-size: 30px; }
+  .paper .timer { font-size: 96px; margin: 4px 0 14px; }
+  .paper .stop { background: var(--text); color: var(--bg); }
+  .paper .stop i { background: var(--danger); }
+  .paper .search, .paper .btn { background: transparent; border-radius: 2px; }
+  .paper .dot { border-radius: 50%; }
+  .paper .eyebrow { text-transform: none; letter-spacing: .08em; }
+  :is(.graphite, .graphite-light) .card:first-child { background: radial-gradient(120% 140% at 0% 0%, var(--glow), transparent 55%), var(--surface); }
+  :is(.graphite, .graphite-light) .btn { background: var(--text); color: var(--bg); border: 0; }
+  :is(.graphite, .graphite-light) .stop { background: transparent; color: var(--text); border: 1px solid var(--border-2); }
+  :is(.graphite, .graphite-light) .stop i { background: var(--danger); }
+  .graphite-light .card { box-shadow: 0 1px 2px rgba(10,10,20,.03); }
+  .native aside { backdrop-filter: blur(30px); }
+  .native .btn { background: var(--accent); color: #fff; border: 0; }
+  .native .search { background: var(--surface-2); border: 0; }
+  .native .nav.on { background: var(--accent); color: #fff; }
+  .native .nav.on .k { color: rgba(255,255,255,.7); }
+  .native .play { border: 0; background: var(--surface-2); }
+
+  /* ---------- Switcher ---------- */
+  .switch { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 10; display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: rgba(120,120,128,.18); backdrop-filter: blur(20px); font-family: 'Inter', sans-serif; }
+  .switch button { padding: 6px 14px; border-radius: 999px; font-size: 12px; font-weight: 500; color: var(--text-2); }
+  .switch button.on { background: var(--text); color: var(--bg); }
+  .switch.fonts { top: auto; bottom: 14px; white-space: nowrap; }
+</style>
+</head>
+<body class="graphite">
+<div class="switch" role="tablist" aria-label="スタイル案">
+  <button class="on" data-t="graphite">A · Graphite Dark</button>
+  <button data-t="graphite-light">A · Graphite Light</button>
+  <button data-t="paper">B · Paper</button>
+  <button data-t="native">C · Native</button>
+</div>
+<div class="switch fonts" role="tablist" aria-label="数字フォント">
+  <button data-f="'Inter'|300|-0.04em">1 Inter</button>
+  <button data-f="'Geist'|200|-0.04em">2 Geist</button>
+  <button data-f="'Geist Mono'|300|-0.06em">3 Geist Mono</button>
+  <button data-f="'JetBrains Mono'|200|-0.06em">4 JetBrains Mono</button>
+  <button data-f="'Space Grotesk'|300|-0.04em">5 Space Grotesk</button>
+  <button class="on" data-f="'Manrope'|200|-0.04em">6 Manrope</button>
+  <button data-f="'DM Mono'|300|-0.07em">7 DM Mono</button>
+</div>
+
+<div class="app">
+  <aside>
+    <div class="brand"><span class="logo" aria-hidden="true"></span>Activity Log</div>
+    <a class="nav on"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>今日<span class="k">⌘1</span></a>
+    <a class="nav"><svg viewBox="0 0 24 24"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg>プロジェクト<span class="k">⌘2</span></a>
+    <a class="nav"><svg viewBox="0 0 24 24"><path d="M5 19V11M12 19V5M19 19v-6"/></svg>レポート<span class="k">⌘3</span></a>
+    <div class="mini">今月の進捗<b>97.4 / 126h · 77%</b></div>
+    <a class="nav" style="margin-top:8px"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg>設定</a>
+  </aside>
+
+  <main>
+    <header>
+      <div><h1>今日</h1><div class="date">2026年11月26日 木曜日</div></div>
+      <div class="actions">
+        <div class="search">プロジェクトを選んで開始<span class="kbd">⌘K</span></div>
+        <button class="btn">＋ 手動で記録</button>
+      </div>
+    </header>
+
+    <div class="grid">
+      <section class="card">
+        <div class="eyebrow"><span class="live"></span>計測中 · 10:30 から</div>
+        <div class="proj"><span class="dot" style="background:var(--p1)"></span>EC開発</div>
+        <div class="timer" id="t">1:24:07</div>
+        <div class="row"><div class="note">何をしていますか？（メモ）</div><button class="stop"><i></i>停止<span class="kbd" style="border-color:currentColor;opacity:.6">⌘.</span></button></div>
+      </section>
+      <section class="card stats">
+        <div class="stat"><div class="l">今日の作業時間</div><div class="v">5:12<small>h</small></div>
+          <div class="bar"><span style="width:20%;background:var(--p1)"></span><span style="width:17%;background:var(--p2)"></span><span style="width:17%;background:var(--p3)"></span></div></div>
+        <div class="split">
+          <div class="stat"><div class="l">今月</div><div class="v" style="font-size:26px">77<small>%</small></div></div>
+          <div class="stat"><div class="l">必要ペース</div><div class="v" style="font-size:26px">9.5<small>h / 日</small></div></div>
+        </div>
+      </section>
+    </div>
+
+    <section class="card">
+      <div class="eyebrow">タイムライン</div>
+      <div class="timeline">
+        <span class="seg" style="left:0%;width:4%;background:var(--p1)"></span>
+        <span class="seg" style="left:8.3%;width:11.6%;background:var(--p3)"></span>
+        <span class="seg" style="left:23%;width:11.2%;background:var(--p2)"></span>
+        <span class="seg" style="left:37.5%;width:11.6%;background:var(--p1);opacity:.65"></span>
+        <span class="now" style="left:49.4%"></span>
+      </div>
+      <div class="axis"><span>6:00</span><span>9:00</span><span>12:00</span><span>15:00</span><span>18:00</span><span>21:00</span></div>
+    </section>
+
+    <section class="card" style="padding-top:12px;padding-bottom:8px">
+      <div class="plist">
+        <div class="pr"><span class="play active" aria-label="停止"></span><span class="row"><span class="dot" style="background:var(--p1)"></span>EC開発</span><div class="bar" style="margin:0"><span style="width:57%;background:var(--p1)"></span></div><span class="hrs">31.8 / 56h</span></div>
+        <div class="pr"><span class="play" aria-label="開始"></span><span class="row"><span class="dot" style="background:var(--p2)"></span>在庫管理システム改修</span><div class="bar" style="margin:0"><span style="width:73%;background:var(--p2)"></span></div><span class="hrs">30.6 / 42h</span></div>
+        <div class="pr"><span class="play" aria-label="開始"></span><span class="row"><span class="dot" style="background:var(--p3)"></span>顧客管理基盤<span class="tag">+6.7h 超過</span></span><div class="bar" style="margin:0"><span style="width:80.6%;background:var(--p3)"></span><span style="width:19.4%;background:var(--danger)"></span></div><span class="hrs over">34.7 / 28h</span></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  const themeButtons = document.querySelectorAll('.switch:not(.fonts) button');
+  themeButtons.forEach(b => b.onclick = () => {
+    document.body.className = b.dataset.t;
+    themeButtons.forEach(x => x.classList.toggle('on', x === b));
+  });
+  document.querySelectorAll('.fonts button').forEach(b => b.onclick = () => {
+    const [family, weight, track] = b.dataset.f.split('|');
+    const st = document.body.style;
+    st.setProperty('--font-num', `${family}, sans-serif`);
+    st.setProperty('--num-weight', weight);
+    st.setProperty('--num-track', track);
+    document.querySelectorAll('.fonts button').forEach(x => x.classList.toggle('on', x === b));
+  });
+  let s = 5047; const t = document.getElementById('t');
+  setInterval(() => { s++; const h = Math.floor(s/3600), m = String(Math.floor(s%3600/60)).padStart(2,'0'), x = String(s%60).padStart(2,'0'); t.textContent = `${h}:${m}:${x}`; }, 1000);
+</script>
+</body>
+</html>
