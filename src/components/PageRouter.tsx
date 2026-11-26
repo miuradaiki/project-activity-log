@@ -5,7 +5,8 @@ import { Modal } from '../hooks/useModal';
 import { ProjectOperations } from '../hooks/useProjectOperations';
 
 import { Dashboard } from './dashboard/Dashboard';
-import { ProjectsView } from './ui/project/ProjectsView';
+import { ProjectsView } from './projects/ProjectsView';
+import { useSettingsContext } from '../contexts/SettingsContext';
 import { SettingsView } from './settings/SettingsView';
 import { TodayView } from './today/TodayView';
 import { TimeEntryList } from './timer/TimeEntryList';
@@ -37,6 +38,8 @@ export const PageRouter: React.FC<PageRouterProps> = ({
   isDarkMode,
   onToggleTheme,
 }) => {
+  const { settings } = useSettingsContext();
+
   switch (activePage) {
     case 'dashboard':
       return (
@@ -58,7 +61,10 @@ export const PageRouter: React.FC<PageRouterProps> = ({
         <ProjectsView
           projects={projects}
           timeEntries={timeEntries}
-          activeProjectId={timer.activeProject?.id || null}
+          activeProjectId={
+            timer.isRunning ? (timer.activeProject?.id ?? null) : null
+          }
+          baseMonthlyHours={settings.workHours.baseMonthlyHours}
           onEditProject={(project) => projectFormModal.open(project)}
           onDeleteProject={projectOps.deleteProject}
           onArchiveProject={projectOps.archiveProject}

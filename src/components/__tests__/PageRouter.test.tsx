@@ -8,7 +8,7 @@ jest.mock('../dashboard/Dashboard', () => ({
   Dashboard: () => <div data-testid="dashboard">Dashboard</div>,
 }));
 
-jest.mock('../ui/project/ProjectsView', () => ({
+jest.mock('../projects/ProjectsView', () => ({
   ProjectsView: () => <div data-testid="projects-view">ProjectsView</div>,
 }));
 
