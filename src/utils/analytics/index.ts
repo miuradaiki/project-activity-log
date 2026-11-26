@@ -43,3 +43,9 @@ export {
   generateHeatmapData,
 } from './heatmap';
 export type { HeatmapDay, HeatmapWeek } from './heatmap';
+
+export {
+  getProjectMonthProgress,
+  sumProjectHoursInMonth,
+} from './project-progress';
+export type { ProjectMonthProgress, ProgressStatus } from './project-progress';
