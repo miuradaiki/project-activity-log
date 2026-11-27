@@ -5,6 +5,7 @@ interface PlayToggleButtonProps {
   active: boolean;
   label: string;
   onClick: () => void;
+  testId?: string;
 }
 
 /** 行内の開始/停止トグル。計測中は赤い■、それ以外は ▶ */
@@ -12,8 +13,10 @@ export const PlayToggleButton: React.FC<PlayToggleButtonProps> = ({
   active,
   label,
   onClick,
+  testId,
 }) => (
   <ButtonBase
+    data-testid={testId}
     onClick={onClick}
     aria-label={label}
     sx={(theme) => ({

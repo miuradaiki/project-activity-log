@@ -133,6 +133,7 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({
             <Button
               variant="contained"
               startIcon={<AddIcon />}
+              data-testid="add-project-button"
               onClick={onAddProject}
             >
               {t('projects.new')}
@@ -228,6 +229,7 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({
         {archived.length > 0 && (
           <>
             <ButtonBase
+              data-testid="archived-toggle"
               onClick={() => setShowArchived((v) => !v)}
               aria-expanded={showArchived}
               sx={{

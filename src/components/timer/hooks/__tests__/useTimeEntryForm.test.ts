@@ -1,6 +1,4 @@
-// UTC と日付が食い違う時間帯（JST 0〜9時）を再現するため、タイムゾーンを固定する
-process.env.TZ = 'Asia/Tokyo';
-
+// JST 0〜9時（UTC と日付が食い違う時間帯）を再現する。TZ は jest.global-setup.cjs で JST に固定している
 import { renderHook, act } from '@testing-library/react';
 import { useTimeEntryForm } from '../useTimeEntryForm';
 import { TimeEntry } from '../../../../types';

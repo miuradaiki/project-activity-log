@@ -52,6 +52,7 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
       })}
     >
       <PlayToggleButton
+        testId="project-play-button"
         active={isRunning}
         onClick={onToggle}
         label={t(isRunning ? 'today.stop.project' : 'today.start.project', {
@@ -166,6 +167,7 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
       </Typography>
       <IconButton
         size="small"
+        data-testid="project-more-button"
         aria-label={t('aria.project.menu')}
         onClick={(e) => onOpenMenu(e.currentTarget)}
       >

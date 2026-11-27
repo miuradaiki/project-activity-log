@@ -40,12 +40,14 @@ const MAIN_NAV = [
 ];
 
 const NavItem: React.FC<{
+  page: string;
   label: string;
   Icon: typeof TodayIcon;
   active: boolean;
   onClick: () => void;
-}> = ({ label, Icon, active, onClick }) => (
+}> = ({ page, label, Icon, active, onClick }) => (
   <ButtonBase
+    data-testid={`nav-${page}`}
     onClick={onClick}
     aria-current={active ? 'page' : undefined}
     sx={{
@@ -111,6 +113,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {MAIN_NAV.map(({ page, labelKey, Icon }) => (
           <NavItem
             key={page}
+            page={page}
             label={t(labelKey)}
             Icon={Icon}
             active={activePage === page}
@@ -219,6 +222,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           )}
 
           <NavItem
+            page="settings"
             label={t('nav.settings')}
             Icon={SettingsIcon}
             active={activePage === 'settings'}

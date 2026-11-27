@@ -38,62 +38,39 @@ test.describe('Application Launch', () => {
     expect(title).toContain('Project Activity Log');
   });
 
-  test('should display the sidebar with navigation icons', async () => {
-    // サイドバーのナビゲーションアイコンが表示されていることを確認
-    const sidebar = window.locator('[class*="MuiDrawer-root"]').first();
-    await expect(sidebar).toBeVisible();
+  test('should display the sidebar navigation', async () => {
+    for (const page of ['timer', 'projects', 'dashboard', 'settings']) {
+      await expect(window.locator(`[data-testid="nav-${page}"]`)).toBeVisible({
+        timeout: 10000,
+      });
+    }
   });
 
-  test('should display the main content area with projects', async () => {
-    // プロジェクト画面に遷移
-    const projectsIcon = window.locator('[data-testid="nav-projects"]').first();
-    await expect(projectsIcon).toBeVisible({ timeout: 10000 });
-    await projectsIcon.click();
-    await window.waitForTimeout(1000);
-
-    // プロジェクトタブが表示されていることを確認（日本語/英語両対応）
-    const tabContent = window.locator('[role="tab"]').first();
-    await expect(tabContent).toBeVisible({ timeout: 10000 });
+  test('should open the today page with hourly timeline dividers', async () => {
+    await window.locator('[data-testid="nav-timer"]').click();
+    await expect(window.locator('[data-testid="nav-timer"]')).toHaveAttribute(
+      'aria-current',
+      'page'
+    );
+    // 6:00〜21:00 の帯に、7時〜20時の毎時の区切り線
+    await expect(
+      window.locator('[data-testid="timeline-hour-line"]')
+    ).toHaveCount(14, { timeout: 10000 });
   });
 });
 
 test.describe('Navigation', () => {
-  test('should navigate using sidebar icons', async () => {
-    // ダッシュボードアイコン（グリッドアイコン）をクリック
-    const dashboardIcon = window
-      .locator('[data-testid="nav-dashboard"]')
-      .first();
-    await expect(dashboardIcon).toBeVisible({ timeout: 10000 });
-    await dashboardIcon.click();
-    await window.waitForTimeout(1000);
+  test('should navigate to the projects page', async () => {
+    await window.locator('[data-testid="nav-projects"]').click();
+    await expect(
+      window.locator('[data-testid="add-project-button"]')
+    ).toBeVisible({ timeout: 10000 });
   });
 
-  test('should show project list on initial load', async () => {
-    // プロジェクトカードが表示されていることを確認
-    const projectCards = window.locator('[class*="MuiCard"]');
-    const count = await projectCards.count();
-    expect(count).toBeGreaterThanOrEqual(0);
-  });
-});
-
-test.describe('Dashboard Features', () => {
-  test('should display dashboard content', async () => {
-    // ダッシュボードのコンテンツが表示されていることを確認
-    const dashboardContent = window.locator('[class*="MuiBox"]').first();
-    await expect(dashboardContent).toBeVisible({ timeout: 10000 });
-  });
-
-  test('should display dashboard cards', async () => {
-    // ダッシュボードのカードが表示されていることを確認
-    const cards = window.locator('[class*="MuiCard"], [class*="MuiPaper"]');
-    const count = await cards.count();
-    expect(count).toBeGreaterThanOrEqual(0);
-  });
-
-  test('should display tabs if present', async () => {
-    // タブが存在する場合は表示されていることを確認
-    const tabs = window.locator('[role="tab"]');
-    const count = await tabs.count();
-    expect(count).toBeGreaterThanOrEqual(0);
+  test('should navigate to the reports page', async () => {
+    const reports = window.locator('[data-testid="nav-dashboard"]');
+    await reports.click();
+    await expect(reports).toHaveAttribute('aria-current', 'page');
+    await expect(window.locator('h1')).toBeVisible({ timeout: 10000 });
   });
 });
