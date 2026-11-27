@@ -155,4 +155,51 @@ describe('useTimeEntryForm の日付（ローカル時刻基準）', () => {
       new Date('2026-11-27T01:00:00+09:00').toISOString()
     );
   });
+
+  describe('他の記録との重なり', () => {
+    const firstDay = entryAt(
+      '2026-11-26T23:00:00+09:00',
+      '2026-11-26T23:59:59.999+09:00'
+    );
+    const secondDay = {
+      ...entryAt('2026-11-27T00:00:00+09:00', '2026-11-27T01:00:00+09:00'),
+      id: 'e2',
+    };
+
+    it('分割済みの1日目を翌日まで延ばすと、翌日分と重なるので保存しない', () => {
+      const onSave = jest.fn();
+      const { result } = renderHook(() =>
+        useTimeEntryForm({
+          timeEntry: firstDay,
+          timeEntries: [firstDay, secondDay],
+          onSave,
+          onClose: jest.fn(),
+        })
+      );
+
+      act(() => result.current.setEndDate('2026-11-27'));
+      act(() => result.current.setEndTime('01:00'));
+
+      expect(result.current.validationError).toBe('overlap');
+      act(() =>
+        result.current.handleSubmit({ preventDefault: () => {} } as never)
+      );
+      expect(onSave).not.toHaveBeenCalled();
+    });
+
+    it('編集中の記録自身や、接しているだけの記録とは重なりとみなさない', () => {
+      const { result } = renderHook(() =>
+        useTimeEntryForm({
+          timeEntry: secondDay,
+          timeEntries: [firstDay, secondDay],
+          onSave: jest.fn(),
+          onClose: jest.fn(),
+        })
+      );
+
+      act(() => result.current.setEndTime('02:00'));
+
+      expect(result.current.validationError).toBeNull();
+    });
+  });
 });
