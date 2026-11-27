@@ -19,18 +19,19 @@ interface ProjectFormProps {
   open: boolean;
   project?: Project;
   projects?: Project[];
+  /** 設定の月間基準時間。目標時間の目安表示に使う */
+  baseMonthlyHours: number;
   onClose: () => void;
   onSave: (
     projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>
   ) => void;
 }
 
-const BASE_MONTHLY_HOURS = 140; // 基準となる月間時間
-
 export const ProjectForm: React.FC<ProjectFormProps> = ({
   open,
   project,
   projects = [],
+  baseMonthlyHours,
   onClose,
   onSave,
 }) => {
@@ -155,7 +156,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
             />
             <Typography color="text.secondary" variant="body2" sx={{ mt: 1 }}>
               {t('projects.monthly.target')}:{' '}
-              {formatHours(monthlyCapacity * BASE_MONTHLY_HOURS)}{' '}
+              {formatHours(monthlyCapacity * baseMonthlyHours)}{' '}
               {t('units.hours')}/{t('time.this.month')}
             </Typography>
           </Box>

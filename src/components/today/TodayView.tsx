@@ -32,6 +32,7 @@ interface TodayViewProps {
   onToggleProject: (project: Project) => void;
   onStop: () => void;
   onManualEntry: () => void;
+  onCreateProject: () => void;
   /** 一覧の下に置く今日の記録など */
   children?: React.ReactNode;
 }
@@ -45,6 +46,7 @@ export const TodayView: React.FC<TodayViewProps> = ({
   onToggleProject,
   onStop,
   onManualEntry,
+  onCreateProject,
   children,
 }) => {
   const { t, language } = useLanguage();
@@ -192,6 +194,7 @@ export const TodayView: React.FC<TodayViewProps> = ({
         activeProjectId={activeProject?.id ?? null}
         isRunning={isRunning}
         onToggle={onToggleProject}
+        onCreateProject={onCreateProject}
       />
 
       {children}

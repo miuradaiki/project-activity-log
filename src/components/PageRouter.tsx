@@ -79,6 +79,7 @@ export const PageRouter: React.FC<PageRouterProps> = ({
           onToggleProject={onStartTimer}
           onStop={() => timer.stop()}
           onManualEntry={() => manualEntryModal.open()}
+          onCreateProject={() => projectFormModal.open()}
         >
           <TimeEntryList
             timeEntries={timeEntries}

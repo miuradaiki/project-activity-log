@@ -2,6 +2,7 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { Alert, Box, CircularProgress, Snackbar } from '@mui/material';
 import { useLanguage } from './contexts/LanguageContext';
 import { useCsvImport } from './hooks/useCsvImport';
+import { useSettingsContext } from './contexts/SettingsContext';
 import { Project, TimeEntry } from './types';
 
 import { ProjectForm } from './components/ProjectForm';
@@ -20,6 +21,7 @@ import { projectColorManager } from './utils/colorUtils';
 
 const App: React.FC = () => {
   const { t } = useLanguage();
+  const { settings } = useSettingsContext();
   // テーマとレイアウト管理
   const { isDarkMode, toggleThemeMode } = useThemeMode();
 
@@ -187,6 +189,7 @@ const App: React.FC = () => {
         }
         project={projectFormModal.data}
         projects={projects}
+        baseMonthlyHours={settings.workHours.baseMonthlyHours}
       />
 
       <ManualTimeEntryForm

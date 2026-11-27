@@ -43,6 +43,7 @@ const renderList = (
       activeProjectId="ec"
       isRunning
       onToggle={jest.fn()}
+      onCreateProject={jest.fn()}
       {...props}
     />
   );
@@ -66,5 +67,28 @@ describe('TodayProjectList', () => {
     expect(screen.getByText('31.8 / 56h')).toBeInTheDocument();
     expect(screen.getByText('34.7 / 28h')).toBeInTheDocument();
     expect(screen.getByText('+6.7h 超過')).toBeInTheDocument();
+  });
+});
+
+describe('TodayProjectList の空状態', () => {
+  it('プロジェクトがないときは作成ボタンを出す', () => {
+    const onCreateProject = jest.fn();
+    renderWithGraphite(
+      <TodayProjectList
+        projects={[]}
+        timeEntries={[]}
+        baseMonthlyHours={140}
+        activeProjectId={null}
+        isRunning={false}
+        onToggle={jest.fn()}
+        onCreateProject={onCreateProject}
+      />
+    );
+
+    expect(
+      screen.getByText('まだプロジェクトがありません')
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'プロジェクトを作成' }));
+    expect(onCreateProject).toHaveBeenCalledTimes(1);
   });
 });

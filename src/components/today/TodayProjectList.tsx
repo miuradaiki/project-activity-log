@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { Project, TimeEntry } from '../../types';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { getProjectMonthProgress } from '../../utils/analytics';
@@ -16,6 +16,7 @@ interface TodayProjectListProps {
   activeProjectId: string | null;
   isRunning: boolean;
   onToggle: (project: Project) => void;
+  onCreateProject: () => void;
 }
 
 export const TodayProjectList: React.FC<TodayProjectListProps> = ({
@@ -25,9 +26,30 @@ export const TodayProjectList: React.FC<TodayProjectListProps> = ({
   activeProjectId,
   isRunning,
   onToggle,
+  onCreateProject,
 }) => {
   const { t } = useLanguage();
   const visible = projects.filter((p) => !p.isArchived);
+
+  if (visible.length === 0) {
+    return (
+      <GraphiteCard
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 2,
+        }}
+      >
+        <Typography sx={{ fontSize: 13, color: 'text.secondary' }}>
+          {t('today.no.projects')}
+        </Typography>
+        <Button variant="contained" onClick={onCreateProject}>
+          {t('today.create.project')}
+        </Button>
+      </GraphiteCard>
+    );
+  }
 
   return (
     <GraphiteCard padding="6px 20px">
