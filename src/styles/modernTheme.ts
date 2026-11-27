@@ -331,6 +331,30 @@ const buildTheme = (s: Scheme): Theme => {
           },
         },
       },
+      MuiSwitch: {
+        styleOverrides: {
+          root: { width: 38, height: 22, padding: 0, margin: '0 4px' },
+          switchBase: {
+            padding: 3,
+            '&.Mui-checked': {
+              transform: 'translateX(16px)',
+              color: s.bg,
+              '& + .MuiSwitch-track': {
+                backgroundColor: s.text,
+                opacity: 1,
+                border: 0,
+              },
+            },
+          },
+          thumb: { width: 16, height: 16, boxShadow: 'none' },
+          track: {
+            borderRadius: 11,
+            backgroundColor: s.track,
+            border: `1px solid ${s.border2}`,
+            opacity: 1,
+          },
+        },
+      },
       MuiLinearProgress: {
         styleOverrides: {
           root: { height: 4, borderRadius: 4, backgroundColor: s.track },

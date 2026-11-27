@@ -174,7 +174,6 @@ export const translations = {
     'aria.time.set.end': '現在時刻を終了時刻に設定',
     'aria.settings.info': '設定の詳細情報',
     'aria.language.switch': '言語を切り替え',
-    'aria.testmode.toggle': 'テストモードの切り替え',
     'aria.timer.stop': 'タイマーを停止',
     'aria.timer.start': 'タイマーを開始',
     'aria.week.navigation': '週の移動',
@@ -294,6 +293,15 @@ export const translations = {
     'history.no.match': '該当する作業記録はありません',
     'history.more': 'さらに表示（残り {count} 件）',
     'history.unknown.project': '不明なプロジェクト',
+    'settings.testmode.title': 'テストモード',
+    'settings.testmode.badge': '開発用',
+    'settings.testmode.use': 'テストデータを使う',
+    'settings.testmode.description':
+      '本番データは触らず、生成したデータで画面を確認します。',
+    'settings.testmode.data': 'テストデータ',
+    'settings.testmode.projects': 'プロジェクト',
+    'settings.testmode.entries': '記録',
+    'settings.testmode.regenerate': 'データを作り直す',
   },
   en: {
     // ===== Common =====
@@ -443,7 +451,6 @@ export const translations = {
     'aria.time.set.end': 'Set current time as end time',
     'aria.settings.info': 'Settings information',
     'aria.language.switch': 'Switch language',
-    'aria.testmode.toggle': 'Toggle test mode',
     'aria.timer.stop': 'Stop timer',
     'aria.timer.start': 'Start timer',
     'aria.week.navigation': 'Week navigation',
@@ -563,5 +570,14 @@ export const translations = {
     'history.no.match': 'No matching records',
     'history.more': 'Show more ({count} left)',
     'history.unknown.project': 'Unknown project',
+    'settings.testmode.title': 'Test mode',
+    'settings.testmode.badge': 'Dev',
+    'settings.testmode.use': 'Use test data',
+    'settings.testmode.description':
+      'Preview the app with generated data without touching real data.',
+    'settings.testmode.data': 'Test data',
+    'settings.testmode.projects': 'projects',
+    'settings.testmode.entries': 'entries',
+    'settings.testmode.regenerate': 'Regenerate data',
   },
 };
