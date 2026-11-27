@@ -77,25 +77,3 @@ export const getWeekdayBreakdown = (
   }
   return weeks;
 };
-
-export const getMonthProjectShares = (
-  entries: TimeEntry[],
-  year: number,
-  month: number
-): { projectId: string; hours: number; share: number }[] => {
-  const totals = new Map<string, number>();
-  entries.forEach((entry) => {
-    const start = new Date(entry.startTime);
-    if (start.getFullYear() !== year || start.getMonth() !== month) return;
-    const h = calculateDuration(entry.startTime, entry.endTime) / HOUR;
-    totals.set(entry.projectId, (totals.get(entry.projectId) ?? 0) + h);
-  });
-  const sum = Array.from(totals.values()).reduce((a, b) => a + b, 0);
-  return Array.from(totals.entries())
-    .map(([projectId, h]) => ({
-      projectId,
-      hours: round1(h),
-      share: sum > 0 ? h / sum : 0,
-    }))
-    .sort((a, b) => b.hours - a.hours);
-};

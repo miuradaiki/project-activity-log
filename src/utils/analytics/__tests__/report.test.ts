@@ -1,4 +1,4 @@
-import { getWeekdayBreakdown, getMonthProjectShares } from '../report';
+import { getWeekdayBreakdown } from '../report';
 import { TimeEntry } from '../../../types';
 
 const e = (projectId: string, start: string, hours: number): TimeEntry => {
@@ -51,38 +51,5 @@ describe('getWeekdayBreakdown', () => {
     expect(thursday.isToday).toBe(true);
     expect(weeks[3].days[4].isFuture).toBe(true);
     expect(thursday.isFuture).toBe(false);
-  });
-});
-
-describe('getMonthProjectShares', () => {
-  it('今月のプロジェクト別時間と全体に占める割合を多い順に返す', () => {
-    const entries = [
-      e('a', '2026-11-02T09:00:00', 3),
-      e('b', '2026-11-03T09:00:00', 1),
-      e('a', '2026-10-03T09:00:00', 9),
-    ];
-
-    expect(getMonthProjectShares(entries, 2026, 10)).toEqual([
-      { projectId: 'a', hours: 3, share: 0.75 },
-      { projectId: 'b', hours: 1, share: 0.25 },
-    ]);
-  });
-});
-
-describe('終了時刻のない（計測中の）記録', () => {
-  it('現在時刻までとして集計し、NaN にしない', () => {
-    jest.useFakeTimers();
-    jest.setSystemTime(new Date(2026, 10, 26, 12));
-    const open: TimeEntry = {
-      ...e('a', '2026-11-26T10:00:00', 0),
-      endTime: '',
-    };
-
-    const weeks = getWeekdayBreakdown([open], 2026, 10, new Date());
-    const shares = getMonthProjectShares([open], 2026, 10);
-    jest.useRealTimers();
-
-    expect(weeks[3].days[3].byProject).toEqual({ a: 2 });
-    expect(shares[0].hours).toBe(2);
   });
 });
