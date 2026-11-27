@@ -8,7 +8,8 @@ export interface UseProjectOperationsProps {
   setTimeEntries: React.Dispatch<React.SetStateAction<TimeEntry[]>>;
   activeProjectId: string | null;
   isTimerRunning: boolean;
-  onTimerStop: () => void;
+  /** 停止で作られた記録を返す。削除と「元に戻す」で、その記録も一緒に扱うため */
+  onTimerStop: () => Promise<TimeEntry[]>;
 }
 
 export interface ProjectOperations {
@@ -21,7 +22,8 @@ export interface ProjectOperations {
   ) => void;
   archiveProject: (project: Project) => void;
   unarchiveProject: (project: Project) => void;
-  deleteProject: (project: Project) => void;
+  /** 計測中なら停止してから削除する。停止で作られた記録を返す */
+  deleteProject: (project: Project) => Promise<TimeEntry[]>;
   deleteTimeEntry: (timeEntryId: string) => void;
   saveTimeEntry: (timeEntry: TimeEntry, isEditing: boolean) => void;
 }
@@ -108,12 +110,15 @@ export const useProjectOperations = ({
   );
 
   const deleteProject = useCallback(
-    (project: Project) => {
-      if (activeProjectId === project.id && isTimerRunning) {
-        onTimerStop();
-      }
+    async (project: Project) => {
+      // 停止で追加される記録まで消すため、停止の完了を待ってから絞り込む
+      const stopped =
+        activeProjectId === project.id && isTimerRunning
+          ? await onTimerStop()
+          : [];
       setProjects((prev) => prev.filter((p) => p.id !== project.id));
       setTimeEntries((prev) => prev.filter((t) => t.projectId !== project.id));
+      return stopped;
     },
     [activeProjectId, isTimerRunning, onTimerStop, setProjects, setTimeEntries]
   );
