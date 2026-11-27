@@ -1,32 +1,29 @@
 import React from 'react';
-import { useLanguage } from '../contexts/LanguageContext';
 import { Button } from '@mui/material';
-import { Download } from '@mui/icons-material';
+import { useLanguage } from '../contexts/LanguageContext';
+import { useToast } from '../contexts/ToastContext';
 
-export const ExportButton = () => {
+export const ExportButton: React.FC = () => {
   const { t } = useLanguage();
+  const { showToast } = useToast();
+
   const handleExport = async () => {
     try {
-      // exportCSVは引数を取らない（main.js側でデータを取得する）
       const result = await window.electronAPI.exportToCSV();
-      if (result && result.success) {
-        alert(t('timer.export.success'));
-      } else {
-        alert(t('timer.export.error'));
-      }
+      if (result?.canceled) return;
+      showToast(
+        result?.success
+          ? { message: t('timer.export.success'), kind: 'success' }
+          : { message: t('timer.export.error'), kind: 'error' }
+      );
     } catch {
-      alert(t('timer.export.error'));
+      showToast({ message: t('timer.export.error'), kind: 'error' });
     }
   };
 
   return (
-    <Button
-      variant="contained"
-      color="primary"
-      startIcon={<Download />}
-      onClick={handleExport}
-    >
-      {t('actions.export')}
+    <Button variant="outlined" size="small" onClick={handleExport}>
+      {t('timer.export.csv')}
     </Button>
   );
 };

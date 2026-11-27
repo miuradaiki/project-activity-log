@@ -171,15 +171,15 @@ describe('useTimerController', () => {
       expect(entries[0].projectId).toBe(mockProject.id);
     });
 
-    it('1分未満の場合、TimeEntryは作成されない', async () => {
+    it('1分未満の場合、TimeEntryは作成されず、alert ではなく onDiscarded で知らせる', async () => {
       const onTimeEntriesCreated = jest.fn();
-      // alert mockを追加
+      const onDiscarded = jest.fn();
       const alertMock = jest
         .spyOn(window, 'alert')
         .mockImplementation(() => {});
 
       const { result } = renderHook(() =>
-        useTimerController(mockProjects, onTimeEntriesCreated)
+        useTimerController(mockProjects, onTimeEntriesCreated, onDiscarded)
       );
 
       await act(async () => {
@@ -196,7 +196,8 @@ describe('useTimerController', () => {
       });
 
       expect(onTimeEntriesCreated).not.toHaveBeenCalled();
-      expect(alertMock).toHaveBeenCalled();
+      expect(onDiscarded).toHaveBeenCalledTimes(1);
+      expect(alertMock).not.toHaveBeenCalled();
 
       alertMock.mockRestore();
     });

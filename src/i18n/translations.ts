@@ -105,7 +105,7 @@ export const translations = {
     'timer.notification.maxtime': '作業時間が8時間を超過しました',
     'timer.notification.maxtime.body':
       'タイマーを自動停止しました。必要に応じて新しいセッションを開始してください。',
-    'timer.export.success': '作業記録のエクスポートが完了しました',
+    'timer.export.success': 'CSVを書き出しました',
     'timer.export.error': 'エクスポートに失敗しました',
     'timer.multiday.notice':
       '{duration} ({startDate} - {endDate}) の記録になります。',
@@ -274,6 +274,9 @@ export const translations = {
     'settings.theme.light': 'ライト',
     'settings.theme.dark': 'ダーク',
     'settings.instant': '変更はすぐに保存されます',
+    'actions.close': '閉じる',
+    'timer.export.csv': 'CSV書き出し',
+    'timer.discarded': '1分未満のため記録しませんでした',
   },
   en: {
     // ===== Common =====
@@ -353,7 +356,7 @@ export const translations = {
     'timer.notification.maxtime': 'Working time exceeded 8 hours',
     'timer.notification.maxtime.body':
       'Timer has been automatically stopped. Start a new session if needed.',
-    'timer.export.success': 'Time entries exported successfully',
+    'timer.export.success': 'Exported CSV',
     'timer.export.error': 'Failed to export time entries',
     'timer.multiday.notice':
       'This will be a {duration} entry ({startDate} - {endDate}).',
@@ -522,5 +525,8 @@ export const translations = {
     'settings.theme.light': 'Light',
     'settings.theme.dark': 'Dark',
     'settings.instant': 'Changes are saved automatically',
+    'actions.close': 'Close',
+    'timer.export.csv': 'Export CSV',
+    'timer.discarded': 'Not recorded (under 1 minute)',
   },
 };

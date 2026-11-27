@@ -25,7 +25,9 @@ export interface TimerController {
 
 export const useTimerController = (
   projects: Project[],
-  onTimeEntriesCreated?: (entries: TimeEntry[]) => void
+  onTimeEntriesCreated?: (entries: TimeEntry[]) => void,
+  /** 1分未満で停止し、記録を保存しなかったときに呼ばれる */
+  onDiscarded?: () => void
 ): TimerController => {
   const [activeProject, setActiveProject] = useState<Project | null>(null);
   const [isRunning, setIsRunning] = useState(false);
@@ -133,7 +135,7 @@ export const useTimerController = (
 
     // 1分未満の場合は保存しない
     if (duration < MIN_DURATION_MS) {
-      alert('1分未満の時間エントリは保存できません。');
+      onDiscarded?.();
       return;
     }
 
@@ -146,7 +148,7 @@ export const useTimerController = (
     );
 
     onTimeEntriesCreated?.(newTimeEntries);
-  }, [activeProject, startTime, onTimeEntriesCreated]);
+  }, [activeProject, startTime, onTimeEntriesCreated, onDiscarded]);
 
   const toggle = useCallback(
     async (project?: Project) => {

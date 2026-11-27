@@ -2,17 +2,11 @@ import React, { useState, useCallback } from 'react';
 import { useSettingsContext } from '../../../contexts/SettingsContext';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { useStorage } from '../../../hooks/useStorage';
-
-interface Notification {
-  open: boolean;
-  message: string;
-  severity: 'success' | 'error' | 'info';
-}
+import { useToast } from '../../../contexts/ToastContext';
 
 interface UseSettingsStateReturn {
   baseMonthlyHours: number;
   setBaseMonthlyHours: React.Dispatch<React.SetStateAction<number>>;
-  notification: Notification;
   isLoading: boolean;
   isTestMode: boolean;
   testDataStats: { projectCount: number; timeEntryCount: number };
@@ -25,7 +19,6 @@ interface UseSettingsStateReturn {
     message: string,
     severity: 'success' | 'error' | 'info'
   ) => void;
-  handleCloseNotification: () => void;
 }
 
 export const useSettingsState = (): UseSettingsStateReturn => {
@@ -43,22 +36,12 @@ export const useSettingsState = (): UseSettingsStateReturn => {
     settings?.workHours?.baseMonthlyHours || 140
   );
 
-  const [notification, setNotification] = useState<Notification>({
-    open: false,
-    message: '',
-    severity: 'info',
-  });
-
+  const { showToast } = useToast();
   const showNotification = useCallback(
-    (message: string, severity: 'success' | 'error' | 'info') => {
-      setNotification({ open: true, message, severity });
-    },
-    []
+    (message: string, severity: 'success' | 'error' | 'info') =>
+      showToast({ message, kind: severity }),
+    [showToast]
   );
-
-  const handleCloseNotification = useCallback(() => {
-    setNotification((prev) => ({ ...prev, open: false }));
-  }, []);
 
   // 値を変えた時点で保存する（保存ボタンを押し忘れて反映されない問題を防ぐ）
   const handleCommitBaseMonthlyHours = useCallback(
@@ -78,16 +61,14 @@ export const useSettingsState = (): UseSettingsStateReturn => {
   const handleLanguageChange = useCallback(
     (language: 'ja' | 'en') => {
       setLanguage(language);
-      showNotification(t('settings.language.changed'), 'success');
     },
-    [setLanguage, showNotification, t]
+    [setLanguage]
   );
 
   const handleResetSettings = useCallback(async () => {
     try {
       await updateBaseMonthlyHours(140);
       setBaseMonthlyHours(140);
-      showNotification(t('settings.reset.success'), 'success');
     } catch {
       showNotification(t('settings.reset.error'), 'error');
     }
@@ -129,7 +110,6 @@ export const useSettingsState = (): UseSettingsStateReturn => {
   return {
     baseMonthlyHours,
     setBaseMonthlyHours,
-    notification,
     isLoading,
     isTestMode,
     testDataStats,
@@ -139,6 +119,5 @@ export const useSettingsState = (): UseSettingsStateReturn => {
     handleToggleTestMode,
     handleRegenerateTestData,
     showNotification,
-    handleCloseNotification,
   };
 };

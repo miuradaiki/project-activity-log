@@ -1,7 +1,8 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import { Alert, Box, CircularProgress, Snackbar } from '@mui/material';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import { Box, CircularProgress } from '@mui/material';
 import { useLanguage } from './contexts/LanguageContext';
 import { useCsvImport } from './hooks/useCsvImport';
+import { useToast } from './contexts/ToastContext';
 import { useSettingsContext } from './contexts/SettingsContext';
 import { Project, TimeEntry } from './types';
 
@@ -48,9 +49,18 @@ const App: React.FC = () => {
   const shortcutsModal = useModal();
 
   // タイマーコントローラー
-  const timer = useTimerController(projects, (entries) => {
-    setTimeEntries((prev) => [...prev, ...entries]);
-  });
+  const { showToast } = useToast();
+  const handleTimerDiscarded = useCallback(
+    () => showToast({ message: t('timer.discarded') }),
+    [showToast, t]
+  );
+  const timer = useTimerController(
+    projects,
+    (entries) => {
+      setTimeEntries((prev) => [...prev, ...entries]);
+    },
+    handleTimerDiscarded
+  );
 
   // プロジェクト操作
   const projectOps = useProjectOperations({
@@ -96,6 +106,22 @@ const App: React.FC = () => {
     setProjects,
     setTimeEntries,
   });
+  const { result: importResult, dismiss: dismissImport } = csvImport;
+  useEffect(() => {
+    if (!importResult) return;
+    showToast(
+      importResult.kind === 'success'
+        ? {
+            kind: 'success',
+            message: t('import.success', {
+              entries: importResult.addedEntries,
+              projects: importResult.addedProjects,
+            }),
+          }
+        : { kind: 'error', message: t('import.error') }
+    );
+    dismissImport();
+  }, [importResult, dismissImport, showToast, t]);
 
   // ナビゲーション処理
   const handleNavigate = useCallback((page: string) => {
@@ -203,26 +229,6 @@ const App: React.FC = () => {
         projects={projects}
         timeEntry={manualEntryModal.data}
       />
-
-      <Snackbar
-        open={!!csvImport.result}
-        autoHideDuration={6000}
-        onClose={csvImport.dismiss}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert
-          onClose={csvImport.dismiss}
-          severity={csvImport.result?.kind === 'error' ? 'error' : 'success'}
-          variant="filled"
-        >
-          {csvImport.result?.kind === 'success'
-            ? t('import.success', {
-                entries: csvImport.result.addedEntries,
-                projects: csvImport.result.addedProjects,
-              })
-            : t('import.error')}
-        </Alert>
-      </Snackbar>
 
       {/* キーボードショートカットダイアログ */}
       <KeyboardShortcutsDialog

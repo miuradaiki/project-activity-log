@@ -8,7 +8,11 @@ export interface ElectronAPI {
   saveTimeEntries: (entries: TimeEntry[]) => Promise<void>;
   loadSettings: () => Promise<AppSettings>;
   saveSettings: (settings: AppSettings) => Promise<void>;
-  exportToCSV: () => Promise<{ success: boolean; error?: string }>;
+  exportToCSV: () => Promise<{
+    success: boolean;
+    canceled?: boolean;
+    error?: string;
+  }>;
   showOpenDialog: () => Promise<{ canceled: boolean; filePaths: string[] }>;
   showNotification: (title: string, body: string) => void;
   onTimerStop: (callback: () => void) => void;

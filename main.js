@@ -235,7 +235,7 @@ app.whenReady().then(async () => {
       const timeEntries = await loadTimeEntries();
       const projects = await loadProjects();
       const result = await exportToCSV(timeEntries, projects);
-      return { success: result };
+      return { success: result === 'saved', canceled: result === 'canceled' };
     } catch (error) {
       console.error('Error in export-to-csv handler:', error);
       return { success: false, error: error.message };

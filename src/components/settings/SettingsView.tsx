@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, Box, Snackbar, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { isTestDataEnabled } from '../../utils/env';
 import { useSettingsState } from './hooks/useSettingsState';
@@ -25,7 +25,6 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
   const {
     baseMonthlyHours,
-    notification,
     isLoading,
     isTestMode,
     testDataStats,
@@ -34,7 +33,6 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
     handleResetSettings,
     handleToggleTestMode,
     handleRegenerateTestData,
-    handleCloseNotification,
   } = useSettingsState();
 
   if (isLoading) {
@@ -79,20 +77,6 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           />
         )}
       </Box>
-      <Snackbar
-        open={notification.open}
-        autoHideDuration={4000}
-        onClose={handleCloseNotification}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert
-          onClose={handleCloseNotification}
-          severity={notification.severity}
-          variant="filled"
-        >
-          {notification.message}
-        </Alert>
-      </Snackbar>
     </Box>
   );
 };
