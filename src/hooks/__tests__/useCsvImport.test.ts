@@ -85,4 +85,30 @@ describe('useCsvImport', () => {
     expect(safeImportWorkLog).not.toHaveBeenCalled();
     expect(result.current.result).toBeNull();
   });
+
+  it('ファイル選択中に増えた記録も含めて取り込む（古い一覧で上書きしない）', async () => {
+    let choose: (path: string) => void = () => {};
+    (window as unknown as { electronAPI: object }).electronAPI = {
+      showOpenFileDialog: jest.fn(
+        () => new Promise<string>((resolve) => (choose = resolve))
+      ),
+    };
+    (safeImportWorkLog as jest.Mock).mockResolvedValue({ success: true });
+    const { result, rerender } = renderHook((props) => useCsvImport(props), {
+      initialProps: base,
+    });
+
+    let pending: Promise<void> = Promise.resolve();
+    act(() => {
+      pending = result.current.importCSV();
+    });
+    const latest = [entry('e1'), entry('auto-stopped')];
+    rerender({ ...base, timeEntries: latest });
+    await act(async () => {
+      choose('/tmp/log.csv');
+      await pending;
+    });
+
+    expect((safeImportWorkLog as jest.Mock).mock.calls[0][2]).toBe(latest);
+  });
 });
