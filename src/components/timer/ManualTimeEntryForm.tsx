@@ -142,7 +142,6 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
         endDate={formState.endDate}
         startTime={formState.startTime}
         endTime={formState.endTime}
-        isEditing={isEditing}
         error={validationError ? t(ERROR_KEYS[validationError]) : undefined}
         onStartDateChange={form.setStartDate}
         onEndDateChange={form.setEndDate}
@@ -151,7 +150,7 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
         onSetCurrentTime={form.handleSetCurrentTime}
       />
 
-      {isMultiDay && !isEditing && !validationError && (
+      {isMultiDay && !validationError && (
         <GraphiteNotice>
           {t('timer.manual.split.notice', { hours })}
         </GraphiteNotice>
