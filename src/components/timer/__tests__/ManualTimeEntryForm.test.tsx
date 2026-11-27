@@ -270,7 +270,7 @@ describe('ManualTimeEntryForm', () => {
       confirmSpy.mockRestore();
     });
 
-    it('編集モードでは終了日が固定され、既存エントリが上書きされる', async () => {
+    it('編集モードでは終了日も編集でき、既存エントリが上書きされる', async () => {
       const onSave = jest.fn();
       const onClose = jest.fn();
 
@@ -290,7 +290,8 @@ describe('ManualTimeEntryForm', () => {
       await waitFor(() => {
         expect(startDateInput.value).toBe(initialDate);
       });
-      expect(endDateInput).toBeDisabled();
+      // 日をまたぐ記録も編集できるよう、終了日は固定しない
+      expect(endDateInput).not.toBeDisabled();
       expect(endDateInput.value).toBe(startDateInput.value);
 
       const projectSelect = screen.getByRole('combobox');

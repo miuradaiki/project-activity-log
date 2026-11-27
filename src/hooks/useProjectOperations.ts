@@ -128,8 +128,11 @@ export const useProjectOperations = ({
   const saveTimeEntry = useCallback(
     (timeEntry: TimeEntry, isEditing: boolean) => {
       if (isEditing) {
+        // 日をまたぐ編集では、翌日以降の分が新しい記録として届く
         setTimeEntries((prev) =>
-          prev.map((t) => (t.id === timeEntry.id ? timeEntry : t))
+          prev.some((t) => t.id === timeEntry.id)
+            ? prev.map((t) => (t.id === timeEntry.id ? timeEntry : t))
+            : [...prev, timeEntry]
         );
       } else {
         setTimeEntries((prev) => [...prev, timeEntry]);

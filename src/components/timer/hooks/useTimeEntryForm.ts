@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { TimeEntry } from '../../../types';
-import { v4 as uuidv4 } from 'uuid';
 import { isSameDay, differenceInHours, format } from 'date-fns';
 import { createSplitEntries } from '../../../utils/timeEntryUtils';
 
@@ -88,7 +87,7 @@ export const useTimeEntryForm = ({
       setFormState({
         projectId: timeEntry.projectId,
         startDate: toLocalDate(startDateTime),
-        endDate: toLocalDate(startDateTime),
+        endDate: toLocalDate(endDateTime),
         startTime: startDateTime.toTimeString().slice(0, 5),
         endTime: endDateTime.toTimeString().slice(0, 5),
         description: timeEntry.description || '',
@@ -167,43 +166,24 @@ export const useTimeEntryForm = ({
       if (Number.isNaN(durationMs) || getValidationError(durationMs)) return;
 
       const timestamp = new Date().toISOString();
-
+      const entries = createSplitEntries(
+        projectId,
+        startDateTime,
+        endDateTime,
+        description
+      );
       if (timeEntry) {
-        const updatedTimeEntry: TimeEntry = {
+        // 最初の日の分は元の記録として上書きし、翌日以降の分を新しい記録として追加する
+        entries[0] = {
           ...timeEntry,
           projectId,
-          startTime: startDateTime.toISOString(),
-          endTime: endDateTime.toISOString(),
+          startTime: entries[0].startTime,
+          endTime: entries[0].endTime,
           description,
           updatedAt: timestamp,
         };
-        onSave(updatedTimeEntry);
-        handleClose();
-        return;
       }
-
-      const isMultiDay = !isSameDay(startDateTime, endDateTime);
-
-      if (isMultiDay) {
-        const splitEntries = createSplitEntries(
-          projectId,
-          startDateTime,
-          endDateTime,
-          description
-        );
-        splitEntries.forEach((entry) => onSave(entry));
-      } else {
-        const newTimeEntry: TimeEntry = {
-          id: uuidv4(),
-          projectId,
-          startTime: startDateTime.toISOString(),
-          endTime: endDateTime.toISOString(),
-          description,
-          createdAt: timestamp,
-          updatedAt: timestamp,
-        };
-        onSave(newTimeEntry);
-      }
+      entries.forEach((entry) => onSave(entry));
 
       handleClose();
     },

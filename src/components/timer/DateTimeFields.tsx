@@ -8,7 +8,6 @@ interface DateTimeFieldsProps {
   endDate: string;
   startTime: string;
   endTime: string;
-  isEditing: boolean;
   error?: string;
   onStartDateChange: (value: string) => void;
   onEndDateChange: (value: string) => void;
@@ -48,7 +47,6 @@ export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({
   endDate,
   startTime,
   endTime,
-  isEditing,
   error,
   onStartDateChange,
   onEndDateChange,
@@ -94,19 +92,13 @@ export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({
         </GraphiteField>
       </Box>
       <Box sx={row}>
-        <GraphiteField
-          label={t('timer.end.date')}
-          htmlFor="entry-end-date"
-          // 編集時は1件の記録として上書きするため、日をまたぐ変更はできない
-          help={isEditing ? t('timer.manual.end.date.fixed') : undefined}
-        >
+        <GraphiteField label={t('timer.end.date')} htmlFor="entry-end-date">
           <TextField
             id="entry-end-date"
             type="date"
             size="small"
             value={endDate}
             onChange={(e) => onEndDateChange(e.target.value)}
-            disabled={isEditing}
             required
           />
         </GraphiteField>
