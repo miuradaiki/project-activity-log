@@ -4,8 +4,8 @@ import { PageRouter } from '../PageRouter';
 import { Project, TimeEntry } from '../../types';
 
 // Mock the child components
-jest.mock('../dashboard/Dashboard', () => ({
-  Dashboard: () => <div data-testid="dashboard">Dashboard</div>,
+jest.mock('../reports/ReportsView', () => ({
+  ReportsView: () => <div data-testid="dashboard">Dashboard</div>,
 }));
 
 jest.mock('../projects/ProjectsView', () => ({

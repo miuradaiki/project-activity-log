@@ -1,4 +1,5 @@
 import { Project, TimeEntry } from '../../types';
+import { calculateDuration } from './common';
 
 const HOUR = 3600_000;
 
@@ -32,7 +33,11 @@ export const getTodaySegments = (
     .filter((e) => isSameDay(e.startTime, now))
     .map((e) => {
       const s = Math.max(from, new Date(e.startTime).getTime());
-      const f = Math.min(to, new Date(e.endTime).getTime());
+      const f = Math.min(
+        to,
+        new Date(e.startTime).getTime() +
+          calculateDuration(e.startTime, e.endTime)
+      );
       return {
         id: e.id,
         projectId: e.projectId,
@@ -51,8 +56,7 @@ export const getTodayProjectHours = (
   entries
     .filter((e) => isSameDay(e.startTime, now))
     .forEach((e) => {
-      const ms =
-        new Date(e.endTime).getTime() - new Date(e.startTime).getTime();
+      const ms = calculateDuration(e.startTime, e.endTime);
       totals.set(e.projectId, (totals.get(e.projectId) ?? 0) + ms);
     });
   return Array.from(totals.entries())

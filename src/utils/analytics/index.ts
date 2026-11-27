@@ -36,14 +36,6 @@ export {
   calculateProjectHours,
 } from './aggregations';
 
-// Heatmap
-export {
-  calculateHeatmapLevel,
-  getRolling12MonthRange,
-  generateHeatmapData,
-} from './heatmap';
-export type { HeatmapDay, HeatmapWeek } from './heatmap';
-
 export {
   getProjectMonthProgress,
   getMonthOverview,
@@ -60,3 +52,5 @@ export {
   getRecentProjects,
 } from './today';
 export type { TimelineSegment } from './today';
+export { getWeekdayBreakdown, getMonthProjectShares } from './report';
+export type { ReportDay, ReportWeek } from './report';

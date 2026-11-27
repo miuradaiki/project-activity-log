@@ -4,7 +4,7 @@ import { TimerController } from '../hooks/useTimerController';
 import { Modal } from '../hooks/useModal';
 import { ProjectOperations } from '../hooks/useProjectOperations';
 
-import { Dashboard } from './dashboard/Dashboard';
+import { ReportsView } from './reports/ReportsView';
 import { ProjectsView } from './projects/ProjectsView';
 import { useSettingsContext } from '../contexts/SettingsContext';
 import { SettingsView } from './settings/SettingsView';
@@ -43,16 +43,10 @@ export const PageRouter: React.FC<PageRouterProps> = ({
   switch (activePage) {
     case 'dashboard':
       return (
-        <Dashboard
+        <ReportsView
           projects={projects}
           timeEntries={timeEntries}
-          onStartTimer={(projectId) => {
-            const project = projects.find((p) => p.id === projectId);
-            if (project) onStartTimer(project);
-          }}
-          onEditProject={(project) => projectFormModal.open(project)}
-          onArchiveProject={projectOps.archiveProject}
-          onUnarchiveProject={projectOps.unarchiveProject}
+          baseMonthlyHours={settings.workHours.baseMonthlyHours}
         />
       );
 

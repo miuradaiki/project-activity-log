@@ -95,3 +95,19 @@ describe('getRecentProjects', () => {
     ]);
   });
 });
+
+describe('終了時刻のない記録', () => {
+  it('今日の集計では現在時刻までとして扱う', () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(NOW);
+    const open = {
+      ...entry('o', 'p1', '2026-11-26T12:00:00', '2026-11-26T12:00:00'),
+      endTime: '',
+    };
+
+    const hours = getTodayProjectHours([open], NOW);
+    jest.useRealTimers();
+
+    expect(hours).toEqual([{ projectId: 'p1', hours: 1.5 }]);
+  });
+});
