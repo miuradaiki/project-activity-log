@@ -15,9 +15,10 @@ const SHORTCUTS: { keys: string; labelKey: string }[] = [
   { keys: 'Alt+L', labelKey: 'shortcuts.theme' },
 ];
 
+// 割り当ては Control キーなので、Mac でも ⌘ ではなく ⌃ と表示する
 const formatKeys = (keys: string) =>
   navigator.platform.toUpperCase().includes('MAC')
-    ? keys.replace('Ctrl', '⌘').replace('Alt', '⌥')
+    ? keys.replace('Ctrl+', '⌃').replace('Alt+', '⌥')
     : keys;
 
 interface KeyboardShortcutsProps {

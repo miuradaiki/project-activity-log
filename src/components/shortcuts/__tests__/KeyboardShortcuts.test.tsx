@@ -22,7 +22,9 @@ describe('KeyboardShortcutsDialog', () => {
     renderWithGraphite(<KeyboardShortcutsDialog open onClose={jest.fn()} />);
 
     expect(within(rowOf('Ctrl+1')).getByText('今日')).toBeInTheDocument();
-    expect(within(rowOf('Ctrl+2')).getByText('プロジェクト')).toBeInTheDocument();
+    expect(
+      within(rowOf('Ctrl+2')).getByText('プロジェクト')
+    ).toBeInTheDocument();
     expect(within(rowOf('Ctrl+3')).getByText('レポート')).toBeInTheDocument();
   });
 
@@ -30,5 +32,16 @@ describe('KeyboardShortcutsDialog', () => {
     renderWithGraphite(<KeyboardShortcutsDialog open onClose={jest.fn()} />);
 
     expect(screen.queryByText('Esc', { selector: 'kbd' })).toBeNull();
+  });
+
+  it('Mac では Ctrl を ⌘ ではなく ⌃ で表示する（⌘ では動かないため）', () => {
+    Object.defineProperty(window.navigator, 'platform', {
+      value: 'MacIntel',
+      configurable: true,
+    });
+    renderWithGraphite(<KeyboardShortcutsDialog open onClose={jest.fn()} />);
+
+    expect(screen.getByText('⌃1', { selector: 'kbd' })).toBeInTheDocument();
+    expect(screen.queryByText(/⌘/)).toBeNull();
   });
 });
