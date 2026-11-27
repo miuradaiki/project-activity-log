@@ -1,179 +1,233 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useLanguage } from '../contexts/LanguageContext';
+import React, { useEffect, useState } from 'react';
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
   Box,
-  Typography,
+  Button,
+  ButtonBase,
   Slider,
-  Alert,
+  TextField,
+  useTheme,
 } from '@mui/material';
+import { useLanguage } from '../contexts/LanguageContext';
 import { Project } from '../types';
-import { formatHours } from '../utils/formatters/timeFormatters';
+import { PROJECT_COLORS, projectColorManager } from '../utils/colorUtils';
+import { numberTypography } from '../styles/modernTheme';
+import { GraphiteDialog } from './ui/graphite/GraphiteDialog';
+import { GraphiteField } from './ui/graphite/GraphiteField';
+import { GraphiteNotice } from './ui/graphite/GraphiteNotice';
 
 interface ProjectFormProps {
   open: boolean;
   project?: Project;
   projects?: Project[];
+  /** 設定の月間基準時間。配分を時間に換算して示すのに使う */
+  baseMonthlyHours: number;
   onClose: () => void;
   onSave: (
     projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>
   ) => void;
 }
 
-const BASE_MONTHLY_HOURS = 140; // 基準となる月間時間
+const round1 = (n: number) => Math.round(n * 10) / 10;
 
 export const ProjectForm: React.FC<ProjectFormProps> = ({
   open,
   project,
   projects = [],
+  baseMonthlyHours,
   onClose,
   onSave,
 }) => {
+  const theme = useTheme();
   const { t } = useLanguage();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [monthlyCapacity, setMonthlyCapacity] = useState(0);
-  const [warning, setWarning] = useState<string | null>(null);
+  const [color, setColor] = useState<string>(PROJECT_COLORS[0]);
+  const [nameError, setNameError] = useState(false);
 
   useEffect(() => {
-    if (project) {
-      setName(project.name);
-      setDescription(project.description);
-      setMonthlyCapacity(project.monthlyCapacity);
-    } else {
-      setName('');
-      setDescription('');
-      setMonthlyCapacity(0);
-    }
-    setWarning(null);
+    if (!open) return;
+    setName(project?.name ?? '');
+    setDescription(project?.description ?? '');
+    setMonthlyCapacity(project?.monthlyCapacity ?? 0);
+    // 既存プロジェクトは今表示されている色を引き継ぎ、保存時に固定する
+    setColor(
+      project
+        ? (project.color ?? projectColorManager.getColorById(project.id))
+        : projectColorManager.pickUnusedColor(projects)
+    );
+    setNameError(false);
+    // projects は開いた時点の値で十分（入力中に色の候補が変わらないように）
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [project, open]);
 
-  const calculateTotalCapacity = useCallback(
-    (capacity: number): number => {
-      const otherProjectsCapacity = projects
-        .filter((p) => p.id !== project?.id && !p.isArchived) // アーカイブされたプロジェクトを除外
-        .reduce((sum, p) => sum + p.monthlyCapacity, 0);
-      return otherProjectsCapacity + capacity;
-    },
-    [projects, project]
-  );
-
-  useEffect(() => {
-    const totalCapacity = calculateTotalCapacity(monthlyCapacity);
-    if (totalCapacity > 1) {
-      setWarning(
-        `${t('projects.utilization')}${(totalCapacity * 100).toFixed(1)}%。`
-      );
-    } else {
-      setWarning(null);
-    }
-  }, [monthlyCapacity, calculateTotalCapacity]);
+  const totalCapacity =
+    projects
+      .filter((p) => p.id !== project?.id && !p.isArchived)
+      .reduce((sum, p) => sum + p.monthlyCapacity, 0) + monthlyCapacity;
 
   const handleSave = () => {
     if (!name.trim()) {
-      setWarning(t('projects.name.required'));
+      setNameError(true);
       return;
     }
-
-    // 保存処理を実行
     onSave({
       name: name.trim(),
       description: description.trim(),
       monthlyCapacity,
-      isArchived: false,
+      isArchived: project?.isArchived ?? false,
+      color,
     });
-
-    handleClose();
-  };
-
-  const handleClose = () => {
-    setName('');
-    setDescription('');
-    setMonthlyCapacity(0);
-    setWarning(null);
     onClose();
   };
 
-  const handleCapacityChange = (_: Event, newValue: number | number[]) => {
-    setMonthlyCapacity(newValue as number);
-  };
-
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle>
-        {project ? t('projects.edit') : t('projects.new')}
-      </DialogTitle>
-      <DialogContent>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
-          <TextField
-            label={t('projects.name')}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            fullWidth
-            required
-            error={!name.trim() && warning !== null}
-            helperText={
-              !name.trim() && warning !== null
-                ? t('projects.name.required')
-                : ''
-            }
-          />
+    <GraphiteDialog
+      open={open}
+      onClose={onClose}
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleSave();
+      }}
+      title={project ? t('projects.edit') : t('projects.new')}
+      actions={
+        <>
+          <Button onClick={onClose}>{t('projects.cancel')}</Button>
+          <Button type="submit" variant="contained">
+            {t('actions.save')}
+          </Button>
+        </>
+      }
+    >
+      <GraphiteField
+        label={t('projects.form.name')}
+        htmlFor="project-name"
+        error={nameError ? t('projects.name.required') : undefined}
+      >
+        <TextField
+          id="project-name"
+          size="small"
+          autoFocus
+          value={name}
+          error={nameError}
+          onChange={(e) => {
+            setName(e.target.value);
+            if (e.target.value.trim()) setNameError(false);
+          }}
+        />
+      </GraphiteField>
 
-          <TextField
-            label={t('projects.description')}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            multiline
-            rows={3}
-            fullWidth
-          />
+      <GraphiteField
+        label={t('projects.description')}
+        htmlFor="project-description"
+        optionalLabel={t('form.optional')}
+      >
+        <TextField
+          id="project-description"
+          size="small"
+          placeholder={t('projects.form.description.placeholder')}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+      </GraphiteField>
 
-          <Box sx={{ mt: 2 }}>
-            <Typography gutterBottom>
-              {t('projects.utilization')}: {(monthlyCapacity * 100).toFixed(1)}%
-            </Typography>
-            <Slider
-              value={monthlyCapacity}
-              onChange={handleCapacityChange}
-              min={0}
-              max={1}
-              step={0.05}
-              marks={[
-                { value: 0, label: '0%' },
-                { value: 0.25, label: '25%' },
-                { value: 0.5, label: '50%' },
-                { value: 0.75, label: '75%' },
-                { value: 1, label: '100%' },
-              ]}
-              valueLabelDisplay="auto"
-              valueLabelFormat={(value) => `${(value * 100).toFixed(1)}%`}
-            />
-            <Typography color="text.secondary" variant="body2" sx={{ mt: 1 }}>
-              {t('projects.monthly.target')}:{' '}
-              {formatHours(monthlyCapacity * BASE_MONTHLY_HOURS)}{' '}
-              {t('units.hours')}/{t('time.this.month')}
-            </Typography>
+      <GraphiteField label={t('projects.form.allocation')}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'baseline',
+            justifyContent: 'space-between',
+          }}
+        >
+          <Box
+            data-testid="allocation-hours"
+            sx={{ ...numberTypography(theme), fontWeight: 300, fontSize: 28 }}
+          >
+            {round1(baseMonthlyHours * monthlyCapacity)}
+            <Box
+              component="span"
+              sx={{
+                fontFamily: theme.typography.fontFamily,
+                fontSize: 12.5,
+                letterSpacing: 0,
+                color: 'text.secondary',
+                ml: 0.5,
+              }}
+            >
+              {t('projects.form.hours.unit')}
+            </Box>
           </Box>
-
-          {warning && (
-            <Alert severity="warning" sx={{ mt: 2 }}>
-              {warning}
-            </Alert>
-          )}
+          <Box sx={{ fontSize: 12.5, color: 'text.secondary' }}>
+            {t('projects.form.allocation.of', {
+              base: baseMonthlyHours,
+              percent: Math.round(monthlyCapacity * 100),
+            })}
+          </Box>
         </Box>
-      </DialogContent>
+        <Slider
+          value={monthlyCapacity}
+          onChange={(_, v) => setMonthlyCapacity(v as number)}
+          min={0}
+          max={1}
+          step={0.05}
+          aria-label={t('projects.form.allocation')}
+          getAriaValueText={(v) => `${Math.round(v * 100)}%`}
+          sx={{
+            color: 'text.primary',
+            height: 4,
+            py: 1.25,
+            '& .MuiSlider-thumb': {
+              width: 16,
+              height: 16,
+              bgcolor: 'background.paper',
+              border: 2,
+              borderColor: 'text.primary',
+              boxShadow: 'none',
+            },
+            '& .MuiSlider-rail': {
+              bgcolor: theme.custom.tokens.track,
+              opacity: 1,
+            },
+          }}
+        />
+      </GraphiteField>
 
-      <DialogActions>
-        <Button onClick={handleClose}>{t('projects.cancel')}</Button>
-        <Button onClick={handleSave} variant="contained">
-          {t('actions.save')}
-        </Button>
-      </DialogActions>
-    </Dialog>
+      {totalCapacity > 1 && (
+        <GraphiteNotice>
+          {t('projects.form.over', {
+            percent: Math.round(totalCapacity * 100),
+            hours: round1((totalCapacity - 1) * baseMonthlyHours),
+          })}
+        </GraphiteNotice>
+      )}
+
+      <GraphiteField label={t('projects.form.color')}>
+        <Box
+          role="radiogroup"
+          aria-label={t('projects.form.color')}
+          sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}
+        >
+          {PROJECT_COLORS.map((c, i) => (
+            <ButtonBase
+              key={c}
+              role="radio"
+              aria-checked={color === c}
+              aria-label={t('projects.form.color.n', { n: i + 1 })}
+              onClick={() => setColor(c)}
+              sx={{
+                width: 20,
+                height: 20,
+                borderRadius: '6px',
+                bgcolor: c,
+                outline: color === c ? 2 : 0,
+                outlineStyle: 'solid',
+                outlineColor: theme.palette.text.primary,
+                outlineOffset: 2,
+              }}
+            />
+          ))}
+        </Box>
+      </GraphiteField>
+    </GraphiteDialog>
   );
 };

@@ -1,6 +1,9 @@
-import React, { useState, useCallback } from 'react';
-import { useLanguage } from './contexts/LanguageContext';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { Box, CircularProgress } from '@mui/material';
+import { useLanguage } from './contexts/LanguageContext';
+import { useCsvImport } from './hooks/useCsvImport';
+import { useToast } from './contexts/ToastContext';
+import { useSettingsContext } from './contexts/SettingsContext';
 import { Project, TimeEntry } from './types';
 
 import { ProjectForm } from './components/ProjectForm';
@@ -10,15 +13,17 @@ import { useKeyboardShortcuts, Shortcut } from './hooks/useKeyboardShortcuts';
 import { useTimerController } from './hooks/useTimerController';
 import { useModal } from './hooks/useModal';
 import { useProjectOperations } from './hooks/useProjectOperations';
+import { useUndoableProjectOperations } from './hooks/useUndoableProjectOperations';
 import { Layout } from './components/ui/layout/Layout';
 import { useThemeMode } from './components/ui/ThemeProvider';
 import { KeyboardShortcutsDialog } from './components/shortcuts/KeyboardShortcuts';
 import { PageRouter } from './components/PageRouter';
 import { STORAGE_KEYS } from './constants/storageKeys';
+import { projectColorManager } from './utils/colorUtils';
 
 const App: React.FC = () => {
-  // 多言語対応
   const { t } = useLanguage();
+  const { settings } = useSettingsContext();
   // テーマとレイアウト管理
   const { isDarkMode, toggleThemeMode } = useThemeMode();
 
@@ -36,18 +41,30 @@ const App: React.FC = () => {
   const { projects, setProjects, timeEntries, setTimeEntries, isLoading } =
     useStorage();
 
+  // 色はどの画面から開いても同じになるよう、描画前にプロジェクト一覧から割り当てる
+  useMemo(() => projectColorManager.initializeColors(projects), [projects]);
+
   // モーダル管理
   const projectFormModal = useModal<Project>();
   const manualEntryModal = useModal<TimeEntry>();
   const shortcutsModal = useModal();
 
   // タイマーコントローラー
-  const timer = useTimerController(projects, (entries) => {
-    setTimeEntries((prev) => [...prev, ...entries]);
-  });
+  const { showToast } = useToast();
+  const handleTimerDiscarded = useCallback(
+    () => showToast({ message: t('timer.discarded') }),
+    [showToast, t]
+  );
+  const timer = useTimerController(
+    projects,
+    (entries) => {
+      setTimeEntries((prev) => [...prev, ...entries]);
+    },
+    handleTimerDiscarded
+  );
 
   // プロジェクト操作
-  const projectOps = useProjectOperations({
+  const baseProjectOps = useProjectOperations({
     projects,
     setProjects,
     setTimeEntries,
@@ -55,14 +72,20 @@ const App: React.FC = () => {
     isTimerRunning: timer.isRunning,
     onTimerStop: () => timer.stop(),
   });
+  const projectOps = useUndoableProjectOperations({
+    projectOps: baseProjectOps,
+    projects,
+    timeEntries,
+    setProjects,
+    setTimeEntries,
+  });
+
+  // 安定した参照にして、Layout の自動停止監視（毎秒のインターバル）を作り直さない
+  const { stop: stopTimer } = timer;
+  const handleStopTimer = useCallback(() => stopTimer(), [stopTimer]);
 
   const handleStartTimer = useCallback(
-    async (project: Project) => {
-      if (timer.isRunning) {
-        await timer.stop();
-      }
-      await timer.start(project);
-    },
+    (project: Project) => timer.toggle(project),
     [timer]
   );
 
@@ -85,32 +108,28 @@ const App: React.FC = () => {
     [manualEntryModal, projectOps]
   );
 
-  // CSV インポート関数
-  const handleImportCSV = useCallback(async () => {
-    try {
-      const filePath = await window.electronAPI.showOpenFileDialog();
-      if (!filePath) return; // ユーザーがキャンセルした場合
-
-      const { safeImportWorkLog } = await import('./utils/safeImportUtils');
-      const result = await safeImportWorkLog(
-        filePath,
-        projects,
-        timeEntries,
-        (updatedProjects, updatedTimeEntries) => {
-          setProjects(updatedProjects);
-          setTimeEntries(updatedTimeEntries);
-        }
-      );
-
-      if (result.success) {
-        // インポート成功時の処理は不要
-      } else {
-        // インポート失敗時の処理は不要
-      }
-    } catch {
-      // エラーハンドリングは不要
-    }
-  }, [projects, timeEntries, setProjects, setTimeEntries]);
+  const csvImport = useCsvImport({
+    projects,
+    timeEntries,
+    setProjects,
+    setTimeEntries,
+  });
+  const { result: importResult, dismiss: dismissImport } = csvImport;
+  useEffect(() => {
+    if (!importResult) return;
+    showToast(
+      importResult.kind === 'success'
+        ? {
+            kind: 'success',
+            message: t('import.success', {
+              entries: importResult.addedEntries,
+              projects: importResult.addedProjects,
+            }),
+          }
+        : { kind: 'error', message: t('import.error') }
+    );
+    dismissImport();
+  }, [importResult, dismissImport, showToast, t]);
 
   // ナビゲーション処理
   const handleNavigate = useCallback((page: string) => {
@@ -119,46 +138,6 @@ const App: React.FC = () => {
     // ローカルストレージに保存
     localStorage.setItem(STORAGE_KEYS.ACTIVE_PAGE, page);
   }, []);
-
-  // ページタイトルの取得
-  const getPageTitle = useCallback(() => {
-    switch (activePage) {
-      case 'dashboard':
-        return t('nav.dashboard');
-      case 'projects':
-        return t('nav.projects');
-      case 'timer':
-        return t('nav.timer');
-      case 'settings':
-        return t('nav.settings');
-      default:
-        return t('app.name');
-    }
-  }, [activePage, t]);
-
-  // フローティングアクションボタンの設定
-  const getAddButtonConfig = useCallback(() => {
-    switch (activePage) {
-      case 'projects':
-        return {
-          show: true,
-          tooltip: t('projects.new'),
-          onClick: () => projectFormModal.open(),
-        };
-      case 'timer':
-        return {
-          show: true,
-          tooltip: t('timer.manual'),
-          onClick: () => manualEntryModal.open(),
-        };
-      default:
-        return {
-          show: false,
-          tooltip: '',
-          onClick: () => {},
-        };
-    }
-  }, [activePage, projectFormModal, manualEntryModal, t]);
 
   // モーダルが開いているかどうか
   const hasOpenModal =
@@ -191,7 +170,6 @@ const App: React.FC = () => {
       },
       disabled: activePage !== 'timer',
     },
-    { key: 'Escape', action: () => timer.stop(), disabled: !timer.isRunning },
   ];
 
   // キーボードショートカットの処理
@@ -201,38 +179,37 @@ const App: React.FC = () => {
   if (isLoading) {
     return (
       <Box
+        role="progressbar"
+        aria-label={t('app.loading')}
         sx={{
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
           height: '100vh',
+          bgcolor: 'background.default',
         }}
       >
-        <CircularProgress />
+        <CircularProgress
+          size={20}
+          thickness={5}
+          sx={{ color: 'text.disabled' }}
+        />
       </Box>
     );
   }
 
-  // フローティングボタンの設定を取得
-  const addButtonConfig = getAddButtonConfig();
-
   return (
     <Layout
-      title={getPageTitle()}
       activePage={activePage}
       onNavigate={handleNavigate}
-      onToggleTheme={toggleThemeMode}
-      isDarkMode={isDarkMode}
       sidebarOpen={sidebarOpen}
       onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-      showAddButton={addButtonConfig.show}
-      onAddButtonClick={addButtonConfig.onClick}
-      addButtonTooltip={addButtonConfig.tooltip}
-      // グローバルタイマー関連のプロパティを渡す
+      projects={projects}
+      timeEntries={timeEntries}
       activeProject={timer.activeProject}
       isTimerRunning={timer.isRunning}
       startTime={timer.startTime}
-      onStopTimer={() => timer.stop()}
+      onStopTimer={handleStopTimer}
     >
       <PageRouter
         activePage={activePage}
@@ -243,7 +220,7 @@ const App: React.FC = () => {
         manualEntryModal={manualEntryModal}
         projectOps={projectOps}
         onStartTimer={handleStartTimer}
-        onImportCSV={handleImportCSV}
+        onImportCSV={csvImport.importCSV}
         isDarkMode={isDarkMode}
         onToggleTheme={toggleThemeMode}
       />
@@ -257,6 +234,7 @@ const App: React.FC = () => {
         }
         project={projectFormModal.data}
         projects={projects}
+        baseMonthlyHours={settings.workHours.baseMonthlyHours}
       />
 
       <ManualTimeEntryForm

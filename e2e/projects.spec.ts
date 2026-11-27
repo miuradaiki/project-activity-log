@@ -39,93 +39,45 @@ test.afterAll(async () => {
 
 test.describe('Project Management', () => {
   test.describe('Project List', () => {
-    test('should display project list with tabs', async () => {
-      // タブが表示されていることを確認（言語非依存）
-      const tabs = window.locator('[role="tab"]');
-      await expect(tabs.first()).toBeVisible({ timeout: 10000 });
-      const tabCount = await tabs.count();
-      expect(tabCount).toBeGreaterThanOrEqual(2);
+    test('should list active projects as rows', async () => {
+      // global-setup で作る進行中プロジェクトは2件
+      await expect(
+        window.locator('[data-testid="project-play-button"]')
+      ).toHaveCount(2, { timeout: 10000 });
     });
 
-    test('should display existing projects', async () => {
-      // プロジェクトカードが表示されていることを確認
-      const projectCards = window.locator('[class*="MuiCard"]').first();
-      await expect(projectCards).toBeVisible({ timeout: 10000 });
-    });
+    test('should keep archived projects collapsed until opened', async () => {
+      const archivedName = window.getByText('アーカイブ済みプロジェクト');
+      await expect(archivedName).toHaveCount(0);
 
-    test('should show project details in card', async () => {
-      // プロジェクトカードが表示されていることを確認
-      const projectCard = window.locator('[class*="MuiCard"]').first();
-      await expect(projectCard).toBeVisible({ timeout: 10000 });
+      await window.locator('[data-testid="archived-toggle"]').click();
+      await expect(archivedName).toBeVisible({ timeout: 10000 });
     });
   });
 
   test.describe('Add Project', () => {
-    test('should have add project button (FAB)', async () => {
-      // FAB（Floating Action Button）が表示されていることを確認
-      const fab = window.locator('[class*="MuiFab"]').first();
-      await expect(fab).toBeVisible({ timeout: 10000 });
+    test('should open the project dialog from the add button', async () => {
+      await window.locator('[data-testid="add-project-button"]').click();
+      await expect(window.locator('[role="dialog"]')).toBeVisible({
+        timeout: 10000,
+      });
+      await window.keyboard.press('Escape');
+      await expect(window.locator('[role="dialog"]')).toHaveCount(0, {
+        timeout: 10000,
+      });
     });
   });
 
   test.describe('Project Actions', () => {
-    test('should have play button for starting timer', async () => {
-      // プロジェクトカードの再生ボタンが表示されていることを確認
-      const playButton = window
-        .locator('[data-testid="project-play-button"]')
-        .first();
-      await expect(playButton).toBeVisible({ timeout: 10000 });
-    });
-
-    test('should have more options menu', async () => {
-      // プロジェクトカードの3点メニューが表示されていることを確認
-      const moreButton = window
-        .locator('[data-testid="project-more-button"]')
-        .first();
-      await expect(moreButton).toBeVisible({ timeout: 10000 });
-    });
-
     test('should open menu when more button clicked', async () => {
-      // 3点メニューをクリック
-      const moreButton = window
+      await window
         .locator('[data-testid="project-more-button"]')
-        .first();
-      await expect(moreButton).toBeVisible({ timeout: 10000 });
-      await moreButton.click();
-      await window.waitForTimeout(300);
-
-      // メニューが表示されることを確認
-      const menu = window.locator('[role="menu"]');
-      await expect(menu).toBeVisible({ timeout: 10000 });
-
-      // メニューを閉じる
+        .first()
+        .click();
+      await expect(window.locator('[role="menu"]')).toBeVisible({
+        timeout: 10000,
+      });
       await window.keyboard.press('Escape');
-      await window.waitForTimeout(300);
-    });
-  });
-
-  test.describe('Tab Navigation', () => {
-    test('should switch to archive tab', async () => {
-      // 3番目のタブ（アーカイブ）をクリック
-      const archiveTab = window.locator('[role="tab"]').nth(2);
-      await expect(archiveTab).toBeVisible({ timeout: 10000 });
-      await archiveTab.click();
-      await window.waitForTimeout(500);
-
-      // タブがクリック可能であることを確認
-      await expect(archiveTab).toBeVisible({ timeout: 10000 });
-    });
-
-    test('should switch back to active tab', async () => {
-      // 2番目のタブ（進行中/Active）をクリック
-      const activeTab = window.locator('[role="tab"]').nth(1);
-      await expect(activeTab).toBeVisible({ timeout: 10000 });
-      await activeTab.click();
-      await window.waitForTimeout(500);
-
-      // 表示されているタブパネルを確認（hidden属性がないもの）
-      const tabPanel = window.locator('[role="tabpanel"]:not([hidden])');
-      await expect(tabPanel).toBeVisible({ timeout: 10000 });
     });
   });
 });

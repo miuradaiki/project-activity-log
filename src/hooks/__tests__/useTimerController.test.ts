@@ -171,15 +171,15 @@ describe('useTimerController', () => {
       expect(entries[0].projectId).toBe(mockProject.id);
     });
 
-    it('1分未満の場合、TimeEntryは作成されない', async () => {
+    it('1分未満の場合、TimeEntryは作成されず、alert ではなく onDiscarded で知らせる', async () => {
       const onTimeEntriesCreated = jest.fn();
-      // alert mockを追加
+      const onDiscarded = jest.fn();
       const alertMock = jest
         .spyOn(window, 'alert')
         .mockImplementation(() => {});
 
       const { result } = renderHook(() =>
-        useTimerController(mockProjects, onTimeEntriesCreated)
+        useTimerController(mockProjects, onTimeEntriesCreated, onDiscarded)
       );
 
       await act(async () => {
@@ -196,7 +196,8 @@ describe('useTimerController', () => {
       });
 
       expect(onTimeEntriesCreated).not.toHaveBeenCalled();
-      expect(alertMock).toHaveBeenCalled();
+      expect(onDiscarded).toHaveBeenCalledTimes(1);
+      expect(alertMock).not.toHaveBeenCalled();
 
       alertMock.mockRestore();
     });
@@ -243,6 +244,53 @@ describe('useTimerController', () => {
       });
 
       expect(result.current.isRunning).toBe(false);
+    });
+
+    it('実行中に同じプロジェクトでtoggleを呼ぶと停止し、再開しない', async () => {
+      const { result } = renderHook(() => useTimerController(mockProjects));
+
+      await act(async () => {
+        await result.current.start(mockProject);
+      });
+      act(() => {
+        jest.advanceTimersByTime(2 * 60 * 1000);
+      });
+
+      await act(async () => {
+        await result.current.toggle(mockProject);
+      });
+
+      expect(result.current.isRunning).toBe(false);
+      expect(result.current.activeProject).toBeNull();
+    });
+
+    it('実行中に別プロジェクトでtoggleを呼ぶと、記録を保存してそのプロジェクトに切り替える', async () => {
+      const otherProject = createMockProject({
+        id: 'project-2',
+        name: 'Other',
+      });
+      const onTimeEntriesCreated = jest.fn();
+      const { result } = renderHook(() =>
+        useTimerController([mockProject, otherProject], onTimeEntriesCreated)
+      );
+
+      await act(async () => {
+        await result.current.start(mockProject);
+      });
+      act(() => {
+        jest.advanceTimersByTime(2 * 60 * 1000);
+      });
+
+      await act(async () => {
+        await result.current.toggle(otherProject);
+      });
+
+      expect(onTimeEntriesCreated).toHaveBeenCalledTimes(1);
+      expect(onTimeEntriesCreated.mock.calls[0][0][0].projectId).toBe(
+        mockProject.id
+      );
+      expect(result.current.isRunning).toBe(true);
+      expect(result.current.activeProject).toEqual(otherProject);
     });
   });
 

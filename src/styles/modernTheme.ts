@@ -1,45 +1,27 @@
-import {
-  createTheme,
-  responsiveFontSizes,
-  alpha,
-  Theme,
-} from '@mui/material/styles';
+import { createTheme, alpha, Theme, ThemeOptions } from '@mui/material/styles';
+
+/**
+ * Graphite デザインシステム（Linear 風のニュートラル配色＋アクセント1色）。
+ * 決定事項: plans/261126-1551-modern-ui-mockups/design-decisions.md
+ */
+
+export interface GraphiteTokens {
+  surface2: string;
+  border2: string;
+  track: string;
+  navActive: string;
+  glow: string;
+  cardShadow: string;
+  numberFont: string;
+}
 
 declare module '@mui/material/styles' {
   interface Theme {
     custom: {
-      gradients: {
-        primary: string;
-        secondary: string;
-        success: string;
-        warning: string;
-        error: string;
-        info: string;
-        dark: string;
-        light: string;
-        mesh: string;
-        radial: string;
-        glass: string;
-      };
-      shadows: {
-        soft: string;
-        medium: string;
-        strong: string;
-        glow: string;
-        inset: string;
-        card: string;
-        hover: string;
-      };
-      animations: {
-        easeInOut: string;
-        spring: string;
-        bounce: string;
-      };
-      glassmorphism: {
-        background: string;
-        border: string;
-        blur: string;
-      };
+      gradients: Record<GradientKey, string>;
+      shadows: Record<ShadowKey, string>;
+      animations: { easeInOut: string; spring: string; bounce: string };
+      glassmorphism: { background: string; border: string; blur: string };
       borderRadius: {
         xs: number;
         sm: number;
@@ -49,651 +31,393 @@ declare module '@mui/material/styles' {
         xxl: number;
         round: string;
       };
+      tokens: GraphiteTokens;
     };
   }
   interface ThemeOptions {
-    custom?: {
-      gradients?: Record<string, string>;
-      shadows?: Record<string, string>;
-      animations?: Record<string, string>;
-      glassmorphism?: Record<string, string>;
-      borderRadius?: Record<string, number | string>;
-    };
+    custom?: Partial<Theme['custom']>;
   }
 }
 
-// Modern color palette with semantic colors
-const modernColors = {
-  primary: {
-    main: '#5E35B1',
-    light: '#7E57C2',
-    dark: '#4527A0',
-    50: '#EDE7F6',
-    100: '#D1C4E9',
-    200: '#B39DDB',
-    300: '#9575CD',
-    400: '#7E57C2',
-    500: '#673AB7',
-    600: '#5E35B1',
-    700: '#512DA8',
-    800: '#4527A0',
-    900: '#311B92',
-  },
-  secondary: {
-    main: '#00ACC1',
-    light: '#26C6DA',
-    dark: '#00838F',
-    50: '#E0F7FA',
-    100: '#B2EBF2',
-    200: '#80DEEA',
-    300: '#4DD0E1',
-    400: '#26C6DA',
-    500: '#00BCD4',
-    600: '#00ACC1',
-    700: '#0097A7',
-    800: '#00838F',
-    900: '#006064',
-  },
-  success: {
-    main: '#00C853',
-    light: '#69F0AE',
-    dark: '#00A844',
-    gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-  },
-  warning: {
-    main: '#FFB300',
-    light: '#FFCA28',
-    dark: '#FF8F00',
-    gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-  },
-  error: {
-    main: '#FF5252',
-    light: '#FF8A80',
-    dark: '#FF1744',
-    gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-  },
-  info: {
-    main: '#536DFE',
-    light: '#8C9EFF',
-    dark: '#3D5AFE',
-  },
-  neutral: {
-    50: '#FAFAFA',
-    100: '#F5F5F5',
-    200: '#EEEEEE',
-    300: '#E0E0E0',
-    400: '#BDBDBD',
-    500: '#9E9E9E',
-    600: '#757575',
-    700: '#616161',
-    800: '#424242',
-    900: '#212121',
-  },
+type GradientKey =
+  | 'primary'
+  | 'secondary'
+  | 'success'
+  | 'warning'
+  | 'error'
+  | 'info'
+  | 'dark'
+  | 'light'
+  | 'mesh'
+  | 'radial'
+  | 'glass';
+type ShadowKey =
+  | 'soft'
+  | 'medium'
+  | 'strong'
+  | 'glow'
+  | 'inset'
+  | 'card'
+  | 'hover';
+
+const BODY_FONT = '"Inter", "Noto Sans JP", -apple-system, sans-serif';
+const NUMBER_FONT = '"Manrope", "Inter", sans-serif';
+
+interface Scheme {
+  mode: 'dark' | 'light';
+  bg: string;
+  sidebar: string;
+  surface: string;
+  surface2: string;
+  border: string;
+  border2: string;
+  text: string;
+  text2: string;
+  text3: string;
+  accent: string;
+  danger: string;
+  success: string;
+  warning: string;
+  track: string;
+  navActive: string;
+  glow: string;
+  cardShadow: string;
+}
+
+const darkScheme: Scheme = {
+  mode: 'dark',
+  bg: '#09090B',
+  sidebar: '#09090B',
+  surface: '#111114',
+  surface2: '#18181C',
+  border: 'rgba(255,255,255,0.07)',
+  border2: 'rgba(255,255,255,0.12)',
+  text: '#EDEDEF',
+  text2: '#A0A0AB',
+  text3: '#5E5E68',
+  accent: '#8E8CFF',
+  danger: '#FF6B6B',
+  success: '#3DD6A3',
+  warning: '#F5A524',
+  track: 'rgba(255,255,255,0.06)',
+  navActive: 'rgba(255,255,255,0.06)',
+  glow: 'rgba(142,140,255,0.10)',
+  cardShadow: 'none',
 };
 
-// Modern gradients
-const gradients = {
-  primary: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-  secondary: 'linear-gradient(135deg, #00ACC1 0%, #26C6DA 100%)',
-  success: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-  warning: 'linear-gradient(135deg, #FFB300 0%, #FFCA28 100%)',
-  error: 'linear-gradient(135deg, #FF5252 0%, #FF8A80 100%)',
-  info: 'linear-gradient(135deg, #536DFE 0%, #8C9EFF 100%)',
-  dark: 'linear-gradient(135deg, #2D3748 0%, #1A202C 100%)',
-  light: 'linear-gradient(135deg, #FFFFFF 0%, #F7FAFC 100%)',
-  mesh: 'radial-gradient(at 40% 20%, hsla(28,100%,74%,0.3) 0px, transparent 50%), radial-gradient(at 80% 0%, hsla(189,100%,56%,0.3) 0px, transparent 50%), radial-gradient(at 0% 50%, hsla(355,100%,93%,0.3) 0px, transparent 50%)',
-  radial:
-    'radial-gradient(circle at 50% 50%, rgba(94, 53, 177, 0.1) 0%, transparent 70%)',
-  glass:
-    'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+const lightScheme: Scheme = {
+  mode: 'light',
+  bg: '#FBFBFC',
+  sidebar: '#F5F5F7',
+  surface: '#FFFFFF',
+  surface2: '#F4F4F6',
+  border: 'rgba(10,10,20,0.08)',
+  border2: 'rgba(10,10,20,0.14)',
+  text: '#0B0B0F',
+  text2: '#5E5E6B',
+  text3: '#A1A1AB',
+  accent: '#5652E0',
+  danger: '#E5484D',
+  success: '#12A58A',
+  warning: '#E08A0B',
+  track: 'rgba(10,10,20,0.06)',
+  navActive: 'rgba(10,10,20,0.06)',
+  glow: 'rgba(108,104,238,0.07)',
+  cardShadow: '0 1px 2px rgba(10,10,20,0.03)',
 };
 
-// Modern shadows
-const modernShadows = {
-  soft: '0 2px 20px 0 rgba(0,0,0,0.05)',
-  medium: '0 10px 40px -15px rgba(0,0,0,0.15)',
-  strong: '0 20px 60px -20px rgba(0,0,0,0.3)',
-  glow: '0 0 20px rgba(94, 53, 177, 0.3)',
-  inset: 'inset 0 2px 4px 0 rgba(0,0,0,0.06)',
-  card: '0 0 1px 0 rgba(0,0,0,0.05), 0 2px 8px -2px rgba(0,0,0,0.1)',
-  hover: '0 10px 40px -10px rgba(0,0,0,0.2)',
-};
-
-// Animation curves
-const animations = {
-  easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
-  spring: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-  bounce: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
-};
-
-// Border radius system
 const borderRadius = {
   xs: 4,
   sm: 8,
   md: 12,
-  lg: 16,
-  xl: 24,
-  xxl: 32,
+  lg: 12,
+  xl: 16,
+  xxl: 20,
   round: '50%',
 };
 
-// Create base theme configuration
-const baseThemeConfig = {
-  typography: {
-    fontFamily:
-      '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica", "Arial", sans-serif',
-    h1: {
-      fontWeight: 800,
-      letterSpacing: '-0.02em',
-      lineHeight: 1.2,
-    },
-    h2: {
-      fontWeight: 700,
-      letterSpacing: '-0.01em',
-      lineHeight: 1.3,
-    },
-    h3: {
-      fontWeight: 700,
-      letterSpacing: '-0.005em',
-      lineHeight: 1.3,
-    },
-    h4: {
-      fontWeight: 600,
-      letterSpacing: '0',
-      lineHeight: 1.4,
-    },
-    h5: {
-      fontWeight: 600,
-      letterSpacing: '0',
-      lineHeight: 1.4,
-    },
-    h6: {
-      fontWeight: 600,
-      letterSpacing: '0',
-      lineHeight: 1.4,
-    },
-    subtitle1: {
-      fontWeight: 500,
-      letterSpacing: '0.005em',
-    },
-    subtitle2: {
-      fontWeight: 500,
-      letterSpacing: '0.005em',
-    },
-    body1: {
-      letterSpacing: '0.003em',
-      lineHeight: 1.6,
-    },
-    body2: {
-      letterSpacing: '0.003em',
-      lineHeight: 1.6,
-    },
-    button: {
-      textTransform: 'none' as const,
-      fontWeight: 600,
-      letterSpacing: '0.02em',
-    },
-  },
-  shape: {
-    borderRadius: borderRadius.md,
-  },
-  spacing: 8,
-  transitions: {
-    easing: {
-      easeInOut: animations.easeInOut,
-      easeOut: animations.spring,
-      easeIn: animations.easeInOut,
-      sharp: animations.bounce,
-    },
-    duration: {
-      shortest: 150,
-      shorter: 200,
-      short: 250,
-      standard: 300,
-      complex: 375,
-      enteringScreen: 225,
-      leavingScreen: 195,
-    },
-  },
-};
-
-// Light theme
-export const modernLightTheme = createTheme({
-  ...baseThemeConfig,
-  palette: {
-    mode: 'light',
-    primary: modernColors.primary,
-    secondary: modernColors.secondary,
-    success: modernColors.success,
-    warning: modernColors.warning,
-    error: modernColors.error,
-    info: modernColors.info,
-    grey: modernColors.neutral,
-    background: {
-      default: '#F8FAFC',
-      paper: '#FFFFFF',
-    },
-    text: {
-      primary: modernColors.neutral[900],
-      secondary: modernColors.neutral[600],
-      disabled: modernColors.neutral[400],
-    },
-  },
-  custom: {
-    gradients,
-    shadows: modernShadows,
-    animations,
-    glassmorphism: {
-      background: 'rgba(255, 255, 255, 0.25)',
-      border: '1px solid rgba(255, 255, 255, 0.18)',
-      blur: 'blur(20px)',
-    },
-    borderRadius,
-  },
-  components: {
-    MuiCssBaseline: {
-      styleOverrides: {
-        body: {
-          scrollbarWidth: 'thin',
-          '&::-webkit-scrollbar': {
-            width: '8px',
-            height: '8px',
-          },
-          '&::-webkit-scrollbar-track': {
-            background: modernColors.neutral[100],
-            borderRadius: '4px',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            background: modernColors.neutral[400],
-            borderRadius: '4px',
-            '&:hover': {
-              background: modernColors.neutral[500],
-            },
-          },
-        },
-      },
-    },
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: borderRadius.sm,
-          padding: '10px 24px',
-          fontSize: '0.95rem',
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          '&:active': {
-            transform: 'scale(0.98)',
-          },
-        },
-        contained: {
-          boxShadow: modernShadows.soft,
-          '&:hover': {
-            boxShadow: modernShadows.medium,
-            transform: 'translateY(-2px)',
-          },
-        },
-        containedPrimary: {
-          background: gradients.primary,
-          '&:hover': {
-            background: gradients.primary,
-            filter: 'brightness(1.1)',
-          },
-        },
-        containedSecondary: {
-          background: gradients.secondary,
-          '&:hover': {
-            background: gradients.secondary,
-            filter: 'brightness(1.1)',
-          },
-        },
-        outlined: {
-          borderWidth: '2px',
-          '&:hover': {
-            borderWidth: '2px',
-            transform: 'translateY(-2px)',
-          },
-        },
-        text: {
-          '&:hover': {
-            backgroundColor: alpha(modernColors.primary.main, 0.08),
-          },
-        },
-      },
-    },
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          borderRadius: borderRadius.lg,
-          boxShadow: modernShadows.card,
-          backdropFilter: 'blur(20px)',
-          background: 'rgba(255, 255, 255, 0.9)',
-          border: '1px solid rgba(255, 255, 255, 0.6)',
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          '&:hover': {
-            boxShadow: modernShadows.hover,
-            transform: 'translateY(-4px)',
-          },
-        },
-      },
-    },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          backgroundImage: 'none',
-        },
-        rounded: {
-          borderRadius: borderRadius.md,
-        },
-        elevation0: {
-          boxShadow: 'none',
-        },
-        elevation1: {
-          boxShadow: modernShadows.soft,
-        },
-        elevation2: {
-          boxShadow: modernShadows.medium,
-        },
-        elevation3: {
-          boxShadow: modernShadows.strong,
-        },
-      },
-    },
-    MuiTextField: {
-      styleOverrides: {
-        root: {
-          '& .MuiOutlinedInput-root': {
-            borderRadius: borderRadius.sm,
-            transition: 'all 0.3s ease',
-            '&:hover': {
-              boxShadow: modernShadows.soft,
-            },
-            '&.Mui-focused': {
-              boxShadow: `0 0 0 3px ${alpha(modernColors.primary.main, 0.1)}`,
-            },
-          },
-        },
-      },
-    },
-    MuiListItemButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: borderRadius.sm,
-          margin: '4px 8px',
-          transition: 'all 0.2s ease',
-          '&:hover': {
-            backgroundColor: alpha(modernColors.primary.main, 0.08),
-            transform: 'translateX(4px)',
-          },
-          '&.Mui-selected': {
-            background: gradients.primary,
-            color: '#FFFFFF',
-            boxShadow: modernShadows.soft,
-            '&:hover': {
-              background: gradients.primary,
-              filter: 'brightness(1.1)',
-            },
-            '& .MuiListItemIcon-root': {
-              color: '#FFFFFF',
-            },
-            '& .MuiListItemText-primary': {
-              fontWeight: 600,
-            },
-          },
-        },
-      },
-    },
-    MuiAppBar: {
-      styleOverrides: {
-        root: {
-          backdropFilter: 'blur(20px)',
-          background: 'rgba(255, 255, 255, 0.8)',
-          borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
-          boxShadow: modernShadows.soft,
-        },
-      },
-    },
-    MuiDrawer: {
-      styleOverrides: {
-        paper: {
-          borderRadius: 0,
-          borderRight: '1px solid rgba(0, 0, 0, 0.08)',
-          background: 'linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)',
-        },
-      },
-    },
-    MuiTab: {
-      styleOverrides: {
-        root: {
-          textTransform: 'none',
-          fontWeight: 600,
-          fontSize: '0.95rem',
-          minWidth: 'auto',
-          padding: '12px 24px',
-          transition: 'all 0.3s ease',
-          '&:hover': {
-            color: modernColors.primary.main,
-            opacity: 1,
-          },
-          '&.Mui-selected': {
-            color: modernColors.primary.main,
-          },
-        },
-      },
-    },
-    MuiTabs: {
-      styleOverrides: {
-        indicator: {
-          height: 3,
-          borderRadius: '3px 3px 0 0',
-          background: gradients.primary,
-        },
-      },
-    },
-    MuiChip: {
-      styleOverrides: {
-        root: {
-          borderRadius: borderRadius.sm,
-          fontWeight: 500,
-          transition: 'all 0.2s ease',
-          '&:hover': {
-            transform: 'scale(1.05)',
-          },
-        },
-        filled: {
-          background: alpha(modernColors.primary.main, 0.1),
-          color: modernColors.primary.main,
-          '&:hover': {
-            background: alpha(modernColors.primary.main, 0.2),
-          },
-        },
-      },
-    },
-    MuiTooltip: {
-      styleOverrides: {
-        tooltip: {
-          backgroundColor: modernColors.neutral[800],
-          borderRadius: borderRadius.sm,
-          fontSize: '0.875rem',
-          padding: '8px 12px',
-          boxShadow: modernShadows.medium,
-        },
-        arrow: {
-          color: modernColors.neutral[800],
-        },
-      },
-    },
-    MuiLinearProgress: {
-      styleOverrides: {
-        root: {
-          height: 6,
-          borderRadius: borderRadius.xs,
-          backgroundColor: modernColors.neutral[200],
-        },
-        bar: {
-          borderRadius: borderRadius.xs,
-          background: gradients.primary,
-        },
-      },
-    },
-    MuiCircularProgress: {
-      styleOverrides: {
-        root: {
-          color: modernColors.primary.main,
-        },
-      },
-    },
-    MuiSkeleton: {
-      styleOverrides: {
-        root: {
-          backgroundColor: alpha(modernColors.neutral[300], 0.3),
-          '&::after': {
-            background: `linear-gradient(90deg, transparent, ${alpha(modernColors.neutral[100], 0.5)}, transparent)`,
-          },
-        },
-      },
-    },
-    MuiFab: {
-      styleOverrides: {
-        root: {
-          boxShadow: modernShadows.medium,
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          '&:hover': {
-            boxShadow: modernShadows.strong,
-            transform: 'scale(1.1) rotate(5deg)',
-          },
-        },
-        primary: {
-          background: gradients.primary,
-        },
-      },
-    },
-  },
-});
-
-// Dark theme
-export const modernDarkTheme = createTheme({
-  ...baseThemeConfig,
-  palette: {
-    mode: 'dark',
-    primary: {
-      ...modernColors.primary,
-      main: '#7E57C2',
-    },
-    secondary: modernColors.secondary,
-    success: modernColors.success,
-    warning: modernColors.warning,
-    error: modernColors.error,
-    info: modernColors.info,
-    grey: modernColors.neutral,
-    background: {
-      default: '#0F1419',
-      paper: '#1A1F2E',
-    },
-    text: {
-      primary: '#E4E6EB',
-      secondary: '#B0B3B8',
-      disabled: modernColors.neutral[600],
-    },
-  },
-  custom: {
+const buildCustom = (s: Scheme): Theme['custom'] => {
+  // 旧 UI のグラデーション参照を、フラットな単色に置き換えて互換を保つ
+  const flat = (c: string) => c;
+  return {
     gradients: {
-      ...gradients,
-      glass:
-        'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
+      primary: flat(s.accent),
+      secondary: flat(s.text2),
+      success: flat(s.success),
+      warning: flat(s.warning),
+      error: flat(s.danger),
+      info: flat(s.accent),
+      dark: flat(s.surface),
+      light: flat(s.surface),
+      mesh: 'none',
+      radial: `radial-gradient(120% 140% at 0% 0%, ${s.glow}, transparent 55%)`,
+      glass: flat(s.surface),
     },
     shadows: {
-      ...modernShadows,
-      card: '0 0 1px 0 rgba(0,0,0,0.3), 0 2px 8px -2px rgba(0,0,0,0.5)',
-      hover: '0 10px 40px -10px rgba(0,0,0,0.5)',
+      soft: s.cardShadow,
+      medium: s.cardShadow,
+      strong: '0 12px 32px rgba(0,0,0,0.28)',
+      glow: 'none',
+      inset: 'none',
+      card: s.cardShadow,
+      hover: s.cardShadow,
     },
-    animations,
+    animations: {
+      easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      spring: 'cubic-bezier(0.2, 0, 0, 1)',
+      bounce: 'cubic-bezier(0.2, 0, 0, 1)',
+    },
     glassmorphism: {
-      background: 'rgba(26, 31, 46, 0.5)',
-      border: '1px solid rgba(255, 255, 255, 0.08)',
-      blur: 'blur(20px)',
+      background: s.surface,
+      border: `1px solid ${s.border}`,
+      blur: 'none',
     },
     borderRadius,
-  },
-  components: {
-    ...modernLightTheme.components,
-    MuiCssBaseline: {
-      styleOverrides: {
-        body: {
-          scrollbarWidth: 'thin',
-          '&::-webkit-scrollbar': {
-            width: '8px',
-            height: '8px',
+    tokens: {
+      surface2: s.surface2,
+      border2: s.border2,
+      track: s.track,
+      navActive: s.navActive,
+      glow: s.glow,
+      cardShadow: s.cardShadow,
+      numberFont: NUMBER_FONT,
+    },
+  };
+};
+
+const buildTheme = (s: Scheme): Theme => {
+  const options: ThemeOptions = {
+    palette: {
+      mode: s.mode,
+      primary: {
+        main: s.accent,
+        contrastText: s.mode === 'dark' ? s.bg : '#fff',
+      },
+      secondary: { main: s.text2 },
+      error: { main: s.danger },
+      warning: { main: s.warning },
+      success: { main: s.success },
+      info: { main: s.accent },
+      background: { default: s.bg, paper: s.surface },
+      text: { primary: s.text, secondary: s.text2, disabled: s.text3 },
+      divider: s.border,
+      action: {
+        hover: s.track,
+        selected: s.navActive,
+        disabledBackground: s.track,
+      },
+    },
+    typography: {
+      fontFamily: BODY_FONT,
+      fontSize: 13.5,
+      h1: { fontWeight: 600, letterSpacing: '-0.02em' },
+      h2: { fontWeight: 600, letterSpacing: '-0.02em' },
+      h3: { fontWeight: 600, letterSpacing: '-0.02em' },
+      h4: { fontWeight: 600, letterSpacing: '-0.02em', fontSize: '1.625rem' },
+      h5: { fontWeight: 600, letterSpacing: '-0.01em', fontSize: '1.125rem' },
+      h6: { fontWeight: 600, fontSize: '0.9375rem' },
+      subtitle1: { fontWeight: 500 },
+      subtitle2: { fontWeight: 500, fontSize: '0.8125rem' },
+      body1: { fontSize: '0.84375rem', lineHeight: 1.55 },
+      body2: { fontSize: '0.78125rem', lineHeight: 1.55 },
+      caption: { fontSize: '0.75rem', color: s.text2 },
+      button: { textTransform: 'none', fontWeight: 500, letterSpacing: 0 },
+    },
+    shape: { borderRadius: 9 },
+    spacing: 8,
+    custom: buildCustom(s),
+    components: {
+      MuiCssBaseline: {
+        styleOverrides: {
+          body: {
+            backgroundColor: s.bg,
+            WebkitFontSmoothing: 'antialiased',
+            scrollbarWidth: 'thin',
+            scrollbarColor: `${s.border2} transparent`,
           },
-          '&::-webkit-scrollbar-track': {
-            background: modernColors.neutral[800],
-            borderRadius: '4px',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            background: modernColors.neutral[600],
-            borderRadius: '4px',
-            '&:hover': {
-              background: modernColors.neutral[500],
+          '@media (prefers-reduced-motion: reduce)': {
+            '*, *::before, *::after': {
+              animationDuration: '0.01ms !important',
+              animationIterationCount: '1 !important',
+              transitionDuration: '0.01ms !important',
             },
           },
         },
       },
-    },
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          borderRadius: borderRadius.lg,
-          boxShadow:
-            '0 0 1px 0 rgba(0,0,0,0.3), 0 2px 8px -2px rgba(0,0,0,0.5)',
-          backdropFilter: 'blur(20px)',
-          background: 'rgba(26, 31, 46, 0.6)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          '&:hover': {
-            boxShadow: '0 10px 40px -10px rgba(0,0,0,0.5)',
-            transform: 'translateY(-4px)',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
+      MuiButton: {
+        defaultProps: { disableElevation: true },
+        styleOverrides: {
+          root: {
+            borderRadius: 9,
+            height: 34,
+            padding: '0 14px',
+            fontSize: 13,
+          },
+          sizeSmall: { height: 28, padding: '0 10px', fontSize: 12.5 },
+          // 主要 CTA は「文字色の塗り」で、アクセントの紫とは役割を分ける
+          containedPrimary: {
+            backgroundColor: s.text,
+            color: s.bg,
+            '&:hover': { backgroundColor: alpha(s.text, 0.86) },
+          },
+          outlined: {
+            borderColor: s.border2,
+            color: s.text,
+            backgroundColor: s.surface,
+            '&:hover': { borderColor: s.border2, backgroundColor: s.track },
+          },
+          text: { color: s.text2, '&:hover': { backgroundColor: s.track } },
+        },
+      },
+      MuiIconButton: {
+        styleOverrides: {
+          root: { borderRadius: 8, '&:hover': { backgroundColor: s.track } },
+        },
+      },
+      MuiPaper: {
+        defaultProps: { elevation: 0 },
+        styleOverrides: {
+          root: { backgroundImage: 'none' },
+          outlined: { borderColor: s.border },
+        },
+      },
+      MuiCard: {
+        defaultProps: { elevation: 0 },
+        styleOverrides: {
+          root: {
+            borderRadius: 12,
+            border: `1px solid ${s.border}`,
+            boxShadow: s.cardShadow,
+            backgroundColor: s.surface,
+          },
+        },
+      },
+      MuiMenu: {
+        styleOverrides: {
+          paper: {
+            border: `1px solid ${s.border2}`,
+            boxShadow: '0 12px 32px rgba(0,0,0,0.28)',
+            borderRadius: 10,
+          },
+          list: { padding: 5 },
+        },
+      },
+      MuiMenuItem: {
+        styleOverrides: {
+          root: { borderRadius: 6, fontSize: 13, minHeight: 32 },
+        },
+      },
+      MuiDialog: {
+        styleOverrides: {
+          paper: {
+            border: `1px solid ${s.border2}`,
+            borderRadius: 14,
+            backgroundColor: s.surface,
+          },
+        },
+      },
+      MuiOutlinedInput: {
+        styleOverrides: {
+          root: {
+            borderRadius: 9,
+            '& .MuiOutlinedInput-notchedOutline': { borderColor: s.border2 },
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+              borderColor: s.text3,
+            },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+              borderColor: s.accent,
+              borderWidth: 1,
+            },
+          },
+        },
+      },
+      MuiSwitch: {
+        styleOverrides: {
+          root: { width: 38, height: 22, padding: 0, margin: '0 4px' },
+          switchBase: {
+            padding: 3,
+            '&.Mui-checked': {
+              transform: 'translateX(16px)',
+              color: s.bg,
+              '& + .MuiSwitch-track': {
+                backgroundColor: s.text,
+                opacity: 1,
+                border: 0,
+              },
+            },
+          },
+          thumb: { width: 16, height: 16, boxShadow: 'none' },
+          track: {
+            borderRadius: 11,
+            backgroundColor: s.track,
+            border: `1px solid ${s.border2}`,
+            opacity: 1,
+          },
+        },
+      },
+      MuiLinearProgress: {
+        styleOverrides: {
+          root: { height: 4, borderRadius: 4, backgroundColor: s.track },
+          bar: { borderRadius: 4 },
+        },
+      },
+      MuiChip: {
+        styleOverrides: {
+          root: { borderRadius: 6, fontWeight: 500, height: 22, fontSize: 11 },
+        },
+      },
+      MuiTooltip: {
+        styleOverrides: {
+          tooltip: {
+            backgroundColor: s.mode === 'dark' ? '#26262B' : '#18181B',
+            color: '#EDEDEF',
+            fontSize: 12,
+            borderRadius: 6,
+          },
+        },
+      },
+      MuiTab: {
+        styleOverrides: {
+          root: { textTransform: 'none', fontWeight: 500, minHeight: 40 },
+        },
+      },
+      MuiDivider: { styleOverrides: { root: { borderColor: s.border } } },
+      MuiSnackbarContent: {
+        styleOverrides: {
+          root: {
+            backgroundColor: s.mode === 'dark' ? '#EDEDEF' : '#18181B',
+            color: s.mode === 'dark' ? '#09090B' : '#EDEDEF',
+            borderRadius: 10,
+            fontSize: 13,
           },
         },
       },
     },
-    MuiAppBar: {
-      styleOverrides: {
-        root: {
-          backdropFilter: 'blur(20px)',
-          background: 'rgba(15, 20, 25, 0.8)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-        },
-      },
-    },
-    MuiDrawer: {
-      styleOverrides: {
-        paper: {
-          borderRight: '1px solid rgba(255, 255, 255, 0.08)',
-          background: 'linear-gradient(180deg, #1A1F2E 0%, #0F1419 100%)',
-        },
-      },
-    },
-  },
-});
-
-// Export responsive themes
-export const getResponsiveTheme = (isDarkMode: boolean) => {
-  return responsiveFontSizes(isDarkMode ? modernDarkTheme : modernLightTheme);
+  };
+  return createTheme(options);
 };
 
-// Export modern helper functions
-export const getGradient = (theme: Theme, type: keyof typeof gradients) => {
-  return theme.custom?.gradients?.[type] || gradients[type];
-};
+export const modernDarkTheme = buildTheme(darkScheme);
+export const modernLightTheme = buildTheme(lightScheme);
 
-export const getCustomShadow = (
-  theme: Theme,
-  type: keyof typeof modernShadows
-) => {
-  return theme.custom?.shadows?.[type] || modernShadows[type];
-};
+export const getResponsiveTheme = (isDarkMode: boolean): Theme =>
+  isDarkMode ? modernDarkTheme : modernLightTheme;
+
+export const getGradient = (theme: Theme, type: GradientKey) =>
+  theme.custom.gradients[type];
+
+export const getCustomShadow = (theme: Theme, type: ShadowKey) =>
+  theme.custom.shadows[type];
 
 export const applyGlassmorphism = (theme: Theme) => ({
-  background: theme.custom?.glassmorphism?.background,
-  backdropFilter: theme.custom?.glassmorphism?.blur,
-  border: theme.custom?.glassmorphism?.border,
+  background: theme.custom.glassmorphism.background,
+  border: theme.custom.glassmorphism.border,
+});
+
+/** 数字表示（タイマー・KPI）の共通スタイル */
+export const numberTypography = (theme: Theme) => ({
+  fontFamily: theme.custom.tokens.numberFont,
+  fontWeight: 200,
+  letterSpacing: '-0.04em',
+  fontVariantNumeric: 'tabular-nums' as const,
 });

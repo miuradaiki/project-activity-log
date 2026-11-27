@@ -4,17 +4,20 @@ import { Project } from '../types';
 
 // プロジェクトの色パレット
 export const PROJECT_COLORS = [
-  '#0088FE', // ブルー
-  '#00C49F', // ティール
-  '#FFBB28', // イエロー
-  '#FF8042', // オレンジ
-  '#8884D8', // パープル
-  '#82CA9D', // グリーン
-  '#FFC658', // ライトオレンジ
-  '#FF6B6B', // レッド
-  '#4ECDC4', // ターコイズ
-  '#45B7D1', // スカイブルー
+  '#7C78F0', // インディゴ（アクセント系）
+  '#22B893', // ティール
+  '#E9970F', // アンバー
+  '#3D9FE8', // スカイ
+  '#D9669B', // ローズ
+  '#8FA83A', // オリーブ
+  '#A77DE6', // ラベンダー
+  '#1FA8B8', // シアン
+  '#D97A4A', // テラコッタ
+  '#6E8BA8', // スレート
 ];
+
+const effectiveColor = (project: Project, index: number): string =>
+  project.color ?? PROJECT_COLORS[index % PROJECT_COLORS.length];
 
 // プロジェクトIDと色のマッピングを管理するクラス
 export class ProjectColorManager {
@@ -30,15 +33,21 @@ export class ProjectColorManager {
     return ProjectColorManager.instance;
   }
 
-  // プロジェクトリストから色のマッピングを初期化
+  // プロジェクトリストから色のマッピングを初期化（保存された色を優先する）
   public initializeColors(projects: Project[]): void {
     this.colorMap.clear();
     projects.forEach((project, index) => {
-      this.colorMap.set(
-        project.id,
-        PROJECT_COLORS[index % PROJECT_COLORS.length]
-      );
+      this.colorMap.set(project.id, effectiveColor(project, index));
     });
+  }
+
+  // 新しいプロジェクト用に、既存のプロジェクトとかぶらない色を選ぶ
+  public pickUnusedColor(projects: Project[]): string {
+    const used = new Set(projects.map((p, i) => effectiveColor(p, i)));
+    return (
+      PROJECT_COLORS.find((c) => !used.has(c)) ??
+      PROJECT_COLORS[projects.length % PROJECT_COLORS.length]
+    );
   }
 
   // プロジェクトIDから色を取得

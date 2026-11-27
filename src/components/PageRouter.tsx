@@ -1,18 +1,15 @@
 import React from 'react';
-import { Box, Button } from '@mui/material';
-import { CloudUpload as CloudUploadIcon } from '@mui/icons-material';
-import { useLanguage } from '../contexts/LanguageContext';
 import { Project, TimeEntry } from '../types';
 import { TimerController } from '../hooks/useTimerController';
 import { Modal } from '../hooks/useModal';
 import { ProjectOperations } from '../hooks/useProjectOperations';
 
-import { Dashboard } from './dashboard/Dashboard';
-import { ProjectsView } from './ui/project/ProjectsView';
+import { ReportsView } from './reports/ReportsView';
+import { ProjectsView } from './projects/ProjectsView';
+import { useSettingsContext } from '../contexts/SettingsContext';
 import { SettingsView } from './settings/SettingsView';
-import { TimerFocus } from './ui/timer/TimerFocus';
-import { ProjectList } from './ProjectList';
-import { TimeEntryList } from './timer/TimeEntryList';
+import { TodayView } from './today/TodayView';
+import { EntryHistory } from './history/EntryHistory';
 
 export interface PageRouterProps {
   activePage: string;
@@ -41,21 +38,15 @@ export const PageRouter: React.FC<PageRouterProps> = ({
   isDarkMode,
   onToggleTheme,
 }) => {
-  const { t } = useLanguage();
+  const { settings } = useSettingsContext();
 
   switch (activePage) {
     case 'dashboard':
       return (
-        <Dashboard
+        <ReportsView
           projects={projects}
           timeEntries={timeEntries}
-          onStartTimer={(projectId) => {
-            const project = projects.find((p) => p.id === projectId);
-            if (project) onStartTimer(project);
-          }}
-          onEditProject={(project) => projectFormModal.open(project)}
-          onArchiveProject={projectOps.archiveProject}
-          onUnarchiveProject={projectOps.unarchiveProject}
+          baseMonthlyHours={settings.workHours.baseMonthlyHours}
         />
       );
 
@@ -64,7 +55,10 @@ export const PageRouter: React.FC<PageRouterProps> = ({
         <ProjectsView
           projects={projects}
           timeEntries={timeEntries}
-          activeProjectId={timer.activeProject?.id || null}
+          activeProjectId={
+            timer.isRunning ? (timer.activeProject?.id ?? null) : null
+          }
+          baseMonthlyHours={settings.workHours.baseMonthlyHours}
           onEditProject={(project) => projectFormModal.open(project)}
           onDeleteProject={projectOps.deleteProject}
           onArchiveProject={projectOps.archiveProject}
@@ -76,50 +70,33 @@ export const PageRouter: React.FC<PageRouterProps> = ({
 
     case 'timer':
       return (
-        <Box sx={{ width: '100%', maxWidth: 1200, mx: 'auto' }}>
-          <Box sx={{ mb: 3, display: 'flex', justifyContent: 'flex-end' }}>
-            <Button
-              variant="outlined"
-              startIcon={<CloudUploadIcon />}
-              onClick={onImportCSV}
-            >
-              {t('timer.import.csv')}
-            </Button>
-          </Box>
-
-          <TimerFocus
-            project={timer.activeProject}
-            isRunning={timer.isRunning}
-            startTime={timer.startTime}
-            onStart={() =>
-              timer.activeProject && timer.start(timer.activeProject)
-            }
-            onStop={() => timer.stop()}
-          />
-
-          <ProjectList
-            projects={projects}
-            onEditProject={(project) => projectFormModal.open(project)}
-            onDeleteProject={projectOps.deleteProject}
-            onArchiveProject={projectOps.archiveProject}
-            onUnarchiveProject={projectOps.unarchiveProject}
-            onStartTimer={onStartTimer}
-            activeProjectId={timer.activeProject?.id || null}
-            timeEntries={timeEntries}
-          />
-
-          <TimeEntryList
+        <TodayView
+          projects={projects}
+          timeEntries={timeEntries}
+          activeProject={timer.activeProject}
+          isRunning={timer.isRunning}
+          startTime={timer.startTime}
+          onToggleProject={onStartTimer}
+          onStop={() => timer.stop()}
+          onManualEntry={() => manualEntryModal.open()}
+          onCreateProject={() => projectFormModal.open()}
+        >
+          <EntryHistory
             timeEntries={timeEntries}
             projects={projects}
-            onDeleteTimeEntry={projectOps.deleteTimeEntry}
-            onEditTimeEntry={(entry) => manualEntryModal.open(entry)}
+            onDelete={projectOps.deleteTimeEntry}
+            onEdit={(entry) => manualEntryModal.open(entry)}
           />
-        </Box>
+        </TodayView>
       );
 
     case 'settings':
       return (
-        <SettingsView onToggleTheme={onToggleTheme} isDarkMode={isDarkMode} />
+        <SettingsView
+          onToggleTheme={onToggleTheme}
+          isDarkMode={isDarkMode}
+          onImportCSV={onImportCSV}
+        />
       );
 
     default:

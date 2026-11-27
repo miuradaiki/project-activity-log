@@ -7,6 +7,7 @@ export interface Project {
   updatedAt: string;
   isArchived: boolean; // アーカイブ状態
   archivedAt?: string; // アーカイブした日時
+  color?: string; // 未設定なら一覧の並び順から自動で割り当てる
 }
 
 export interface TimeEntry {

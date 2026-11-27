@@ -113,17 +113,22 @@ import Papa from 'papaparse';
  * @param {Array} timeEntries 時間記録データ
  * @param {Array} projects プロジェクトデータ
  */
+// toISOString は UTC のため、JST 0〜9時に前日の日付になる
+const localDateStamp = (d) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+// 戻り値: 'saved' | 'canceled' | 'empty'（キャンセルを失敗として扱わないため区別する）
 const exportToCSV = async (timeEntries, projects) => {
   try {
     // データが存在するか確認
     if (!timeEntries || timeEntries.length === 0) {
       console.log('No time entries to export');
-      return false;
+      return 'empty';
     }
 
     if (!projects || projects.length === 0) {
       console.log('No projects found');
-      return false;
+      return 'empty';
     }
 
     // プロジェクトデータをIDでマップ化
@@ -156,7 +161,7 @@ const exportToCSV = async (timeEntries, projects) => {
           '作業時間（分）': Math.round(durationMs / (1000 * 60)),
           プロジェクト名: project ? project.name : 'Unknown Project',
           プロジェクト説明: project ? project.description : '',
-          メモ: entry.notes || '',
+          メモ: entry.description || '',
         };
       });
 
@@ -174,16 +179,16 @@ const exportToCSV = async (timeEntries, projects) => {
       BrowserWindow.getFocusedWindow(),
       {
         title: '作業時間記録をエクスポート',
-        defaultPath: `work-log-${new Date().toISOString().split('T')[0]}.csv`,
+        defaultPath: `work-log-${localDateStamp(new Date())}.csv`,
         filters: [{ name: 'CSV Files', extensions: ['csv'] }],
       }
     );
 
     if (!result.canceled && result.filePath) {
       await fs.promises.writeFile(result.filePath, csvWithBom, 'utf-8');
-      return true;
+      return 'saved';
     }
-    return false;
+    return 'canceled';
   } catch (error) {
     console.error('Error exporting to CSV:', error);
     throw error;
