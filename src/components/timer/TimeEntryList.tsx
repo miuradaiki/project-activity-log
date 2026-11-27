@@ -23,7 +23,6 @@ import {
   Close as CloseIcon,
 } from '@mui/icons-material';
 import { TimeEntry, Project } from '../../types';
-import { DeleteConfirmDialog } from '../DeleteConfirmDialog';
 import { ExportButton } from '../ExportButton';
 import { TimelineView } from '../ui/TimelineView';
 
@@ -46,30 +45,9 @@ export const TimeEntryList: React.FC<TimeEntryListProps> = ({
   const { t } = useLanguage();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [entryToDelete, setEntryToDelete] = useState<TimeEntry | null>(null);
   const [page, setPage] = useState(1);
   const [filterProject, setFilterProject] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-
-  // 削除ダイアログの処理
-  const handleDeleteClick = (entry: TimeEntry) => {
-    setEntryToDelete(entry);
-    setDeleteDialogOpen(true);
-  };
-
-  const handleDeleteConfirm = () => {
-    if (entryToDelete) {
-      onDeleteTimeEntry(entryToDelete.id);
-    }
-    setDeleteDialogOpen(false);
-    setEntryToDelete(null);
-  };
-
-  const handleDeleteCancel = () => {
-    setDeleteDialogOpen(false);
-    setEntryToDelete(null);
-  };
 
   // フィルタリングとページネーション
   const handlePageChange = (
@@ -247,7 +225,7 @@ export const TimeEntryList: React.FC<TimeEntryListProps> = ({
             timeEntries={paginatedEntries}
             projects={projects}
             onEdit={onEditTimeEntry}
-            onDelete={handleDeleteClick}
+            onDelete={(entry) => onDeleteTimeEntry(entry.id)}
           />
         ) : (
           <Box
@@ -277,15 +255,6 @@ export const TimeEntryList: React.FC<TimeEntryListProps> = ({
           />
         </Box>
       )}
-
-      {/* 削除確認ダイアログ */}
-      <DeleteConfirmDialog
-        open={deleteDialogOpen}
-        title={t('timer.delete.confirm')}
-        message={t('timer.delete.message')}
-        onConfirm={handleDeleteConfirm}
-        onCancel={handleDeleteCancel}
-      />
     </Paper>
   );
 };

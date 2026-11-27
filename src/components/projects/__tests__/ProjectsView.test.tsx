@@ -105,6 +105,40 @@ describe('ProjectsView', () => {
     expect(onDeleteProject).toHaveBeenCalledWith(projects[0]);
   });
 
+  it('削除の確認では、一緒に消える作業記録の件数と時間を示す', () => {
+    setup();
+
+    fireEvent.click(
+      within(rowOf('EC開発')).getByRole('button', {
+        name: 'プロジェクトメニュー',
+      })
+    );
+    fireEvent.click(screen.getByRole('menuitem', { name: '削除…' }));
+
+    const dialog = screen.getByRole('dialog');
+    expect(dialog).toHaveTextContent('「EC開発」を削除しますか？');
+    expect(dialog).toHaveTextContent('作業記録 1件（10h）も削除されます');
+  });
+
+  it('削除の確認から、代わりにアーカイブできる', () => {
+    const { onDeleteProject, onArchiveProject } = setup();
+
+    fireEvent.click(
+      within(rowOf('EC開発')).getByRole('button', {
+        name: 'プロジェクトメニュー',
+      })
+    );
+    fireEvent.click(screen.getByRole('menuitem', { name: '削除…' }));
+    fireEvent.click(
+      within(screen.getByRole('dialog')).getByRole('button', {
+        name: 'アーカイブにする',
+      })
+    );
+
+    expect(onArchiveProject).toHaveBeenCalledWith(projects[0]);
+    expect(onDeleteProject).not.toHaveBeenCalled();
+  });
+
   it('アーカイブ済みは折りたたまれ、開くと表示される', () => {
     setup();
 

@@ -18,7 +18,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { PageHeader } from '../ui/PageHeader';
 import { GraphiteCard } from '../ui/graphite/GraphiteCard';
 import { SegmentedControl } from '../ui/graphite/SegmentedControl';
-import { DeleteConfirmDialog } from '../DeleteConfirmDialog';
+import { ProjectDeleteDialog } from './ProjectDeleteDialog';
 import { ProjectTableRow, PROJECT_GRID_COLUMNS } from './ProjectTableRow';
 import {
   buildProjectRows,
@@ -277,12 +277,15 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({
         </MenuItem>
       </Menu>
 
-      <DeleteConfirmDialog
-        open={!!toDelete}
-        title={t('projects.delete.confirm')}
-        message={`${toDelete?.name ?? ''}\n${t('projects.delete.warning')}`}
-        onConfirm={() => {
-          if (toDelete) onDeleteProject(toDelete);
+      <ProjectDeleteDialog
+        project={toDelete}
+        timeEntries={timeEntries}
+        onConfirm={(project) => {
+          onDeleteProject(project);
+          setToDelete(null);
+        }}
+        onArchive={(project) => {
+          onArchiveProject(project);
           setToDelete(null);
         }}
         onCancel={() => setToDelete(null)}

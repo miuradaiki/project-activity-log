@@ -99,9 +99,6 @@ export const translations = {
     'timer.import.csv': 'CSVインポート',
     'timer.search': '検索...',
     'timer.no.entries': 'タイマーを開始してください',
-    'timer.delete.confirm': '作業記録の削除',
-    'timer.delete.message':
-      'の作業記録を削除してもよろしいですか？\nこの操作は取り消せません。',
     'timer.notification.maxtime': '作業時間が8時間を超過しました',
     'timer.notification.maxtime.body':
       'タイマーを自動停止しました。必要に応じて新しいセッションを開始してください。',
@@ -122,9 +119,7 @@ export const translations = {
     'settings.loading': '設定を読み込んでいます...',
     'settings.monthly.hours.saved': '月間基準時間を保存しました',
     'settings.save.error': '保存に失敗しました',
-    'settings.reset.success': '設定をデフォルトに戻しました',
     'settings.reset.error': 'リセットに失敗しました',
-    'settings.language.changed': '言語設定を変更しました',
     'settings.monthly.hours.example': '例: {base}h × 40% = {target}h',
     'settings.appearance': '外観設定',
     'settings.darkmode': 'ダークモード',
@@ -277,6 +272,14 @@ export const translations = {
     'actions.close': '閉じる',
     'timer.export.csv': 'CSV書き出し',
     'timer.discarded': '1分未満のため記録しませんでした',
+    'undo.action': '元に戻す',
+    'undo.entry.deleted': '作業記録を削除しました',
+    'undo.project.archived': '「{name}」をアーカイブしました',
+    'undo.project.deleted': '「{name}」と記録{count}件を削除しました',
+    'projects.delete.title': '「{name}」を削除しますか？',
+    'projects.delete.entries': '作業記録 {count}件（{hours}h）も削除されます。',
+    'projects.delete.hint': '記録を残したい場合はアーカイブしてください。',
+    'projects.delete.archive.instead': 'アーカイブにする',
   },
   en: {
     // ===== Common =====
@@ -350,9 +353,6 @@ export const translations = {
     'timer.import.csv': 'Import CSV',
     'timer.search': 'Search...',
     'timer.no.entries': 'No work records found',
-    'timer.delete.confirm': 'Delete Work Record',
-    'timer.delete.message':
-      'Are you sure you want to delete this work record for? This action cannot be undone.',
     'timer.notification.maxtime': 'Working time exceeded 8 hours',
     'timer.notification.maxtime.body':
       'Timer has been automatically stopped. Start a new session if needed.',
@@ -374,9 +374,7 @@ export const translations = {
     'settings.loading': 'Loading settings...',
     'settings.monthly.hours.saved': 'Monthly base hours saved',
     'settings.save.error': 'Failed to save',
-    'settings.reset.success': 'Settings reset to default',
     'settings.reset.error': 'Failed to reset settings',
-    'settings.language.changed': 'Language changed',
     'settings.monthly.hours.example': 'e.g. {base}h × 40% = {target}h',
     'settings.appearance': 'Appearance',
     'settings.darkmode': 'Dark Mode',
@@ -528,5 +526,14 @@ export const translations = {
     'actions.close': 'Close',
     'timer.export.csv': 'Export CSV',
     'timer.discarded': 'Not recorded (under 1 minute)',
+    'undo.action': 'Undo',
+    'undo.entry.deleted': 'Entry deleted',
+    'undo.project.archived': 'Archived "{name}"',
+    'undo.project.deleted': 'Deleted "{name}" and {count} entries',
+    'projects.delete.title': 'Delete "{name}"?',
+    'projects.delete.entries':
+      '{count} entries ({hours}h) will also be deleted. ',
+    'projects.delete.hint': 'Archive it instead to keep the records.',
+    'projects.delete.archive.instead': 'Archive instead',
   },
 };

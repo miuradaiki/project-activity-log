@@ -13,6 +13,7 @@ import { useKeyboardShortcuts, Shortcut } from './hooks/useKeyboardShortcuts';
 import { useTimerController } from './hooks/useTimerController';
 import { useModal } from './hooks/useModal';
 import { useProjectOperations } from './hooks/useProjectOperations';
+import { useUndoableProjectOperations } from './hooks/useUndoableProjectOperations';
 import { Layout } from './components/ui/layout/Layout';
 import { useThemeMode } from './components/ui/ThemeProvider';
 import { KeyboardShortcutsDialog } from './components/shortcuts/KeyboardShortcuts';
@@ -63,13 +64,20 @@ const App: React.FC = () => {
   );
 
   // プロジェクト操作
-  const projectOps = useProjectOperations({
+  const baseProjectOps = useProjectOperations({
     projects,
     setProjects,
     setTimeEntries,
     activeProjectId: timer.activeProject?.id || null,
     isTimerRunning: timer.isRunning,
     onTimerStop: () => timer.stop(),
+  });
+  const projectOps = useUndoableProjectOperations({
+    projectOps: baseProjectOps,
+    projects,
+    timeEntries,
+    setProjects,
+    setTimeEntries,
   });
 
   // 安定した参照にして、Layout の自動停止監視（毎秒のインターバル）を作り直さない
