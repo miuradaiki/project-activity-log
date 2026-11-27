@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { TimeEntry } from '../../../types';
 import { v4 as uuidv4 } from 'uuid';
-import { isSameDay, differenceInHours } from 'date-fns';
+import { isSameDay, differenceInHours, format } from 'date-fns';
 import { createSplitEntries } from '../../../utils/timeEntryUtils';
 
 interface FormState {
@@ -35,8 +35,11 @@ interface UseTimeEntryFormReturn {
   handleClose: () => void;
 }
 
+// toISOString は UTC の日付になり、JST 0〜9時に前日へずれるためローカル時刻で作る
+const toLocalDate = (d: Date): string => format(d, 'yyyy-MM-dd');
+
 const getDefaultFormState = (): FormState => {
-  const today = new Date().toISOString().split('T')[0];
+  const today = toLocalDate(new Date());
   return {
     projectId: '',
     startDate: today,
@@ -63,8 +66,8 @@ export const useTimeEntryForm = ({
 
       setFormState({
         projectId: timeEntry.projectId,
-        startDate: startDateTime.toISOString().split('T')[0],
-        endDate: startDateTime.toISOString().split('T')[0],
+        startDate: toLocalDate(startDateTime),
+        endDate: toLocalDate(startDateTime),
         startTime: startDateTime.toTimeString().slice(0, 5),
         endTime: endDateTime.toTimeString().slice(0, 5),
         description: timeEntry.description || '',
@@ -105,7 +108,7 @@ export const useTimeEntryForm = ({
   const handleSetCurrentTime = useCallback((target: 'start' | 'end') => {
     const now = new Date();
     const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-    const currentDate = now.toISOString().split('T')[0];
+    const currentDate = toLocalDate(now);
 
     if (target === 'start') {
       setFormState((prev) => ({
