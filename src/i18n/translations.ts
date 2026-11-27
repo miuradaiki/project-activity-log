@@ -35,6 +35,12 @@ export const translations = {
     'nav.projects': 'プロジェクト',
     'nav.timer': '今日',
     'nav.settings': '設定',
+    'shortcuts.title': 'キーボードショートカット',
+    'shortcuts.close': '閉じる',
+    'shortcuts.timer.toggle': 'タイマーの開始/停止（今日の画面）',
+    'shortcuts.project.new': '新しいプロジェクト',
+    'shortcuts.help': 'ショートカット一覧',
+    'shortcuts.theme': 'ダーク/ライトの切り替え',
 
     // ===== ダッシュボード =====
 
@@ -273,6 +279,12 @@ export const translations = {
     'nav.projects': 'Projects',
     'nav.timer': 'Today',
     'nav.settings': 'Settings',
+    'shortcuts.title': 'Keyboard shortcuts',
+    'shortcuts.close': 'Close',
+    'shortcuts.timer.toggle': 'Start/stop timer (Today page)',
+    'shortcuts.project.new': 'New project',
+    'shortcuts.help': 'Shortcut list',
+    'shortcuts.theme': 'Toggle dark/light',
 
     // ===== Dashboard =====
 
