@@ -51,7 +51,7 @@ export const getTodaySegments = (
 export const getTodayProjectHours = (
   entries: TimeEntry[],
   now: Date
-): { projectId: string; hours: number }[] => {
+): { projectId: string; ms: number }[] => {
   const totals = new Map<string, number>();
   entries
     .filter((e) => isSameDay(e.startTime, now))
@@ -59,12 +59,12 @@ export const getTodayProjectHours = (
       const ms = calculateDuration(e.startTime, e.endTime);
       totals.set(e.projectId, (totals.get(e.projectId) ?? 0) + ms);
     });
-  return Array.from(totals.entries())
-    .map(([projectId, ms]) => ({
-      projectId,
-      hours: Math.round((ms / HOUR) * 10) / 10,
-    }))
-    .sort((a, b) => b.hours - a.hours);
+  return (
+    Array.from(totals.entries())
+      // ここで丸めると合計が作業履歴とずれるため、丸めは表示するときに1回だけ行う
+      .map(([projectId, ms]) => ({ projectId, ms }))
+      .sort((a, b) => b.ms - a.ms)
+  );
 };
 
 export const getRecentProjects = (
