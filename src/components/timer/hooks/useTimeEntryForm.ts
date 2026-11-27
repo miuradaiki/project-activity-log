@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { TimeEntry } from '../../../types';
 import { isSameDay, differenceInHours, format } from 'date-fns';
 import { createSplitEntries } from '../../../utils/timeEntryUtils';
@@ -16,16 +16,11 @@ interface UseTimeEntryFormProps {
   /** 開くたびに初期値（今日の日付）を作り直すために使う */
   open?: boolean;
   timeEntry?: TimeEntry;
-  /** 重なりの確認に使う。同じ時間を二重に数えないため */
-  timeEntries?: TimeEntry[];
   onSave: (timeEntry: TimeEntry) => void;
   onClose: () => void;
 }
 
-export type TimeEntryValidationError =
-  | 'endBeforeStart'
-  | 'tooShort'
-  | 'overlap';
+export type TimeEntryValidationError = 'endBeforeStart' | 'tooShort';
 
 interface UseTimeEntryFormReturn {
   formState: FormState;
@@ -54,19 +49,11 @@ const toLocalDate = (d: Date): string => format(d, 'yyyy-MM-dd');
 const MIN_DURATION_MS = 60_000;
 
 const getValidationError = (
-  start: Date,
-  end: Date,
-  others: TimeEntry[]
+  durationMs: number
 ): TimeEntryValidationError | null => {
-  const durationMs = end.getTime() - start.getTime();
   if (Number.isNaN(durationMs)) return null;
   if (durationMs <= 0) return 'endBeforeStart';
   if (durationMs < MIN_DURATION_MS) return 'tooShort';
-  const overlaps = others.some(
-    (e) =>
-      e.endTime && start < new Date(e.endTime) && new Date(e.startTime) < end
-  );
-  if (overlaps) return 'overlap';
   return null;
 };
 
@@ -85,17 +72,12 @@ const getDefaultFormState = (): FormState => {
 export const useTimeEntryForm = ({
   open,
   timeEntry,
-  timeEntries = [],
   onSave,
   onClose,
 }: UseTimeEntryFormProps): UseTimeEntryFormReturn => {
   const [formState, setFormState] = useState<FormState>(getDefaultFormState());
 
   const isEditing = !!timeEntry;
-  const otherEntries = useMemo(
-    () => timeEntries.filter((e) => e.id !== timeEntry?.id),
-    [timeEntries, timeEntry]
-  );
 
   useEffect(() => {
     if (timeEntry) {
@@ -181,11 +163,7 @@ export const useTimeEntryForm = ({
       const startDateTime = new Date(`${startDate}T${startTime}`);
       const endDateTime = new Date(`${endDate}T${endTime}`);
       const durationMs = endDateTime.getTime() - startDateTime.getTime();
-      if (
-        Number.isNaN(durationMs) ||
-        getValidationError(startDateTime, endDateTime, otherEntries)
-      )
-        return;
+      if (Number.isNaN(durationMs) || getValidationError(durationMs)) return;
 
       const timestamp = new Date().toISOString();
       const entries = createSplitEntries(
@@ -209,13 +187,13 @@ export const useTimeEntryForm = ({
 
       handleClose();
     },
-    [formState, timeEntry, otherEntries, onSave, handleClose]
+    [formState, timeEntry, onSave, handleClose]
   );
 
   const startAt = new Date(`${formState.startDate}T${formState.startTime}`);
   const endAt = new Date(`${formState.endDate}T${formState.endTime}`);
   const durationMs = endAt.getTime() - startAt.getTime();
-  const validationError = getValidationError(startAt, endAt, otherEntries);
+  const validationError = getValidationError(durationMs);
   const isLongRecord =
     !validationError && differenceInHours(endAt, startAt) > 24;
 
