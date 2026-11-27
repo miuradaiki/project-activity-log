@@ -9,6 +9,7 @@ import { Project, TimeEntry } from './types';
 import { ProjectForm } from './components/ProjectForm';
 import { ManualTimeEntryForm } from './components/timer/ManualTimeEntryForm';
 import { useStorage } from './hooks/useStorage';
+import { StorageProvider } from './contexts/StorageContext';
 import { useKeyboardShortcuts, Shortcut } from './hooks/useKeyboardShortcuts';
 import { useTimerController } from './hooks/useTimerController';
 import { useModal } from './hooks/useModal';
@@ -38,8 +39,9 @@ const App: React.FC = () => {
   const [activePage, setActivePage] = useState(getInitialActivePage);
 
   // データの読み込み
+  const storage = useStorage();
   const { projects, setProjects, timeEntries, setTimeEntries, isLoading } =
-    useStorage();
+    storage;
 
   // 色はどの画面から開いても同じになるよう、描画前にプロジェクト一覧から割り当てる
   useMemo(() => projectColorManager.initializeColors(projects), [projects]);
@@ -199,58 +201,60 @@ const App: React.FC = () => {
   }
 
   return (
-    <Layout
-      activePage={activePage}
-      onNavigate={handleNavigate}
-      sidebarOpen={sidebarOpen}
-      onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-      projects={projects}
-      timeEntries={timeEntries}
-      activeProject={timer.activeProject}
-      isTimerRunning={timer.isRunning}
-      startTime={timer.startTime}
-      onStopTimer={handleStopTimer}
-    >
-      <PageRouter
+    <StorageProvider value={storage}>
+      <Layout
         activePage={activePage}
+        onNavigate={handleNavigate}
+        sidebarOpen={sidebarOpen}
+        onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
         projects={projects}
         timeEntries={timeEntries}
-        timer={timer}
-        projectFormModal={projectFormModal}
-        manualEntryModal={manualEntryModal}
-        projectOps={projectOps}
-        onStartTimer={handleStartTimer}
-        onImportCSV={csvImport.importCSV}
-        isDarkMode={isDarkMode}
-        onToggleTheme={toggleThemeMode}
-      />
+        activeProject={timer.activeProject}
+        isTimerRunning={timer.isRunning}
+        startTime={timer.startTime}
+        onStopTimer={handleStopTimer}
+      >
+        <PageRouter
+          activePage={activePage}
+          projects={projects}
+          timeEntries={timeEntries}
+          timer={timer}
+          projectFormModal={projectFormModal}
+          manualEntryModal={manualEntryModal}
+          projectOps={projectOps}
+          onStartTimer={handleStartTimer}
+          onImportCSV={csvImport.importCSV}
+          isDarkMode={isDarkMode}
+          onToggleTheme={toggleThemeMode}
+        />
 
-      {/* モーダル */}
-      <ProjectForm
-        open={projectFormModal.isOpen}
-        onClose={projectFormModal.close}
-        onSave={
-          projectFormModal.data ? handleEditProject : projectOps.createProject
-        }
-        project={projectFormModal.data}
-        projects={projects}
-        baseMonthlyHours={settings.workHours.baseMonthlyHours}
-      />
+        {/* モーダル */}
+        <ProjectForm
+          open={projectFormModal.isOpen}
+          onClose={projectFormModal.close}
+          onSave={
+            projectFormModal.data ? handleEditProject : projectOps.createProject
+          }
+          project={projectFormModal.data}
+          projects={projects}
+          baseMonthlyHours={settings.workHours.baseMonthlyHours}
+        />
 
-      <ManualTimeEntryForm
-        open={manualEntryModal.isOpen}
-        onClose={manualEntryModal.close}
-        onSave={handleSaveTimeEntry}
-        projects={projects}
-        timeEntry={manualEntryModal.data}
-      />
+        <ManualTimeEntryForm
+          open={manualEntryModal.isOpen}
+          onClose={manualEntryModal.close}
+          onSave={handleSaveTimeEntry}
+          projects={projects}
+          timeEntry={manualEntryModal.data}
+        />
 
-      {/* キーボードショートカットダイアログ */}
-      <KeyboardShortcutsDialog
-        open={shortcutsModal.isOpen}
-        onClose={shortcutsModal.close}
-      />
-    </Layout>
+        {/* キーボードショートカットダイアログ */}
+        <KeyboardShortcutsDialog
+          open={shortcutsModal.isOpen}
+          onClose={shortcutsModal.close}
+        />
+      </Layout>
+    </StorageProvider>
   );
 };
 
