@@ -148,9 +148,10 @@ const App: React.FC = () => {
   // キーボードショートカットの定義
   const shortcuts: Shortcut[] = [
     // ナビゲーション
-    { key: '1', ctrlKey: true, action: () => handleNavigate('dashboard') },
+    // サイドバーの並び順（今日 / プロジェクト / レポート）にそろえる
+    { key: '1', ctrlKey: true, action: () => handleNavigate('timer') },
     { key: '2', ctrlKey: true, action: () => handleNavigate('projects') },
-    { key: '3', ctrlKey: true, action: () => handleNavigate('timer') },
+    { key: '3', ctrlKey: true, action: () => handleNavigate('dashboard') },
     { key: ',', ctrlKey: true, action: () => handleNavigate('settings') },
     // プロジェクト操作
     { key: 'n', ctrlKey: true, action: () => projectFormModal.open() },
