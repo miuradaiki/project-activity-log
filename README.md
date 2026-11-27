@@ -1,121 +1,139 @@
 # Project Activity Log
 
-A desktop application for tracking and analyzing work time across multiple projects.
+[English](./README.en.md) | **日本語**
 
-Set monthly work allocation and visualize progress per project. Efficiently manage daily work with timer functionality and dashboards.
+複数のプロジェクトにかけた作業時間を記録し、月ごとの稼働割合を確認するデスクトップアプリです。
 
-## Quick Start
+月間の基準時間とプロジェクトごとの配分（%）を決めておくと、目標に対する実績と、残りの日数で必要な 1 日あたりのペースが分かります。
+データはすべて手元の PC に保存され、外部には送信しません。
+
+## はじめかた
 
 ```bash
-# Installation
-git clone https://github.com/daikimiura/project-activity-log.git
+git clone https://github.com/miuradaiki/project-activity-log.git
 cd project-activity-log
 npm install
-
-# Launch
 npm run electron:dev
 ```
 
-**Requirements**: Node.js v16 or higher
+**動作環境**: Node.js 18 以上
 
-## Screens
+## 画面
 
-The app consists of 4 screens. Switch between them using the sidebar or keyboard shortcuts.
+サイドバーかキーボードショートカットで、4 つの画面を切り替えます。
 
-### Timer Screen (`Ctrl+3`)
+### 今日（`Ctrl+1`）
 
-The main screen for recording work time.
+作業時間を記録するメイン画面です。
 
-- **Timer**: Select a project and start. Continues tracking during system sleep, auto-stops after 8 hours
-- **Manual Entry**: Add past work time with date and time specification
-- **History**: View, edit, and delete work records in timeline or list format
+- **タイマー**: プロジェクトを選んで開始・停止します。スリープ中も計測を続け、8 時間を超えると自動で停止して記録を 8 時間で区切ります
+- **今日の状況**: 今日の作業時間、今月の進捗、目標達成に必要な 1 日あたりのペースを表示します
+- **タイムライン**: 今日の作業を時間帯ごとの帯で表示します
+- **手動で記録**: 過去の作業を日時を指定して追加します。日をまたぐ記録は日ごとに分けて保存します
+- **作業履歴**: 記録の検索・プロジェクトでの絞り込み・編集・削除ができます。削除は直後なら元に戻せます。CSV 書き出しもここから行います
 
-### Dashboard Screen (`Ctrl+1`)
+1 分未満の計測は記録しません。
 
-Analyze and visualize work data.
+### プロジェクト（`Ctrl+2`）
 
-- **Daily**: Today's work time and active projects
-- **Weekly**: Daily work time trends, time distribution by project
-- **Monthly**: Weekly work time trends, monthly summary
-- **Activity Calendar**: GitHub-style heatmap
+プロジェクトの作成・管理と、今月の進捗の確認を行います。
 
-### Projects Screen (`Ctrl+2`)
+- **配分**: プロジェクトごとに今月の配分を設定します（例: A に 40%、B に 60%）。配分 0% のプロジェクトは「追跡のみ」として時間だけを集計します
+- **進捗**: 実績と目標時間、残り時間、必要ペースを一覧で表示します。90% 以上で注意、100% を超えると超過として示します
+- **絞り込みと並べ替え**: 状態（進行中・超過・追跡のみ）で絞り込み、名前・進捗・残り時間で並べ替えます。名前で検索もできます
+- **アーカイブ**: 使わなくなったプロジェクトを、記録を残したまま一覧から隠します
 
-Create and manage projects, track progress.
+### レポート（`Ctrl+3`）
 
-- **Allocation**: Set monthly work allocation for each project (e.g., 40% for Project A, 60% for B)
-- **Progress Tracking**: Display actual vs target hours with progress bars. Warning at 90%, exceeded warning at 100%+
-- **Filter & Sort**: Filter by status, sort by name, progress rate, or remaining time
-- **Archive**: Hide completed projects
+月ごとの稼働をまとめて振り返ります。前後の月にも移動できます。
 
-### Settings Screen (`Ctrl+,`)
+- **稼働のまとめ**: 配分のあるプロジェクトの合計実績と目標、超過・注意の件数、追跡のみの時間
+- **週ごとの作業時間**: 平日の作業時間を週単位のグラフで表示します
+- **プロジェクト別**: プロジェクトごとの実績と目標に対する割合
 
-- **Monthly Base Hours**: Set between 80-200 hours. Multiplied by each project's allocation to calculate monthly target hours
-- **Appearance**: Toggle dark mode (`Alt+L`)
+### 設定（`Ctrl+,`）
 
-## Keyboard Shortcuts
+- **月間基準時間**: 80〜200 時間の範囲で設定します。プロジェクトの目標時間は「基準時間 × 配分」で決まります
+- **外観と言語**: ライト・ダークのテーマ（`Alt+L`）と、表示言語（日本語・英語）を切り替えます
+- **データ**: CSV ファイルから作業記録を取り込みます
 
-| Action           | Shortcut               |
-| ---------------- | ---------------------- |
-| Dashboard        | `Ctrl+1`               |
-| Projects         | `Ctrl+2`               |
-| Timer            | `Ctrl+3`               |
-| Settings         | `Ctrl+,`               |
-| New Project      | `Ctrl+N`               |
-| Start/Stop Timer | `Space` (Timer screen) |
-| Stop Timer       | `Escape`               |
-| Toggle Theme     | `Alt+L`                |
-| Shortcuts List   | `Ctrl+H` or `Ctrl+/`   |
+変更はすぐに保存されます。
 
-## Data
+## キーボードショートカット
 
-All data is stored locally. No data is sent to external servers.
+Mac でも `Ctrl`（⌃）キーを使います。
 
-```
+| 操作                     | ショートカット           |
+| ------------------------ | ------------------------ |
+| 今日                     | `Ctrl+1`                 |
+| プロジェクト             | `Ctrl+2`                 |
+| レポート                 | `Ctrl+3`                 |
+| 設定                     | `Ctrl+,`                 |
+| 新しいプロジェクト       | `Ctrl+N`                 |
+| タイマーの開始・停止     | `Space`（今日の画面）    |
+| ダーク・ライトの切り替え | `Alt+L`（Mac: `⌥L`）     |
+| ショートカット一覧       | `Ctrl+/` または `Ctrl+H` |
+
+## データ
+
+データは Electron の userData ディレクトリに JSON で保存します。
+
+```text
 [userData]/
 ├── data/
-│   ├── projects.json      # Project information
-│   └── timeEntries.json   # Time entries
-├── settings.json          # App settings
-└── backups/               # Automatic backups
+│   ├── projects.json      # プロジェクト
+│   └── timeEntries.json   # 作業記録
+├── settings.json          # 設定
+└── backups/               # 自動バックアップ
 ```
 
-**CSV Import**: Supports migration from other tools. Creates automatic backup before import and auto-restores on failure.
+### CSV の取り込み
+
+ほかのツールからの移行に使えます。
+取り込む前に自動でバックアップを取り、失敗したときは元に戻します。
+CSV にあってアプリにないプロジェクトは新しく作成します。
 
 ```csv
 date,start_time,end_time,duration_minutes,project_name,project_description,notes
-2025/2/3,10:35:42,11:28:19,53,Project Name,Description,Notes
+2025/2/3,10:35:42,11:28:19,53,プロジェクト名,説明,メモ
 ```
 
-## Development
+## 開発
 
-### Commands
+### コマンド
 
 ```bash
-npm run electron:dev      # Start development environment
-npm run electron:build    # Production build
-npm test                  # Unit tests
-npm run test:e2e          # E2E tests (Playwright)
+npm run electron:dev      # 開発環境の起動
+npm run electron:build    # 配布用ビルド（release/ に出力）
+npm test                  # ユニットテスト（Jest）
+npm run test:e2e          # E2E テスト（Playwright）
 npm run lint              # ESLint
 npm run format            # Prettier
 ```
 
-### Tech Stack
+コミット時には Husky と lint-staged で lint と関連テストが走ります。
 
-| Category  | Technology                          |
-| --------- | ----------------------------------- |
-| Framework | Electron 29, React 18, TypeScript 5 |
-| UI        | Material-UI 5, Framer Motion 12     |
-| Charts    | Recharts 2                          |
-| Build     | Vite 5                              |
-| Testing   | Jest 30, Playwright                 |
+### 技術スタック
 
-### Architecture
+| 分類           | 技術                                       |
+| -------------- | ------------------------------------------ |
+| フレームワーク | Electron 40、React 19、TypeScript 5        |
+| UI             | MUI 7、Framer Motion 12                    |
+| グラフ         | Recharts 2                                 |
+| ビルド         | Vite 5、electron-builder                   |
+| テスト         | Jest 30、React Testing Library、Playwright |
 
-Uses standard Electron architecture. The main process handles file I/O and communicates with the renderer process (React) via IPC.
+### 構成
 
-See [CLAUDE.md](./CLAUDE.md) for details.
+標準的な Electron の構成です。
+メインプロセスがファイルの読み書きを担い、preload スクリプト経由の IPC でレンダラー（React）とやり取りします。
 
-## License
+詳しくは次を参照してください。
+
+- [CLAUDE.md](./CLAUDE.md): アーキテクチャと開発の進め方（TDD）
+- [docs/design-guidelines.md](./docs/design-guidelines.md): UI のデザインガイドライン
+- [docs/testing-guide.md](./docs/testing-guide.md): テストの書き方
+
+## ライセンス
 
 MIT License
