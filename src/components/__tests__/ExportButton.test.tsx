@@ -4,7 +4,11 @@ import { renderWithGraphite } from '../../test-helpers/render-with-graphite';
 import { ToastProvider } from '../../contexts/ToastContext';
 import { ExportButton } from '../ExportButton';
 
-const setup = (result: { success: boolean; canceled?: boolean }) => {
+const setup = (result: {
+  success: boolean;
+  canceled?: boolean;
+  empty?: boolean;
+}) => {
   const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => {});
   window.electronAPI = {
     ...window.electronAPI,
@@ -45,5 +49,14 @@ describe('ExportButton', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'エクスポートに失敗しました'
     );
+  });
+
+  it('書き出す記録がないときは、失敗ではなくその旨を知らせる', async () => {
+    setup({ success: false, empty: true });
+
+    expect(await screen.findByRole('status')).toHaveTextContent(
+      '書き出す作業記録がありません'
+    );
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 });

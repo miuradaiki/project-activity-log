@@ -11,6 +11,7 @@ export interface ElectronAPI {
   exportToCSV: () => Promise<{
     success: boolean;
     canceled?: boolean;
+    empty?: boolean;
     error?: string;
   }>;
   showOpenDialog: () => Promise<{ canceled: boolean; filePaths: string[] }>;

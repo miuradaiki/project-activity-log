@@ -30,12 +30,8 @@ export const GraphiteToast: React.FC<GraphiteToastProps> = ({
 }) => (
   <Box
     role={kind === 'error' ? 'alert' : 'status'}
-    sx={(theme) => ({
-      position: 'fixed',
-      left: '50%',
-      bottom: theme.spacing(3),
-      transform: 'translateX(-50%)',
-      zIndex: theme.zIndex.snackbar,
+    sx={{
+      pointerEvents: 'auto',
       display: 'flex',
       alignItems: 'center',
       gap: 1.5,
@@ -50,11 +46,11 @@ export const GraphiteToast: React.FC<GraphiteToastProps> = ({
       fontSize: 13,
       boxShadow: '0 24px 64px rgba(0,0,0,.35)',
       '@keyframes toast-in': {
-        from: { opacity: 0, transform: 'translate(-50%, 8px)' },
-        to: { opacity: 1, transform: 'translate(-50%, 0)' },
+        from: { opacity: 0, transform: 'translateY(8px)' },
+        to: { opacity: 1, transform: 'none' },
       },
       animation: 'toast-in .18s ease-out',
-    })}
+    }}
   >
     <Box
       aria-hidden

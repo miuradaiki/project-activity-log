@@ -48,19 +48,45 @@ describe('ToastContext', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('新しい通知は前の通知を置き換える', () => {
+  it('続けて出した通知は重ねて表示し、前の「元に戻す」を消さない', () => {
+    const undoA = jest.fn();
     renderWithGraphite(
       <ToastProvider>
-        <Trigger options={{ message: '一つ目' }} label="a" />
-        <Trigger options={{ message: '二つ目' }} label="b" />
+        <Trigger
+          options={{
+            message: 'A を削除',
+            action: { label: '元に戻す', onClick: undoA },
+          }}
+          label="a"
+        />
+        <Trigger options={{ message: 'B を削除' }} label="b" />
       </ToastProvider>
     );
 
     fireEvent.click(screen.getByText('a'));
     fireEvent.click(screen.getByText('b'));
 
-    expect(screen.queryByText('一つ目')).not.toBeInTheDocument();
-    expect(screen.getByText('二つ目')).toBeInTheDocument();
+    expect(screen.getByText('A を削除')).toBeInTheDocument();
+    expect(screen.getByText('B を削除')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: '元に戻す' }));
+    expect(undoA).toHaveBeenCalled();
+  });
+
+  it('重ねられるのは3件までで、超えたら古いものから消す', () => {
+    renderWithGraphite(
+      <ToastProvider>
+        {['1', '2', '3', '4'].map((n) => (
+          <Trigger key={n} options={{ message: `通知${n}` }} label={`t${n}`} />
+        ))}
+      </ToastProvider>
+    );
+
+    ['1', '2', '3', '4'].forEach((n) =>
+      fireEvent.click(screen.getByText(`t${n}`))
+    );
+
+    expect(screen.queryByText('通知1')).not.toBeInTheDocument();
+    expect(screen.getByText('通知4')).toBeInTheDocument();
   });
 
   it('一定時間で自動的に閉じる', () => {

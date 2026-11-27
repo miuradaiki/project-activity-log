@@ -14,6 +14,8 @@ interface FormState {
 }
 
 interface UseTimeEntryFormProps {
+  /** 開くたびに初期値（今日の日付）を作り直すために使う */
+  open?: boolean;
   timeEntry?: TimeEntry;
   onSave: (timeEntry: TimeEntry) => void;
   onClose: () => void;
@@ -69,6 +71,7 @@ const getDefaultFormState = (): FormState => {
 };
 
 export const useTimeEntryForm = ({
+  open,
   timeEntry,
   onSave,
   onClose,
@@ -93,7 +96,7 @@ export const useTimeEntryForm = ({
     } else {
       setFormState(getDefaultFormState());
     }
-  }, [timeEntry]);
+  }, [timeEntry, open]);
 
   const setProjectId = useCallback((value: string) => {
     setFormState((prev) => ({ ...prev, projectId: value }));
@@ -160,8 +163,8 @@ export const useTimeEntryForm = ({
         formState;
       const startDateTime = new Date(`${startDate}T${startTime}`);
       const endDateTime = new Date(`${endDate}T${endTime}`);
-      if (getValidationError(endDateTime.getTime() - startDateTime.getTime()))
-        return;
+      const durationMs = endDateTime.getTime() - startDateTime.getTime();
+      if (Number.isNaN(durationMs) || getValidationError(durationMs)) return;
 
       const timestamp = new Date().toISOString();
 

@@ -79,4 +79,36 @@ describe('useTimeEntryForm の日付（ローカル時刻基準）', () => {
       })
     );
   });
+
+  it('日付が変わってから新規入力を開くと、開いた日の日付が入る', () => {
+    jest.useFakeTimers().setSystemTime(new Date('2026-11-26T23:50:00+09:00'));
+    const { result, rerender } = renderHook(
+      ({ open }) =>
+        useTimeEntryForm({ open, onSave: jest.fn(), onClose: jest.fn() }),
+      { initialProps: { open: false } }
+    );
+
+    jest.setSystemTime(new Date('2026-11-27T09:00:00+09:00'));
+    rerender({ open: true });
+
+    expect(result.current.formState.startDate).toBe('2026-11-27');
+  });
+
+  it('日付が不正なまま送信しても例外を出さず、保存しない', () => {
+    const onSave = jest.fn();
+    const { result } = renderHook(() =>
+      useTimeEntryForm({ onSave, onClose: jest.fn() })
+    );
+    act(() => {
+      result.current.setProjectId('p1');
+      result.current.setStartDate('');
+    });
+
+    expect(() =>
+      act(() =>
+        result.current.handleSubmit({ preventDefault: () => {} } as never)
+      )
+    ).not.toThrow();
+    expect(onSave).not.toHaveBeenCalled();
+  });
 });

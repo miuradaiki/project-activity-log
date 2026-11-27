@@ -11,6 +11,10 @@ export const ExportButton: React.FC = () => {
     try {
       const result = await window.electronAPI.exportToCSV();
       if (result?.canceled) return;
+      if (result?.empty) {
+        showToast({ message: t('timer.export.empty') });
+        return;
+      }
       showToast(
         result?.success
           ? { message: t('timer.export.success'), kind: 'success' }

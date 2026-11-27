@@ -55,9 +55,18 @@ export const useUndoableProjectOperations = ({
   const archiveProject = useCallback(
     (project: Project) => {
       projectOps.archiveProject(project);
+      // 通知を出している間に編集されても上書きしないよう、アーカイブ状態だけを戻す
       offerUndo(t('undo.project.archived', { name: project.name }), () =>
         setProjects((prev) =>
-          prev.map((p) => (p.id === project.id ? project : p))
+          prev.map((p) =>
+            p.id === project.id
+              ? {
+                  ...p,
+                  isArchived: project.isArchived,
+                  archivedAt: project.archivedAt,
+                }
+              : p
+          )
         )
       );
     },

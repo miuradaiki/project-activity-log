@@ -265,6 +265,7 @@ export const translations = {
     'settings.testmode.regenerate': 'データを作り直す',
     'app.loading': '読み込み中',
     'timer.manual.note': 'メモ',
+    'timer.export.empty': '書き出す作業記録がありません',
   },
   en: {
     // ===== Common =====
@@ -505,5 +506,6 @@ export const translations = {
     'settings.testmode.regenerate': 'Regenerate data',
     'app.loading': 'Loading',
     'timer.manual.note': 'Note',
+    'timer.export.empty': 'No records to export',
   },
 };

@@ -86,7 +86,29 @@ describe('useUndoableProjectOperations', () => {
     ).toBeInTheDocument();
 
     undo();
-    expect(result.current.projects[1]).toEqual(p2);
+    expect(result.current.projects[1]).toMatchObject({
+      id: 'p2',
+      name: '採用サイト',
+      isArchived: false,
+      archivedAt: undefined,
+    });
+  });
+
+  it('アーカイブ後に編集してから元に戻しても、編集内容は残してアーカイブだけ解除する', () => {
+    const { result } = setup();
+
+    act(() => result.current.ops.archiveProject(p2));
+    act(() =>
+      result.current.ops.editProject(result.current.projects[1], {
+        ...result.current.projects[1],
+        name: '採用サイト2',
+      })
+    );
+    undo();
+
+    expect(result.current.projects[1].name).toBe('採用サイト2');
+    expect(result.current.projects[1].isArchived).toBe(false);
+    expect(result.current.projects[1].archivedAt).toBeUndefined();
   });
 
   it('プロジェクト削除を元に戻すと、元の並び順と記録ごと復活する', () => {

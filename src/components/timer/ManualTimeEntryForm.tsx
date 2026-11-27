@@ -53,7 +53,7 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
 }) => {
   const theme = useTheme();
   const { t } = useLanguage();
-  const form = useTimeEntryForm({ timeEntry, onSave, onClose });
+  const form = useTimeEntryForm({ open, timeEntry, onSave, onClose });
   const { formState, validationError, isLongRecord, isMultiDay, isEditing } =
     form;
   const hours = Math.round((form.durationMs / 3600_000) * 10) / 10;
