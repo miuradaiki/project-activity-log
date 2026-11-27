@@ -164,6 +164,28 @@ describe('importUtils', () => {
       );
     });
 
+    it('開始と終了が同じ行は、24時間の記録にしない', async () => {
+      const zeroCSV = `date,start_time,end_time,duration_minutes,project_name,project_description,notes
+2025/11/26,09:00:00,09:00:00,0,Test Project,Test,Zero`;
+      mockReadFile.mockResolvedValueOnce(zeroCSV);
+
+      const result = await importWorkLog('/path/to/file.csv', [], []);
+
+      const [e] = result.timeEntries;
+      expect(result.timeEntries).toHaveLength(1);
+      expect(e.endTime).toBe(e.startTime);
+    });
+
+    it('時刻が読めない行があれば、黙って捨てずに取込を失敗させる', async () => {
+      const badCSV = `date,start_time,end_time,duration_minutes,project_name,project_description,notes
+2025/11/26,abc,10:00:00,60,Test Project,Test,Bad`;
+      mockReadFile.mockResolvedValueOnce(badCSV);
+
+      await expect(
+        importWorkLog('/path/to/file.csv', [], [])
+      ).rejects.toThrow();
+    });
+
     it('ノートが空の場合でも正しく処理する', async () => {
       const csvWithoutNotes = `date,start_time,end_time,duration_minutes,project_name,project_description,notes
 2025/01/15,09:00:00,12:00:00,180,Project A,Description A,`;

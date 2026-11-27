@@ -75,8 +75,14 @@ export const importWorkLog = async (
 
     const start = toDate(row.start_time);
     const end = toDate(row.end_time);
-    // 行には日付が1つしかないため、終了が開始以前なら翌日まで続いた記録とみなす
-    if (end <= start) end.setDate(end.getDate() + 1);
+    // 黙って行を落とすと取込が成功扱いになり、ロールバックされないため失敗させる
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+      throw new Error(
+        `日時を読み取れない行があります: ${row.date} ${row.start_time}-${row.end_time}`
+      );
+    }
+    // 行には日付が1つしかないため、終了が開始より前なら翌日まで続いた記録とみなす
+    if (end < start) end.setDate(end.getDate() + 1);
 
     return createSplitEntries(projectId, start, end, row.notes || '');
   });
