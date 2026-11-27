@@ -55,11 +55,8 @@ export const translations = {
     // ===== プロジェクト =====
     'projects.new': '新しいプロジェクト',
     'projects.edit': 'プロジェクトを編集',
-    'projects.name': 'プロジェクト名',
     'projects.name.required': 'プロジェクト名を入力してください',
     'projects.description': '説明',
-    'projects.utilization': '稼働率',
-    'projects.monthly.target': '月間目標時間',
     'projects.cancel': 'キャンセル',
     'projects.delete': '削除',
     'projects.archive': 'アーカイブ',
@@ -131,7 +128,6 @@ export const translations = {
     'actions.export': 'エクスポート',
 
     // ===== 単位 =====
-    'units.hours': '時間',
     'units.minutes': '分',
     'units.seconds': '秒',
     'units.days': '日',
@@ -139,7 +135,6 @@ export const translations = {
     // ===== 時間表現 =====
     'time.yesterday': '昨日',
     'time.this.week': '今週',
-    'time.this.month': '今月',
 
     // ===== ダッシュボード（追加） =====
     'dashboard.monthly.summary.title': '月間進捗サマリー',
@@ -285,6 +280,15 @@ export const translations = {
     'timer.manual.project.placeholder': 'プロジェクトを選択',
     'timer.manual.description.placeholder': '何をしたか',
     'timer.manual.end.date.fixed': '編集では日付をまたげません',
+    'projects.form.name': '名前',
+    'projects.form.description.placeholder': 'クライアント・目的など',
+    'projects.form.allocation': '今月の配分',
+    'projects.form.hours.unit': 'h / 月',
+    'projects.form.allocation.of': '基準 {base}h の {percent}%',
+    'projects.form.over':
+      '全プロジェクトの配分が合計 {percent}% になります（基準を {hours}h 超えます）',
+    'projects.form.color': '色',
+    'projects.form.color.n': '色 {n}',
   },
   en: {
     // ===== Common =====
@@ -314,11 +318,8 @@ export const translations = {
     // ===== Projects =====
     'projects.new': 'New Project',
     'projects.edit': 'Edit Project',
-    'projects.name': 'Project Name',
     'projects.name.required': 'Project name is required',
     'projects.description': 'Description',
-    'projects.utilization': 'Utilization Rate',
-    'projects.monthly.target': 'Monthly Target Hours',
     'projects.cancel': 'Cancel',
     'projects.delete': 'Delete',
     'projects.archive': 'Archive',
@@ -391,7 +392,6 @@ export const translations = {
     'actions.export': 'Export',
 
     // ===== Units =====
-    'units.hours': 'hours',
     'units.minutes': 'minutes',
     'units.seconds': 'seconds',
     'units.days': 'days',
@@ -399,7 +399,6 @@ export const translations = {
     // ===== Time Expressions =====
     'time.yesterday': 'Yesterday',
     'time.this.week': 'This Week',
-    'time.this.month': 'This Month',
 
     // ===== Dashboard (Extended) =====
     'dashboard.monthly.summary.title': 'Monthly Progress Summary',
@@ -545,5 +544,14 @@ export const translations = {
     'timer.manual.project.placeholder': 'Select a project',
     'timer.manual.description.placeholder': 'What did you work on?',
     'timer.manual.end.date.fixed': 'Editing cannot span days',
+    'projects.form.name': 'Name',
+    'projects.form.description.placeholder': 'Client, goal, etc.',
+    'projects.form.allocation': 'Monthly allocation',
+    'projects.form.hours.unit': 'h / month',
+    'projects.form.allocation.of': '{percent}% of {base}h base',
+    'projects.form.over':
+      'Total allocation will be {percent}% ({hours}h over the base)',
+    'projects.form.color': 'Color',
+    'projects.form.color.n': 'Color {n}',
   },
 };

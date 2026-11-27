@@ -16,6 +16,9 @@ export const PROJECT_COLORS = [
   '#6E8BA8', // スレート
 ];
 
+const effectiveColor = (project: Project, index: number): string =>
+  project.color ?? PROJECT_COLORS[index % PROJECT_COLORS.length];
+
 // プロジェクトIDと色のマッピングを管理するクラス
 export class ProjectColorManager {
   private static instance: ProjectColorManager;
@@ -30,15 +33,21 @@ export class ProjectColorManager {
     return ProjectColorManager.instance;
   }
 
-  // プロジェクトリストから色のマッピングを初期化
+  // プロジェクトリストから色のマッピングを初期化（保存された色を優先する）
   public initializeColors(projects: Project[]): void {
     this.colorMap.clear();
     projects.forEach((project, index) => {
-      this.colorMap.set(
-        project.id,
-        PROJECT_COLORS[index % PROJECT_COLORS.length]
-      );
+      this.colorMap.set(project.id, effectiveColor(project, index));
     });
+  }
+
+  // 新しいプロジェクト用に、既存のプロジェクトとかぶらない色を選ぶ
+  public pickUnusedColor(projects: Project[]): string {
+    const used = new Set(projects.map((p, i) => effectiveColor(p, i)));
+    return (
+      PROJECT_COLORS.find((c) => !used.has(c)) ??
+      PROJECT_COLORS[projects.length % PROJECT_COLORS.length]
+    );
   }
 
   // プロジェクトIDから色を取得
