@@ -5,6 +5,8 @@ import { projectColorManager } from '../../utils/colorUtils';
 
 const CHART_HEIGHT = 190;
 const MAX_HOURS = 12;
+/** 月〜金（Date#getDay の値） */
+const WEEKDAY_SLOTS = [1, 2, 3, 4, 5];
 
 export const WeeklyChart: React.FC<{
   weeks: ReportWeek[];
@@ -60,43 +62,57 @@ export const WeeklyChart: React.FC<{
               height: '100%',
             }}
           >
-            {week.days.map((day) => (
-              <Box
-                key={day.date.toISOString()}
-                role="img"
-                aria-label={`${day.date.getMonth() + 1}/${day.date.getDate()} ${day.total}h`}
-                sx={(theme) => ({
-                  flex: 1,
-                  display: 'flex',
-                  flexDirection: 'column-reverse',
-                  gap: '2px',
-                  ...(day.isToday && {
-                    outline: `1px solid ${theme.custom.tokens.border2}`,
-                    outlineOffset: 3,
-                    borderRadius: 1,
-                  }),
-                  ...(day.isFuture && {
-                    height: '100%',
-                    border: `1px dashed ${theme.custom.tokens.border2}`,
-                    borderRadius: 1,
-                  }),
-                })}
-              >
-                {!day.isFuture &&
-                  projectOrder
-                    .filter((pid) => day.byProject[pid])
-                    .map((pid) => (
-                      <Box
-                        key={pid}
-                        sx={{
-                          height: px(day.byProject[pid]),
-                          borderRadius: '3px',
-                          bgcolor: projectColorManager.getColorById(pid),
-                        }}
-                      />
-                    ))}
-              </Box>
-            ))}
+            {/* 月初・月末で平日が少ない週も5日分の枠を取り、棒の幅をそろえる */}
+            {WEEKDAY_SLOTS.map((slot) => {
+              const day = week.days.find((d) => d.date.getDay() === slot);
+              if (!day) {
+                return (
+                  <Box
+                    key={slot}
+                    data-testid="report-day-slot"
+                    sx={{ flex: 1 }}
+                  />
+                );
+              }
+              return (
+                <Box
+                  key={slot}
+                  data-testid="report-day-slot"
+                  role="img"
+                  aria-label={`${day.date.getMonth() + 1}/${day.date.getDate()} ${day.total}h`}
+                  sx={(theme) => ({
+                    flex: 1,
+                    display: 'flex',
+                    flexDirection: 'column-reverse',
+                    gap: '2px',
+                    ...(day.isToday && {
+                      outline: `1px solid ${theme.custom.tokens.border2}`,
+                      outlineOffset: 3,
+                      borderRadius: 1,
+                    }),
+                    ...(day.isFuture && {
+                      height: '100%',
+                      border: `1px dashed ${theme.custom.tokens.border2}`,
+                      borderRadius: 1,
+                    }),
+                  })}
+                >
+                  {!day.isFuture &&
+                    projectOrder
+                      .filter((pid) => day.byProject[pid])
+                      .map((pid) => (
+                        <Box
+                          key={pid}
+                          sx={{
+                            height: px(day.byProject[pid]),
+                            borderRadius: '3px',
+                            bgcolor: projectColorManager.getColorById(pid),
+                          }}
+                        />
+                      ))}
+                </Box>
+              );
+            })}
           </Box>
         ))}
       </Box>

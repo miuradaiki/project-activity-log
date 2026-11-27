@@ -52,5 +52,7 @@ export {
   getRecentProjects,
 } from './today';
 export type { TimelineSegment } from './today';
-export { getWeekdayBreakdown, getMonthProjectShares } from './report';
+export { getWeekdayBreakdown } from './report';
+export { getMonthProjectRows, summarizeProjectRows } from './report-projects';
+export type { ReportProjectRow, ReportProjectSummary } from './report-projects';
 export type { ReportDay, ReportWeek } from './report';
