@@ -74,10 +74,13 @@ export const useUndoableProjectOperations = ({
   );
 
   const deleteProject = useCallback(
-    (project: Project) => {
+    async (project: Project) => {
       const index = projects.findIndex((p) => p.id === project.id);
-      const entries = timeEntries.filter((e) => e.projectId === project.id);
-      projectOps.deleteProject(project);
+      const stopped = await projectOps.deleteProject(project);
+      const entries = [
+        ...timeEntries.filter((e) => e.projectId === project.id),
+        ...stopped,
+      ];
       offerUndo(
         t('undo.project.deleted', {
           name: project.name,
@@ -94,6 +97,7 @@ export const useUndoableProjectOperations = ({
           setTimeEntries((prev) => appendMissing(prev, entries));
         }
       );
+      return stopped;
     },
     [
       projects,
