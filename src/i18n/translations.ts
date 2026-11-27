@@ -74,7 +74,6 @@ export const translations = {
     'timer.end.date': '終了日',
     'timer.start.time': '開始時間',
     'timer.end.time': '終了時間',
-    'timer.description': ' ',
     'timer.history': '作業履歴',
     'timer.import.csv': 'CSVインポート',
     'timer.notification.maxtime': '作業時間が8時間を超過しました',
@@ -265,6 +264,7 @@ export const translations = {
     'settings.testmode.entries': '記録',
     'settings.testmode.regenerate': 'データを作り直す',
     'app.loading': '読み込み中',
+    'timer.manual.note': 'メモ',
   },
   en: {
     // ===== Common =====
@@ -313,7 +313,6 @@ export const translations = {
     'timer.end.date': 'End Date',
     'timer.start.time': 'Start Time',
     'timer.end.time': 'End Time',
-    'timer.description': ' ',
     'timer.history': 'Work History',
     'timer.import.csv': 'Import CSV',
     'timer.notification.maxtime': 'Working time exceeded 8 hours',
@@ -505,5 +504,6 @@ export const translations = {
     'settings.testmode.entries': 'entries',
     'settings.testmode.regenerate': 'Regenerate data',
     'app.loading': 'Loading',
+    'timer.manual.note': 'Note',
   },
 };

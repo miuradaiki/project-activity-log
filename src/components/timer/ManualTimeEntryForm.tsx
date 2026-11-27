@@ -158,7 +158,7 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
       )}
 
       <GraphiteField
-        label={t('timer.description')}
+        label={t('timer.manual.note')}
         htmlFor="entry-description"
         optionalLabel={t('form.optional')}
       >

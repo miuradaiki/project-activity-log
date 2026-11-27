@@ -276,7 +276,6 @@ export const EntryHistory: React.FC<EntryHistoryProps> = ({
                         fontWeight: 300,
                         fontSize: 15,
                         textAlign: 'right',
-                        display: { xs: 'none', md: 'block' },
                       }}
                     >
                       {formatClock(
