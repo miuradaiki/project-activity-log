@@ -8,19 +8,19 @@ import { GraphiteCard } from '../ui/graphite/GraphiteCard';
 import { StatValue } from '../ui/graphite/StatValue';
 
 interface TodayStatsProps {
-  todayHours: { projectId: string; hours: number }[];
+  todayHours: { projectId: string; ms: number }[];
   monthOverview: MonthOverview;
 }
 
 /** 今日のバーは 8h を満幅とする（1日の標準稼働） */
-const DAY_SCALE_HOURS = 8;
+const DAY_SCALE_MS = 8 * 3600_000;
 
 export const TodayStats: React.FC<TodayStatsProps> = ({
   todayHours,
   monthOverview,
 }) => {
   const { t } = useLanguage();
-  const total = todayHours.reduce((sum, h) => sum + h.hours, 0);
+  const totalMs = todayHours.reduce((sum, h) => sum + h.ms, 0);
 
   return (
     <GraphiteCard
@@ -33,7 +33,7 @@ export const TodayStats: React.FC<TodayStatsProps> = ({
     >
       <StatValue
         label={t('today.hours.today')}
-        value={formatClock(total * 3600_000, false)}
+        value={formatClock(totalMs, false)}
         unit="h"
       >
         <Box
@@ -51,7 +51,7 @@ export const TodayStats: React.FC<TodayStatsProps> = ({
             <Box
               key={h.projectId}
               sx={{
-                width: `${Math.min(100, (h.hours / DAY_SCALE_HOURS) * 100)}%`,
+                width: `${Math.min(100, (h.ms / DAY_SCALE_MS) * 100)}%`,
                 bgcolor: projectColorManager.getColorById(h.projectId),
               }}
             />

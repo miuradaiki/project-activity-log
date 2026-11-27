@@ -69,9 +69,22 @@ describe('getTodayProjectHours', () => {
     ];
 
     expect(getTodayProjectHours(entries, NOW)).toEqual([
-      { projectId: 'p2', hours: 2.5 },
-      { projectId: 'p1', hours: 1.5 },
+      { projectId: 'p2', ms: 2.5 * 3600_000 },
+      { projectId: 'p1', ms: 1.5 * 3600_000 },
     ]);
+  });
+
+  it('プロジェクトごとに丸めず、ミリ秒のまま返す（合計が作業履歴とずれないように）', () => {
+    const entries = [
+      entry('a', 'p1', '2026-11-26T09:00:00', '2026-11-26T09:20:00'),
+      entry('b', 'p2', '2026-11-26T10:00:00', '2026-11-26T10:20:00'),
+    ];
+
+    const total = getTodayProjectHours(entries, NOW).reduce(
+      (sum, h) => sum + h.ms,
+      0
+    );
+    expect(total).toBe(40 * 60_000);
   });
 });
 
@@ -108,6 +121,6 @@ describe('終了時刻のない記録', () => {
     const hours = getTodayProjectHours([open], NOW);
     jest.useRealTimers();
 
-    expect(hours).toEqual([{ projectId: 'p1', hours: 1.5 }]);
+    expect(hours).toEqual([{ projectId: 'p1', ms: 1.5 * 3600_000 }]);
   });
 });
