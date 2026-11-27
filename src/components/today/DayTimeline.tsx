@@ -22,6 +22,11 @@ export const DayTimeline: React.FC<DayTimelineProps> = ({
   const { t } = useLanguage();
   const ticks: number[] = [];
   for (let h = startHour; h <= endHour; h += 3) ticks.push(h);
+  // 何時台の作業かを読み取れるよう、帯の中に毎時の区切りを引く（ラベルと同じ3時間ごとは少し濃く）
+  const hourLines: number[] = [];
+  for (let h = startHour + 1; h < endHour; h++) hourLines.push(h);
+  const positionOf = (h: number) =>
+    ((h - startHour) / (endHour - startHour)) * 100;
 
   return (
     <GraphiteCard>
@@ -38,6 +43,28 @@ export const DayTimeline: React.FC<DayTimelineProps> = ({
           mb: 1,
         }}
       >
+        {hourLines.map((h) => {
+          const major = (h - startHour) % 3 === 0;
+          return (
+            <Box
+              key={h}
+              aria-hidden
+              data-testid="timeline-hour-line"
+              data-hour={h}
+              data-major={major}
+              sx={(theme) => ({
+                position: 'absolute',
+                top: 0,
+                bottom: 0,
+                width: '1px',
+                left: `${positionOf(h)}%`,
+                bgcolor: major
+                  ? theme.custom.tokens.border2
+                  : theme.palette.divider,
+              })}
+            />
+          );
+        })}
         {segments.map((s) => (
           <Box
             key={s.id}
