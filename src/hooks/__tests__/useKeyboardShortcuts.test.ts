@@ -32,6 +32,17 @@ describe('useKeyboardShortcuts', () => {
       expect(action).toHaveBeenCalledTimes(1);
     });
 
+    it('Mac の Option+L（文字は ¬ になる）でも、物理キーで Alt+L として扱う', () => {
+      const action = jest.fn();
+      const shortcuts: Shortcut[] = [{ key: 'l', altKey: true, action }];
+
+      renderHook(() => useKeyboardShortcuts(shortcuts));
+
+      dispatchKeyboardEvent('¬', { altKey: true, code: 'KeyL' });
+
+      expect(action).toHaveBeenCalledTimes(1);
+    });
+
     it('異なるキーが押されたときはアクションを実行しない', () => {
       const action = jest.fn();
       const shortcuts: Shortcut[] = [{ key: 'a', action }];

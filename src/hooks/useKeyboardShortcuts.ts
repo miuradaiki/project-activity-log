@@ -28,7 +28,11 @@ export const useKeyboardShortcuts = (
     const handleKeyDown = (event: KeyboardEvent) => {
       const matchedShortcut = shortcuts.find((shortcut) => {
         if (shortcut.disabled) return false;
-        if (shortcut.key !== event.key) return false;
+        // Mac の Option との組み合わせは event.key が別の文字（L → ¬）になるため、物理キーでも照合する
+        const matchesKey =
+          shortcut.key === event.key ||
+          (event.altKey && event.code === `Key${shortcut.key.toUpperCase()}`);
+        if (!matchesKey) return false;
 
         // 修飾キーのチェック
         if (
