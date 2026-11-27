@@ -44,12 +44,22 @@ export const useTimerController = (
       try {
         const parsed: TimerStateStorage = JSON.parse(stored);
 
-        // 8時間以上経過している場合はリセット
+        // 8時間以上経過している場合は再開せず、停止したときと同じく8時間分を記録に残す
         if (
           parsed.startTime &&
           new Date(parsed.startTime).getTime() < Date.now() - MAX_DURATION_MS
         ) {
+          // 先に消しておき、StrictMode で effect が2回走っても二重に保存しない
           localStorage.removeItem(STORAGE_KEYS.TIMER_STATE);
+          const project = projects.find((p) => p.id === parsed.projectId);
+          if (parsed.isRunning && project) {
+            const endTime = new Date(
+              new Date(parsed.startTime).getTime() + MAX_DURATION_MS
+            ).toISOString();
+            onTimeEntriesCreated?.(
+              createTimerEntries(project.id, parsed.startTime, endTime, '')
+            );
+          }
           setIsRestored(true);
           return;
         }
@@ -74,7 +84,7 @@ export const useTimerController = (
       }
     }
     setIsRestored(true);
-  }, [projects, isRestored]);
+  }, [projects, isRestored, onTimeEntriesCreated]);
 
   // localStorage に状態を保存
   useEffect(() => {
@@ -130,9 +140,11 @@ export const useTimerController = (
     setStartTime(null);
     setActiveProject(null);
 
-    // トレイにタイマー停止を通知
-    if (window.electronAPI?.timerStop) {
-      await window.electronAPI.timerStop();
+    // トレイの表示更新に失敗しても、計測分の記録は失わないよう保存を続ける
+    try {
+      await window.electronAPI?.timerStop?.();
+    } catch (error) {
+      console.error('トレイへのタイマー停止の通知に失敗しました:', error);
     }
 
     // 1分未満の場合は保存しない

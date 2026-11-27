@@ -203,6 +203,28 @@ describe('useTimerController', () => {
       );
     });
 
+    it('トレイへの停止通知が失敗しても、記録は保存する', async () => {
+      const onTimeEntriesCreated = jest.fn();
+      (window.electronAPI.timerStop as jest.Mock).mockRejectedValueOnce(
+        new Error('ipc failed')
+      );
+      const { result } = renderHook(() =>
+        useTimerController(mockProjects, onTimeEntriesCreated)
+      );
+
+      await act(async () => {
+        await result.current.start(mockProject);
+      });
+      act(() => {
+        jest.advanceTimersByTime(2 * 60 * 1000);
+      });
+      await act(async () => {
+        await result.current.stop();
+      });
+
+      expect(onTimeEntriesCreated).toHaveBeenCalledTimes(1);
+    });
+
     it('1分未満の場合、TimeEntryは作成されず、alert ではなく onDiscarded で知らせる', async () => {
       const onTimeEntriesCreated = jest.fn();
       const onDiscarded = jest.fn();
@@ -356,7 +378,7 @@ describe('useTimerController', () => {
       );
     });
 
-    it('8時間以上前の状態は復元しない', async () => {
+    it('8時間以上前の状態は復元せず、開始から8時間分を記録として保存する', async () => {
       jest.useRealTimers();
       const localStorageMock = window.localStorage as jest.Mocked<
         typeof window.localStorage
@@ -375,7 +397,10 @@ describe('useTimerController', () => {
         return null;
       });
 
-      const { result } = renderHook(() => useTimerController(mockProjects));
+      const onTimeEntriesCreated = jest.fn();
+      const { result } = renderHook(() =>
+        useTimerController(mockProjects, onTimeEntriesCreated)
+      );
 
       // 初期化を待つ
       await act(async () => {
@@ -383,6 +408,15 @@ describe('useTimerController', () => {
       });
 
       expect(result.current.isRunning).toBe(false);
+      // アプリを閉じている間に8時間を過ぎても、停止したときと同じく8時間分は記録に残す
+      const entries = onTimeEntriesCreated.mock.calls[0][0];
+      const total = entries.reduce(
+        (sum: number, e: { startTime: string; endTime: string }) =>
+          sum + new Date(e.endTime).getTime() - new Date(e.startTime).getTime(),
+        0
+      );
+      expect(total).toBe(8 * 60 * 60 * 1000);
+      expect(entries[0].startTime).toBe(oldStartTime);
     });
 
     it('アーカイブされたプロジェクトの状態は復元しない', async () => {
