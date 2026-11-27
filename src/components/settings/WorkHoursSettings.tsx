@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Button, ButtonBase, useTheme } from '@mui/material';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { APP_CONSTANTS } from '../../constants';
@@ -24,6 +24,19 @@ export const WorkHoursSettings: React.FC<WorkHoursSettingsProps> = ({
   const { t } = useLanguage();
   const commit = (hours: number) =>
     onCommit(Math.min(MAX, Math.max(MIN, hours)));
+  // 入力中は下書きとして保持し、確定時にだけ保存する（途中の値で保存・巻き戻りしないように）
+  const [draft, setDraft] = useState(String(baseMonthlyHours));
+  useEffect(() => setDraft(String(baseMonthlyHours)), [baseMonthlyHours]);
+  const commitDraft = () => {
+    const v = Number(draft);
+    if (draft.trim() === '' || !Number.isFinite(v)) {
+      setDraft(String(baseMonthlyHours));
+      return;
+    }
+    const clamped = Math.min(MAX, Math.max(MIN, Math.round(v)));
+    setDraft(String(clamped));
+    if (clamped !== baseMonthlyHours) onCommit(clamped);
+  };
   const exampleTarget = Math.round(baseMonthlyHours * 0.4 * 10) / 10;
 
   const stepButton = (label: string, delta: number, disabled: boolean) => (
@@ -78,10 +91,13 @@ export const WorkHoursSettings: React.FC<WorkHoursSettingsProps> = ({
             aria-label={t('settings.monthly.hours')}
             min={MIN}
             max={MAX}
-            value={baseMonthlyHours}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              const v = Number(e.target.value);
-              if (Number.isFinite(v) && v >= MIN && v <= MAX) onCommit(v);
+            value={draft}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setDraft(e.target.value)
+            }
+            onBlur={commitDraft}
+            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+              if (e.key === 'Enter') commitDraft();
             }}
             sx={{
               ...numberTypography(theme),

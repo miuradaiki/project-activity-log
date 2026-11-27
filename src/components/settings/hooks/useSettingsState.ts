@@ -63,16 +63,16 @@ export const useSettingsState = (): UseSettingsStateReturn => {
   // 値を変えた時点で保存する（保存ボタンを押し忘れて反映されない問題を防ぐ）
   const handleCommitBaseMonthlyHours = useCallback(
     async (hours: number) => {
-      const previous = baseMonthlyHours;
       setBaseMonthlyHours(hours);
       try {
         await updateBaseMonthlyHours(hours);
       } catch {
-        setBaseMonthlyHours(previous);
+        // 失敗時は保存済みの値に戻す（連打で古い値へ戻らないよう、描画時の値は使わない）
+        setBaseMonthlyHours(settings.workHours.baseMonthlyHours);
         showNotification(t('settings.save.error'), 'error');
       }
     },
-    [baseMonthlyHours, updateBaseMonthlyHours, showNotification, t]
+    [settings, updateBaseMonthlyHours, showNotification, t]
   );
 
   const handleLanguageChange = useCallback(
