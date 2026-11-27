@@ -8,8 +8,8 @@ describe('TodayStats', () => {
     renderWithGraphite(
       <TodayStats
         todayHours={[
-          { projectId: 'a', hours: 2.5 },
-          { projectId: 'b', hours: 2.7 },
+          { projectId: 'a', ms: 2.5 * 3600_000 },
+          { projectId: 'b', ms: 2.7 * 3600_000 },
         ]}
         monthOverview={{
           actualHours: 97.4,
