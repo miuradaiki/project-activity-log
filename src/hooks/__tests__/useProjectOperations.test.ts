@@ -241,6 +241,22 @@ describe('useProjectOperations', () => {
       expect(entries[1]).toEqual(newEntry);
     });
 
+    it('編集中の保存でも、まだない記録（日をまたぐ編集で分割した翌日分）は追加する', () => {
+      const props = createDefaultProps();
+      const { result } = renderHook(() => useProjectOperations(props));
+      const nextDay: TimeEntry = { ...mockTimeEntry, id: 'split-2' };
+
+      act(() => {
+        result.current.saveTimeEntry(nextDay, true);
+      });
+
+      const updater = (props.setTimeEntries as jest.Mock).mock.calls[0][0];
+      expect(updater([mockTimeEntry]).map((e: TimeEntry) => e.id)).toEqual([
+        mockTimeEntry.id,
+        'split-2',
+      ]);
+    });
+
     it('日跨ぎ分割エントリを連続保存しても既存エントリが複製されない（Bug #4）', () => {
       const props = createDefaultProps();
       const { result } = renderHook(() => useProjectOperations(props));

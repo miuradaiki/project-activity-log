@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import Papa from 'papaparse';
 import { Project, TimeEntry } from '../types';
+import { createSplitEntries } from './timeEntryUtils';
 
 interface CSVRow {
   date: string;
@@ -63,34 +64,27 @@ export const importWorkLog = async (
   });
 
   // TimeEntriesの作成
-  const newTimeEntries: TimeEntry[] = data.map((row) => {
-    const [year, month, day] = row.date.split('/');
+  const newTimeEntries: TimeEntry[] = data.flatMap((row) => {
+    const [year, month, day] = row.date.split('/').map(Number);
     const projectId = projectIdMap.get(row.project_name)!;
 
-    const formatDateTime = (date: string, time: string) => {
-      const [hours, minutes, seconds] = time.split(':');
-      return new Date(
-        parseInt(year),
-        parseInt(month) - 1,
-        parseInt(day),
-        parseInt(hours),
-        parseInt(minutes),
-        parseInt(seconds) || 0
-      ).toISOString();
+    const toDate = (time: string) => {
+      const [hours, minutes, seconds] = time.split(':').map(Number);
+      return new Date(year, month - 1, day, hours, minutes, seconds || 0);
     };
 
-    const startTime = formatDateTime(row.date, row.start_time);
-    const endTime = formatDateTime(row.date, row.end_time);
+    const start = toDate(row.start_time);
+    const end = toDate(row.end_time);
+    // 黙って行を落とすと取込が成功扱いになり、ロールバックされないため失敗させる
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+      throw new Error(
+        `日時を読み取れない行があります: ${row.date} ${row.start_time}-${row.end_time}`
+      );
+    }
+    // 行には日付が1つしかないため、終了が開始より前なら翌日まで続いた記録とみなす
+    if (end < start) end.setDate(end.getDate() + 1);
 
-    return {
-      id: uuidv4(),
-      projectId,
-      startTime,
-      endTime,
-      description: row.notes || '',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+    return createSplitEntries(projectId, start, end, row.notes || '');
   });
 
   return {

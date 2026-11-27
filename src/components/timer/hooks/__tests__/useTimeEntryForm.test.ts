@@ -109,4 +109,50 @@ describe('useTimeEntryForm の日付（ローカル時刻基準）', () => {
     ).not.toThrow();
     expect(onSave).not.toHaveBeenCalled();
   });
+
+  it('日をまたぐ古い記録を編集するとき、終了日は記録の終了日になり、エラーにならない', () => {
+    const entry = entryAt(
+      '2026-11-26T23:00:00+09:00',
+      '2026-11-27T01:00:00+09:00'
+    );
+
+    const { result } = renderHook(() =>
+      useTimeEntryForm({
+        timeEntry: entry,
+        onSave: jest.fn(),
+        onClose: jest.fn(),
+      })
+    );
+
+    expect(result.current.formState.startDate).toBe('2026-11-26');
+    expect(result.current.formState.endDate).toBe('2026-11-27');
+    expect(result.current.validationError).toBeNull();
+  });
+
+  it('日をまたぐ記録を編集して保存すると、日ごとに分割し、最初の分は元の記録を引き継ぐ', () => {
+    const onSave = jest.fn();
+    const entry = {
+      ...entryAt('2026-11-26T23:00:00+09:00', '2026-11-27T01:00:00+09:00'),
+      createdAt: '2026-11-26T00:00:00.000Z',
+    };
+    const { result } = renderHook(() =>
+      useTimeEntryForm({ timeEntry: entry, onSave, onClose: jest.fn() })
+    );
+
+    act(() =>
+      result.current.handleSubmit({ preventDefault: () => {} } as never)
+    );
+
+    expect(onSave).toHaveBeenCalledTimes(2);
+    const [first, second] = onSave.mock.calls.map((c) => c[0] as TimeEntry);
+    expect(first.id).toBe('e1');
+    expect(first.createdAt).toBe('2026-11-26T00:00:00.000Z');
+    expect(new Date(first.startTime).toISOString()).toBe(
+      new Date('2026-11-26T23:00:00+09:00').toISOString()
+    );
+    expect(second.id).not.toBe('e1');
+    expect(second.endTime).toBe(
+      new Date('2026-11-27T01:00:00+09:00').toISOString()
+    );
+  });
 });
