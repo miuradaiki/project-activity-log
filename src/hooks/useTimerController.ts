@@ -17,7 +17,8 @@ export interface TimerController {
   isRunning: boolean;
   startTime: string | null;
   start: (project: Project) => Promise<void>;
-  stop: () => Promise<void>;
+  /** 保存した記録を返す（1分未満で保存しなかったときは空） */
+  stop: () => Promise<TimeEntry[]>;
   toggle: (project?: Project) => Promise<void>;
   canStart: boolean;
   canStop: boolean;
@@ -43,12 +44,22 @@ export const useTimerController = (
       try {
         const parsed: TimerStateStorage = JSON.parse(stored);
 
-        // 8時間以上経過している場合はリセット
+        // 8時間以上経過している場合は再開せず、停止したときと同じく8時間分を記録に残す
         if (
           parsed.startTime &&
           new Date(parsed.startTime).getTime() < Date.now() - MAX_DURATION_MS
         ) {
+          // 先に消しておき、StrictMode で effect が2回走っても二重に保存しない
           localStorage.removeItem(STORAGE_KEYS.TIMER_STATE);
+          const project = projects.find((p) => p.id === parsed.projectId);
+          if (parsed.isRunning && project) {
+            const endTime = new Date(
+              new Date(parsed.startTime).getTime() + MAX_DURATION_MS
+            ).toISOString();
+            onTimeEntriesCreated?.(
+              createTimerEntries(project.id, parsed.startTime, endTime, '')
+            );
+          }
           setIsRestored(true);
           return;
         }
@@ -73,7 +84,7 @@ export const useTimerController = (
       }
     }
     setIsRestored(true);
-  }, [projects, isRestored]);
+  }, [projects, isRestored, onTimeEntriesCreated]);
 
   // localStorage に状態を保存
   useEffect(() => {
@@ -115,28 +126,31 @@ export const useTimerController = (
     }
   }, []);
 
-  const stop = useCallback(async () => {
-    if (!activeProject || !startTime) return;
+  const stop = useCallback(async (): Promise<TimeEntry[]> => {
+    if (!activeProject || !startTime) return [];
 
-    const endTime = new Date().toISOString();
-    const startTimeDate = new Date(startTime);
-    const endTimeDate = new Date(endTime);
-    const duration = endTimeDate.getTime() - startTimeDate.getTime();
+    // スリープ中は自動停止の監視が止まるため、復帰時の停止でも8時間を上限に区切る
+    const startMs = new Date(startTime).getTime();
+    const endMs = Math.min(Date.now(), startMs + MAX_DURATION_MS);
+    const endTime = new Date(endMs).toISOString();
+    const duration = endMs - startMs;
 
     // 状態をリセット
     setIsRunning(false);
     setStartTime(null);
     setActiveProject(null);
 
-    // トレイにタイマー停止を通知
-    if (window.electronAPI?.timerStop) {
-      await window.electronAPI.timerStop();
+    // トレイの表示更新に失敗しても、計測分の記録は失わないよう保存を続ける
+    try {
+      await window.electronAPI?.timerStop?.();
+    } catch (error) {
+      console.error('トレイへのタイマー停止の通知に失敗しました:', error);
     }
 
     // 1分未満の場合は保存しない
     if (duration < MIN_DURATION_MS) {
       onDiscarded?.();
-      return;
+      return [];
     }
 
     // 日跨ぎ対応: createTimerEntriesを使用して適切に分割
@@ -148,6 +162,7 @@ export const useTimerController = (
     );
 
     onTimeEntriesCreated?.(newTimeEntries);
+    return newTimeEntries;
   }, [activeProject, startTime, onTimeEntriesCreated, onDiscarded]);
 
   const toggle = useCallback(

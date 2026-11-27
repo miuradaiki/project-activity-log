@@ -111,10 +111,12 @@ describe('useUndoableProjectOperations', () => {
     expect(result.current.projects[1].archivedAt).toBeUndefined();
   });
 
-  it('プロジェクト削除を元に戻すと、元の並び順と記録ごと復活する', () => {
+  it('プロジェクト削除を元に戻すと、元の並び順と記録ごと復活する', async () => {
     const { result } = setup();
 
-    act(() => result.current.ops.deleteProject(p2));
+    await act(async () => {
+      await result.current.ops.deleteProject(p2);
+    });
     expect(result.current.projects.map((p) => p.id)).toEqual(['p1', 'p3']);
     expect(result.current.timeEntries.map((e) => e.id)).toEqual(['e1']);
     expect(
@@ -132,6 +134,63 @@ describe('useUndoableProjectOperations', () => {
       'e1',
       'e2',
       'e3',
+    ]);
+  });
+
+  it('計測中のプロジェクトを削除すると、停止で作られた記録も消え、元に戻すと一緒に戻る', async () => {
+    Object.defineProperty(window.navigator, 'language', {
+      value: 'ja-JP',
+      configurable: true,
+    });
+    const running = createMockTimeEntry({ id: 'running', projectId: 'p2' });
+    const { result } = renderHook(
+      () => {
+        const [projects, setProjects] = useState<Project[]>([p1, p2, p3]);
+        const [timeEntries, setTimeEntries] = useState<TimeEntry[]>([
+          e1,
+          e2,
+          e3,
+        ]);
+        // 実際のタイマーと同じく、停止の完了前に記録を追加してから解決する
+        const onTimerStop = async () => {
+          await Promise.resolve();
+          setTimeEntries((prev) => [...prev, running]);
+          return [running];
+        };
+        const base = useProjectOperations({
+          projects,
+          setProjects,
+          setTimeEntries,
+          activeProjectId: 'p2',
+          isTimerRunning: true,
+          onTimerStop,
+        });
+        const ops = useUndoableProjectOperations({
+          projectOps: base,
+          projects,
+          timeEntries,
+          setProjects,
+          setTimeEntries,
+        });
+        return { ops, timeEntries };
+      },
+      { wrapper }
+    );
+
+    await act(async () => {
+      await result.current.ops.deleteProject(p2);
+    });
+    expect(result.current.timeEntries.map((e) => e.id)).toEqual(['e1']);
+    expect(
+      screen.getByText('「採用サイト」と記録3件を削除しました')
+    ).toBeInTheDocument();
+
+    undo();
+    expect(result.current.timeEntries.map((e) => e.id).sort()).toEqual([
+      'e1',
+      'e2',
+      'e3',
+      'running',
     ]);
   });
 });
