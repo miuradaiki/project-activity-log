@@ -179,14 +179,21 @@ const App: React.FC = () => {
   if (isLoading) {
     return (
       <Box
+        role="progressbar"
+        aria-label={t('app.loading')}
         sx={{
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
           height: '100vh',
+          bgcolor: 'background.default',
         }}
       >
-        <CircularProgress />
+        <CircularProgress
+          size={20}
+          thickness={5}
+          sx={{ color: 'text.disabled' }}
+        />
       </Box>
     );
   }

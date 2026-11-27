@@ -30,9 +30,6 @@ export const translations = {
   ja: {
     // ===== 共通 =====
     'app.name': 'プロジェクト活動ログ',
-    'language.label': '言語',
-    'language.japanese': '日本語',
-    'language.english': '英語',
 
     // ===== ナビゲーション =====
     'nav.dashboard': 'レポート',
@@ -41,16 +38,6 @@ export const translations = {
     'nav.settings': '設定',
 
     // ===== ダッシュボード =====
-    'dashboard.daily.title': '本日の活動',
-    'dashboard.daily.total': '合計時間',
-    'dashboard.daily.longest': '最も長い作業時間',
-    'dashboard.daily.average': '平均作業時間',
-    'dashboard.weekly.title': '週間サマリー',
-    'dashboard.weekly.byproject': 'プロジェクト別時間',
-    'dashboard.monthly.title': '月間サマリー',
-    'dashboard.monthly.total': '合計時間',
-    'dashboard.progress.title': 'プロジェクト進捗',
-    'dashboard.progress.subtitle': '月間目標に対する進捗状況',
 
     // ===== プロジェクト =====
     'projects.new': '新しいプロジェクト',
@@ -133,33 +120,8 @@ export const translations = {
     'time.this.week': '今週',
 
     // ===== ダッシュボード（追加） =====
-    'dashboard.monthly.summary.title': '月間進捗サマリー',
-    'dashboard.monthly.summary.worked': '作業時間',
-    'dashboard.monthly.summary.target': '目標時間',
-    'dashboard.monthly.summary.remaining.days': '残り営業日',
-    'dashboard.monthly.summary.required.pace': '必要ペース',
-    'dashboard.monthly.summary.per.day': '/日',
-    'dashboard.heatmap.title': '活動ヒートマップ',
-    'dashboard.heatmap.less': '少ない',
-    'dashboard.heatmap.more': '多い',
-    'dashboard.heatmap.hours': '{hours}時間',
-    'dashboard.monthly.year': '年',
-    'dashboard.monthly.month': '月',
-    'dashboard.monthly.tab.projects': 'プロジェクト分布',
-    'dashboard.monthly.tab.weekly': '週別推移',
-    'dashboard.monthly.week': '週',
-    'dashboard.monthly.week.nth': '第{n}週',
-    'dashboard.monthly.no.activity': 'この月の稼働データがありません',
-    'dashboard.monthly.no.projects': 'この月のプロジェクトデータがありません',
-    'dashboard.previous.title': '先月の稼働状況',
-    'dashboard.previous.total': '合計時間:',
-    'dashboard.previous.no.data': '先月の稼働データがありません',
 
     // ===== カレンダー =====
-    'calendar.title': '活動カレンダー',
-    'calendar.subtitle': '作業時間の分布を視覚化',
-    'calendar.total': '合計: {hours}時間',
-    'calendar.activity.level': '活動レベル:',
 
     // ===== フォーマット =====
 
@@ -302,13 +264,11 @@ export const translations = {
     'settings.testmode.projects': 'プロジェクト',
     'settings.testmode.entries': '記録',
     'settings.testmode.regenerate': 'データを作り直す',
+    'app.loading': '読み込み中',
   },
   en: {
     // ===== Common =====
     'app.name': 'Project Activity Log',
-    'language.label': 'Language',
-    'language.japanese': 'Japanese',
-    'language.english': 'English',
 
     // ===== Navigation =====
     'nav.dashboard': 'Reports',
@@ -317,16 +277,6 @@ export const translations = {
     'nav.settings': 'Settings',
 
     // ===== Dashboard =====
-    'dashboard.daily.title': "Today's Activity",
-    'dashboard.daily.total': 'Total Time',
-    'dashboard.daily.longest': 'Longest Work Session',
-    'dashboard.daily.average': 'Average Work Session',
-    'dashboard.weekly.title': 'Weekly Summary',
-    'dashboard.weekly.byproject': 'Hours by Project',
-    'dashboard.monthly.title': 'Monthly Summary',
-    'dashboard.monthly.total': 'Total Hours',
-    'dashboard.progress.title': 'Project Progress',
-    'dashboard.progress.subtitle': 'Progress against monthly targets',
 
     // ===== Projects =====
     'projects.new': 'New Project',
@@ -410,33 +360,8 @@ export const translations = {
     'time.this.week': 'This Week',
 
     // ===== Dashboard (Extended) =====
-    'dashboard.monthly.summary.title': 'Monthly Progress Summary',
-    'dashboard.monthly.summary.worked': 'Hours Worked',
-    'dashboard.monthly.summary.target': 'Target Hours',
-    'dashboard.monthly.summary.remaining.days': 'Working Days Left',
-    'dashboard.monthly.summary.required.pace': 'Required Pace',
-    'dashboard.monthly.summary.per.day': '/day',
-    'dashboard.heatmap.title': 'Activity Heatmap',
-    'dashboard.heatmap.less': 'Less',
-    'dashboard.heatmap.more': 'More',
-    'dashboard.heatmap.hours': '{hours} hours',
-    'dashboard.monthly.year': 'Year',
-    'dashboard.monthly.month': 'Month',
-    'dashboard.monthly.tab.projects': 'Project Distribution',
-    'dashboard.monthly.tab.weekly': 'Weekly Trend',
-    'dashboard.monthly.week': 'Week',
-    'dashboard.monthly.week.nth': 'Week {n}',
-    'dashboard.monthly.no.activity': 'No activity data for this month',
-    'dashboard.monthly.no.projects': 'No project data for this month',
-    'dashboard.previous.title': 'Previous Month Activity',
-    'dashboard.previous.total': 'Total Hours:',
-    'dashboard.previous.no.data': 'No activity data for the previous month',
 
     // ===== Calendar =====
-    'calendar.title': 'Activity Calendar',
-    'calendar.subtitle': 'Visualize work time distribution',
-    'calendar.total': 'Total: {hours} hours',
-    'calendar.activity.level': 'Activity Level:',
 
     // ===== Format =====
 
@@ -579,5 +504,6 @@ export const translations = {
     'settings.testmode.projects': 'projects',
     'settings.testmode.entries': 'entries',
     'settings.testmode.regenerate': 'Regenerate data',
+    'app.loading': 'Loading',
   },
 };
