@@ -4,7 +4,6 @@ import {
   ButtonBase,
   Drawer,
   IconButton,
-  Typography,
   useMediaQuery,
   useTheme,
 } from '@mui/material';
@@ -105,39 +104,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
         borderColor: 'divider',
       }}
     >
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1.25,
-          px: 1.25,
-          pb: 2.75,
-        }}
-      >
-        <Box
-          aria-hidden
-          sx={{
-            width: 22,
-            height: 22,
-            borderRadius: '7px',
-            bgcolor: 'text.primary',
-            position: 'relative',
-            '&::after': {
-              content: '""',
-              position: 'absolute',
-              inset: 6,
-              borderRadius: '50%',
-              border: 2,
-              borderColor: 'background.default',
-              borderRightColor: 'transparent',
-            },
-          }}
-        />
-        <Typography noWrap sx={{ fontWeight: 600, fontSize: 13.5 }}>
-          {t('app.name')}
-        </Typography>
-      </Box>
-
       <Box
         component="nav"
         sx={{ display: 'flex', flexDirection: 'column', gap: 0.25, flex: 1 }}

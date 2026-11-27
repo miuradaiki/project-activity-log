@@ -29,7 +29,6 @@
 export const translations = {
   ja: {
     // ===== 共通 =====
-    'app.name': 'プロジェクト活動ログ',
 
     // ===== ナビゲーション =====
     'nav.dashboard': 'レポート',
@@ -269,7 +268,6 @@ export const translations = {
   },
   en: {
     // ===== Common =====
-    'app.name': 'Project Activity Log',
 
     // ===== Navigation =====
     'nav.dashboard': 'Reports',
