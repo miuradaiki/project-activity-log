@@ -18,6 +18,7 @@ import { useUndoableProjectOperations } from './hooks/useUndoableProjectOperatio
 import { Layout } from './components/ui/layout/Layout';
 import { useThemeMode } from './components/ui/ThemeProvider';
 import { KeyboardShortcutsDialog } from './components/shortcuts/KeyboardShortcuts';
+import { NAV_SHORTCUTS } from './components/shortcuts/shortcut-definitions';
 import { PageRouter } from './components/PageRouter';
 import { STORAGE_KEYS } from './constants/storageKeys';
 import { projectColorManager } from './utils/colorUtils';
@@ -148,10 +149,11 @@ const App: React.FC = () => {
   // キーボードショートカットの定義
   const shortcuts: Shortcut[] = [
     // ナビゲーション
-    { key: '1', ctrlKey: true, action: () => handleNavigate('dashboard') },
-    { key: '2', ctrlKey: true, action: () => handleNavigate('projects') },
-    { key: '3', ctrlKey: true, action: () => handleNavigate('timer') },
-    { key: ',', ctrlKey: true, action: () => handleNavigate('settings') },
+    ...NAV_SHORTCUTS.map(({ key, page }) => ({
+      key,
+      ctrlKey: true,
+      action: () => handleNavigate(page),
+    })),
     // プロジェクト操作
     { key: 'n', ctrlKey: true, action: () => projectFormModal.open() },
     // ヘルプ

@@ -205,6 +205,21 @@ describe('キーボードショートカット', () => {
     mockTimer.stop.mockClear();
   });
 
+  it.each([
+    ['1', 'timer'],
+    ['2', 'projects'],
+    ['3', 'dashboard'],
+  ])(
+    'Ctrl+%s はサイドバーの並び（今日 / プロジェクト / レポート）の順に移動する',
+    (key, page) => {
+      renderApp();
+
+      fireEvent.keyDown(window, { key, ctrlKey: true });
+
+      expect(screen.getByTestId('active-page')).toHaveTextContent(page);
+    }
+  );
+
   it('計測中にEscapeを押してもタイマーは停止しない（メニュー等を閉じる操作と衝突するため）', () => {
     mockTimer.isRunning = true;
     mockTimer.activeProject = { id: 'project-1', name: 'Test Project' };
