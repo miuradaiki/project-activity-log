@@ -3,6 +3,8 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ManualTimeEntryForm } from '../ManualTimeEntryForm';
 import { LanguageProvider } from '../../../contexts/LanguageContext';
+import { ThemeProvider } from '@mui/material';
+import { modernDarkTheme } from '../../../styles/modernTheme';
 import {
   createMockProject,
   createMockTimeEntry,
@@ -50,9 +52,11 @@ const renderManualTimeEntryForm = (
   };
 
   return render(
-    <LanguageProvider>
-      <ManualTimeEntryForm {...defaultProps} {...props} />
-    </LanguageProvider>
+    <ThemeProvider theme={modernDarkTheme}>
+      <LanguageProvider>
+        <ManualTimeEntryForm {...defaultProps} {...props} />
+      </LanguageProvider>
+    </ThemeProvider>
   );
 };
 
@@ -103,14 +107,10 @@ describe('ManualTimeEntryForm', () => {
       fireEvent.change(startTimeInput, { target: { value: '10:00' } });
       fireEvent.change(endTimeInput, { target: { value: '09:00' } });
 
-      // 保存ボタンをクリック
-      const saveButton = getSaveButton();
-      await userEvent.click(saveButton);
-
-      // アラートが表示されることを確認
-      expect(mockAlert).toHaveBeenCalledWith(
-        '終了時間は開始時間より後である必要があります。'
-      );
+      // alert ではなくフォーム内にエラーを表示し、保存できない状態にする
+      expect(screen.getByText('End must be after start')).toBeInTheDocument();
+      expect(getSaveButton()).toBeDisabled();
+      expect(mockAlert).not.toHaveBeenCalled();
       expect(onSave).not.toHaveBeenCalled();
     });
 
@@ -131,14 +131,8 @@ describe('ManualTimeEntryForm', () => {
       fireEvent.change(startTimeInput, { target: { value: '10:00' } });
       fireEvent.change(endTimeInput, { target: { value: '10:00' } });
 
-      // 保存ボタンをクリック
-      const saveButton = getSaveButton();
-      await userEvent.click(saveButton);
-
-      // アラートが表示されることを確認（duration <= 0の場合のメッセージ）
-      expect(mockAlert).toHaveBeenCalledWith(
-        '終了時間は開始時間より後である必要があります。'
-      );
+      expect(screen.getByText('End must be after start')).toBeInTheDocument();
+      expect(getSaveButton()).toBeDisabled();
       expect(onSave).not.toHaveBeenCalled();
     });
 
@@ -158,12 +152,11 @@ describe('ManualTimeEntryForm', () => {
       fireEvent.change(startTimeInput, { target: { value: '10:00:00' } });
       fireEvent.change(endTimeInput, { target: { value: '10:00:30' } });
 
-      const saveButton = getSaveButton();
-      await userEvent.click(saveButton);
-
-      expect(mockAlert).toHaveBeenCalledWith(
-        '1分未満の時間エントリは保存できません。'
-      );
+      expect(
+        screen.getByText('Entries must be at least 1 minute')
+      ).toBeInTheDocument();
+      expect(getSaveButton()).toBeDisabled();
+      expect(mockAlert).not.toHaveBeenCalled();
       expect(onSave).not.toHaveBeenCalled();
     });
 
@@ -245,7 +238,7 @@ describe('ManualTimeEntryForm', () => {
       expect(secondEntry.endTime).toBe(expectedSecondEnd);
     });
 
-    it('24時間を超える場合は確認ダイアログの結果によって保存が制御される', async () => {
+    it('24時間を超える場合は confirm ではなく注意を表示し、「それでも保存」で保存できる', async () => {
       const onSave = jest.fn();
       renderManualTimeEntryForm({ onSave });
 
@@ -263,18 +256,17 @@ describe('ManualTimeEntryForm', () => {
       fireEvent.change(startTimeInput, { target: { value: '00:00' } });
       fireEvent.change(endTimeInput, { target: { value: '02:00' } });
 
-      const confirmSpy = jest.spyOn(window, 'confirm').mockReturnValue(false);
+      const confirmSpy = jest.spyOn(window, 'confirm');
 
-      const saveButton = getSaveButton();
-      await userEvent.click(saveButton);
+      expect(
+        screen.getByText(/26h record\. It will be saved split by day\./)
+      ).toBeInTheDocument();
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Save anyway' })
+      );
 
-      expect(confirmSpy).toHaveBeenCalled();
-      expect(onSave).not.toHaveBeenCalled();
-
-      confirmSpy.mockReturnValue(true);
-      await userEvent.click(saveButton);
+      expect(confirmSpy).not.toHaveBeenCalled();
       expect(onSave).toHaveBeenCalled();
-
       confirmSpy.mockRestore();
     });
 

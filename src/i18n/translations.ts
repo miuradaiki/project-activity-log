@@ -86,8 +86,6 @@ export const translations = {
     'timer.manual': '作業時間を手動入力',
     'timer.manual.title': '作業時間の手動入力',
     'timer.manual.edit': '作業時間の編集',
-    'timer.now.start': '現在時刻を開始時刻にセット',
-    'timer.now.end': '現在時刻を終了時刻にセット',
     'timer.project': 'プロジェクト',
     'timer.start.date': '開始日',
     'timer.end.date': '終了日',
@@ -104,8 +102,6 @@ export const translations = {
       'タイマーを自動停止しました。必要に応じて新しいセッションを開始してください。',
     'timer.export.success': 'CSVを書き出しました',
     'timer.export.error': 'エクスポートに失敗しました',
-    'timer.multiday.notice':
-      '{duration} ({startDate} - {endDate}) の記録になります。',
 
     // ===== 設定 =====
     'settings.title': '設定',
@@ -175,9 +171,6 @@ export const translations = {
     'calendar.activity.level': '活動レベル:',
 
     // ===== フォーマット =====
-    'format.duration.hours.minutes': '{hours}時間{minutes}分',
-    'format.duration.hours': '{hours}時間',
-    'format.duration.minutes': '{minutes}分',
 
     // ===== アクセシビリティ =====
     'aria.sidebar.toggle': 'サイドバーの開閉',
@@ -280,6 +273,18 @@ export const translations = {
     'projects.delete.entries': '作業記録 {count}件（{hours}h）も削除されます。',
     'projects.delete.hint': '記録を残したい場合はアーカイブしてください。',
     'projects.delete.archive.instead': 'アーカイブにする',
+    'timer.now': '今',
+    'form.optional': '任意',
+    'timer.manual.error.order': '終了は開始より後にしてください',
+    'timer.manual.error.short': '1分以上の記録にしてください',
+    'timer.manual.save.anyway': 'それでも保存',
+    'timer.manual.fix.errors': 'エラーを直すと保存できます',
+    'timer.manual.will.record': '記録されます',
+    'timer.manual.split.notice':
+      '日をまたぐ {hours}時間の記録です。日ごとに分けて保存されます。',
+    'timer.manual.project.placeholder': 'プロジェクトを選択',
+    'timer.manual.description.placeholder': '何をしたか',
+    'timer.manual.end.date.fixed': '編集では日付をまたげません',
   },
   en: {
     // ===== Common =====
@@ -340,8 +345,6 @@ export const translations = {
     'timer.manual': 'Manual Time Entry',
     'timer.manual.title': 'Manual Time Entry',
     'timer.manual.edit': 'Edit Time Entry',
-    'timer.now.start': 'Set current time as start time',
-    'timer.now.end': 'Set current time as end time',
     'timer.project': 'Project',
     'timer.start.date': 'Start Date',
     'timer.end.date': 'End Date',
@@ -358,8 +361,6 @@ export const translations = {
       'Timer has been automatically stopped. Start a new session if needed.',
     'timer.export.success': 'Exported CSV',
     'timer.export.error': 'Failed to export time entries',
-    'timer.multiday.notice':
-      'This will be a {duration} entry ({startDate} - {endDate}).',
 
     // ===== Settings =====
     'settings.title': 'Settings',
@@ -430,9 +431,6 @@ export const translations = {
     'calendar.activity.level': 'Activity Level:',
 
     // ===== Format =====
-    'format.duration.hours.minutes': '{hours}h {minutes}m',
-    'format.duration.hours': '{hours}h',
-    'format.duration.minutes': '{minutes}m',
 
     // ===== Accessibility =====
     'aria.sidebar.toggle': 'Toggle sidebar',
@@ -535,5 +533,17 @@ export const translations = {
       '{count} entries ({hours}h) will also be deleted. ',
     'projects.delete.hint': 'Archive it instead to keep the records.',
     'projects.delete.archive.instead': 'Archive instead',
+    'timer.now': 'Now',
+    'form.optional': 'optional',
+    'timer.manual.error.order': 'End must be after start',
+    'timer.manual.error.short': 'Entries must be at least 1 minute',
+    'timer.manual.save.anyway': 'Save anyway',
+    'timer.manual.fix.errors': 'Fix the errors to save',
+    'timer.manual.will.record': 'will be recorded',
+    'timer.manual.split.notice':
+      'Spans multiple days — {hours}h record. It will be saved split by day.',
+    'timer.manual.project.placeholder': 'Select a project',
+    'timer.manual.description.placeholder': 'What did you work on?',
+    'timer.manual.end.date.fixed': 'Editing cannot span days',
   },
 };

@@ -1,22 +1,22 @@
 import React from 'react';
-import { useLanguage } from '../../contexts/LanguageContext';
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Box,
+  Button,
+  MenuItem,
+  Select,
+  TextField,
+  useTheme,
 } from '@mui/material';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { Project, TimeEntry } from '../../types';
-import { differenceInMinutes } from 'date-fns';
 import { useTimeEntryForm } from './hooks/useTimeEntryForm';
-import { DateTimeFields, formatHoursAndMinutes } from './DateTimeFields';
+import { DateTimeFields } from './DateTimeFields';
+import { GraphiteDialog } from '../ui/graphite/GraphiteDialog';
+import { GraphiteField } from '../ui/graphite/GraphiteField';
+import { GraphiteNotice } from '../ui/graphite/GraphiteNotice';
+import { formatClock } from '../../utils/formatters/clock-format';
+import { numberTypography } from '../../styles/modernTheme';
+import { projectColorManager } from '../../utils/colorUtils';
 
 interface ManualTimeEntryFormProps {
   open: boolean;
@@ -26,6 +26,24 @@ interface ManualTimeEntryFormProps {
   timeEntry?: TimeEntry;
 }
 
+const ERROR_KEYS = {
+  endBeforeStart: 'timer.manual.error.order',
+  tooShort: 'timer.manual.error.short',
+} as const;
+
+const Swatch: React.FC<{ projectId: string }> = ({ projectId }) => (
+  <Box
+    component="span"
+    sx={{
+      width: 8,
+      height: 8,
+      borderRadius: '3px',
+      flex: 'none',
+      bgcolor: projectColorManager.getColorById(projectId),
+    }}
+  />
+);
+
 export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
   open,
   onClose,
@@ -33,102 +51,127 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
   projects,
   timeEntry,
 }) => {
+  const theme = useTheme();
   const { t } = useLanguage();
+  const form = useTimeEntryForm({ timeEntry, onSave, onClose });
+  const { formState, validationError, isLongRecord, isMultiDay, isEditing } =
+    form;
+  const hours = Math.round((form.durationMs / 3600_000) * 10) / 10;
 
-  const {
-    formState,
-    setProjectId,
-    setStartDate,
-    setEndDate,
-    setStartTime,
-    setEndTime,
-    setDescription,
-    isEditing,
-    isMultiDay,
-    isFormValid,
-    handleSetCurrentTime,
-    handleSubmit,
-    handleClose,
-  } = useTimeEntryForm({
-    timeEntry,
-    onSave,
-    onClose,
-  });
-
-  const getSubmitButtonLabel = (): string => {
-    if (timeEntry) {
-      return t('actions.update');
-    }
-
-    if (isMultiDay) {
-      const durationMinutes = differenceInMinutes(
-        new Date(`${formState.endDate}T${formState.endTime}`),
-        new Date(`${formState.startDate}T${formState.startTime}`)
-      );
-      return `${formatHoursAndMinutes(durationMinutes)}を日別に保存`;
-    }
-
-    return t('actions.save');
-  };
+  const submitLabel = isEditing
+    ? t('actions.update')
+    : isLongRecord
+      ? t('timer.manual.save.anyway')
+      : t('actions.save');
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle>
-        {timeEntry ? t('timer.manual.edit') : t('timer.manual.title')}
-      </DialogTitle>
-      <form onSubmit={handleSubmit}>
-        <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <FormControl fullWidth>
-              <InputLabel>{t('timer.project')}</InputLabel>
-              <Select
-                value={formState.projectId}
-                onChange={(e) => setProjectId(e.target.value)}
-                label={t('timer.project')}
-                required
-              >
-                {projects
-                  .filter((project) => !project.isArchived)
-                  .map((project) => (
-                    <MenuItem key={project.id} value={project.id}>
-                      {project.name}
-                    </MenuItem>
-                  ))}
-              </Select>
-            </FormControl>
-
-            <DateTimeFields
-              startDate={formState.startDate}
-              endDate={formState.endDate}
-              startTime={formState.startTime}
-              endTime={formState.endTime}
-              isEditing={isEditing}
-              isMultiDay={isMultiDay}
-              onStartDateChange={setStartDate}
-              onEndDateChange={setEndDate}
-              onStartTimeChange={setStartTime}
-              onEndTimeChange={setEndTime}
-              onSetCurrentTime={handleSetCurrentTime}
-            />
-
-            <TextField
-              label={t('timer.description')}
-              multiline
-              rows={3}
-              value={formState.description}
-              onChange={(e) => setDescription(e.target.value)}
-              fullWidth
-            />
-          </Box>
-        </DialogContent>
-
-        <DialogActions>
-          <Button onClick={handleClose}>{t('projects.cancel')}</Button>
-          <Button type="submit" variant="contained" disabled={!isFormValid}>
-            {getSubmitButtonLabel()}
+    <GraphiteDialog
+      open={open}
+      onClose={form.handleClose}
+      onSubmit={form.handleSubmit}
+      title={isEditing ? t('timer.manual.edit') : t('timer.manual.title')}
+      summary={
+        validationError ? (
+          t('timer.manual.fix.errors')
+        ) : (
+          <>
+            <Box
+              component="span"
+              sx={{
+                ...numberTypography(theme),
+                fontSize: 18,
+                color: 'text.primary',
+                mr: 0.5,
+              }}
+            >
+              {formatClock(form.durationMs, false)}
+            </Box>
+            {t('timer.manual.will.record')}
+          </>
+        )
+      }
+      actions={
+        <>
+          <Button onClick={form.handleClose}>{t('projects.cancel')}</Button>
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={!form.isFormValid}
+          >
+            {submitLabel}
           </Button>
-        </DialogActions>
-      </form>
-    </Dialog>
+        </>
+      }
+    >
+      <GraphiteField label={t('timer.project')}>
+        <Select
+          size="small"
+          value={formState.projectId}
+          onChange={(e) => form.setProjectId(e.target.value)}
+          displayEmpty
+          inputProps={{ 'aria-label': t('timer.project') }}
+          renderValue={(id) => {
+            const project = projects.find((p) => p.id === id);
+            if (!project)
+              return (
+                <Box component="span" sx={{ color: 'text.disabled' }}>
+                  {t('timer.manual.project.placeholder')}
+                </Box>
+              );
+            return (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Swatch projectId={project.id} />
+                {project.name}
+              </Box>
+            );
+          }}
+        >
+          {projects
+            .filter((p) => !p.isArchived)
+            .map((p) => (
+              <MenuItem key={p.id} value={p.id} sx={{ gap: 1 }}>
+                <Swatch projectId={p.id} />
+                {p.name}
+              </MenuItem>
+            ))}
+        </Select>
+      </GraphiteField>
+
+      <DateTimeFields
+        startDate={formState.startDate}
+        endDate={formState.endDate}
+        startTime={formState.startTime}
+        endTime={formState.endTime}
+        isEditing={isEditing}
+        error={validationError ? t(ERROR_KEYS[validationError]) : undefined}
+        onStartDateChange={form.setStartDate}
+        onEndDateChange={form.setEndDate}
+        onStartTimeChange={form.setStartTime}
+        onEndTimeChange={form.setEndTime}
+        onSetCurrentTime={form.handleSetCurrentTime}
+      />
+
+      {isMultiDay && !isEditing && !validationError && (
+        <GraphiteNotice>
+          {t('timer.manual.split.notice', { hours })}
+        </GraphiteNotice>
+      )}
+
+      <GraphiteField
+        label={t('timer.description')}
+        htmlFor="entry-description"
+        optionalLabel={t('form.optional')}
+      >
+        <TextField
+          id="entry-description"
+          multiline
+          minRows={2}
+          size="small"
+          placeholder={t('timer.manual.description.placeholder')}
+          value={formState.description}
+          onChange={(e) => form.setDescription(e.target.value)}
+        />
+      </GraphiteField>
+    </GraphiteDialog>
   );
 };
