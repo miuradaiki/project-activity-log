@@ -108,10 +108,9 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({
   }, [isTestMode, testSettings]);
 
   // 月間基準時間を更新
+  // isLoading は初回読み込み専用。更新中に立てると設定画面全体が再マウントされる
   const updateBaseMonthlyHours = async (hours: number) => {
     try {
-      setIsLoading(true);
-
       if (isTestMode) {
         // テストモードの場合はローカルステートのみ更新
         const updatedSettings = {
@@ -138,8 +137,6 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({
         console.error('設定の更新に失敗しました:', error);
       }
       throw error;
-    } finally {
-      setIsLoading(false);
     }
   };
 

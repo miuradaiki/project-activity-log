@@ -3,7 +3,8 @@ import { Box, Typography } from '@mui/material';
 
 interface PageHeaderProps {
   title: string;
-  subtitle?: string;
+  subtitle?: React.ReactNode;
+  /** ページの主要アクション。1画面に1つを基本とする */
   action?: React.ReactNode;
 }
 
@@ -11,35 +12,34 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   title,
   subtitle,
   action,
-}) => {
-  return (
-    <Box
-      sx={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: subtitle ? 'flex-start' : 'center',
-        mb: 4,
-      }}
-    >
-      <Box>
-        <Typography
-          variant="h4"
-          component="h1"
-          fontWeight="600"
-          gutterBottom={!!subtitle}
-          sx={{
-            fontSize: { xs: '1.75rem', md: '2.125rem' },
-          }}
-        >
-          {title}
+}) => (
+  <Box
+    component="header"
+    sx={{
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'flex-end',
+      flexWrap: 'wrap',
+      gap: 2,
+      mb: 2.75,
+    }}
+  >
+    <Box>
+      <Typography
+        variant="h4"
+        component="h1"
+        sx={{ fontSize: 26, fontWeight: 600, letterSpacing: '-0.02em' }}
+      >
+        {title}
+      </Typography>
+      {subtitle && (
+        <Typography sx={{ color: 'text.secondary', fontSize: 13, mt: 0.5 }}>
+          {subtitle}
         </Typography>
-        {subtitle && (
-          <Typography variant="body1" color="text.secondary">
-            {subtitle}
-          </Typography>
-        )}
-      </Box>
-      {action && <Box>{action}</Box>}
+      )}
     </Box>
-  );
-};
+    {action && (
+      <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>{action}</Box>
+    )}
+  </Box>
+);

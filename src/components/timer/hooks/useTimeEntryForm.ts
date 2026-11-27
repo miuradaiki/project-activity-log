@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { TimeEntry } from '../../../types';
 import { v4 as uuidv4 } from 'uuid';
-import { isSameDay, differenceInHours } from 'date-fns';
+import { isSameDay, differenceInHours, format } from 'date-fns';
 import { createSplitEntries } from '../../../utils/timeEntryUtils';
 
 interface FormState {
@@ -14,10 +14,14 @@ interface FormState {
 }
 
 interface UseTimeEntryFormProps {
+  /** 開くたびに初期値（今日の日付）を作り直すために使う */
+  open?: boolean;
   timeEntry?: TimeEntry;
   onSave: (timeEntry: TimeEntry) => void;
   onClose: () => void;
 }
+
+export type TimeEntryValidationError = 'endBeforeStart' | 'tooShort';
 
 interface UseTimeEntryFormReturn {
   formState: FormState;
@@ -30,13 +34,32 @@ interface UseTimeEntryFormReturn {
   isEditing: boolean;
   isMultiDay: boolean;
   isFormValid: boolean;
+  /** 入力中の値から常に計算する。alert で止める代わりにフォーム内に表示するため */
+  validationError: TimeEntryValidationError | null;
+  durationMs: number;
+  /** 24時間を超える記録。確認ダイアログの代わりに注意を出し、ボタン文言で同意を取る */
+  isLongRecord: boolean;
   handleSetCurrentTime: (target: 'start' | 'end') => void;
   handleSubmit: (e: React.FormEvent) => void;
   handleClose: () => void;
 }
 
+// toISOString は UTC の日付になり、JST 0〜9時に前日へずれるためローカル時刻で作る
+const toLocalDate = (d: Date): string => format(d, 'yyyy-MM-dd');
+
+const MIN_DURATION_MS = 60_000;
+
+const getValidationError = (
+  durationMs: number
+): TimeEntryValidationError | null => {
+  if (Number.isNaN(durationMs)) return null;
+  if (durationMs <= 0) return 'endBeforeStart';
+  if (durationMs < MIN_DURATION_MS) return 'tooShort';
+  return null;
+};
+
 const getDefaultFormState = (): FormState => {
-  const today = new Date().toISOString().split('T')[0];
+  const today = toLocalDate(new Date());
   return {
     projectId: '',
     startDate: today,
@@ -48,6 +71,7 @@ const getDefaultFormState = (): FormState => {
 };
 
 export const useTimeEntryForm = ({
+  open,
   timeEntry,
   onSave,
   onClose,
@@ -63,8 +87,8 @@ export const useTimeEntryForm = ({
 
       setFormState({
         projectId: timeEntry.projectId,
-        startDate: startDateTime.toISOString().split('T')[0],
-        endDate: startDateTime.toISOString().split('T')[0],
+        startDate: toLocalDate(startDateTime),
+        endDate: toLocalDate(startDateTime),
         startTime: startDateTime.toTimeString().slice(0, 5),
         endTime: endDateTime.toTimeString().slice(0, 5),
         description: timeEntry.description || '',
@@ -72,7 +96,7 @@ export const useTimeEntryForm = ({
     } else {
       setFormState(getDefaultFormState());
     }
-  }, [timeEntry]);
+  }, [timeEntry, open]);
 
   const setProjectId = useCallback((value: string) => {
     setFormState((prev) => ({ ...prev, projectId: value }));
@@ -105,7 +129,7 @@ export const useTimeEntryForm = ({
   const handleSetCurrentTime = useCallback((target: 'start' | 'end') => {
     const now = new Date();
     const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-    const currentDate = now.toISOString().split('T')[0];
+    const currentDate = toLocalDate(now);
 
     if (target === 'start') {
       setFormState((prev) => ({
@@ -139,27 +163,8 @@ export const useTimeEntryForm = ({
         formState;
       const startDateTime = new Date(`${startDate}T${startTime}`);
       const endDateTime = new Date(`${endDate}T${endTime}`);
-      const duration = endDateTime.getTime() - startDateTime.getTime();
-
-      if (duration <= 0) {
-        window.alert('終了時間は開始時間より後である必要があります。');
-        return;
-      }
-
-      if (duration < 60000) {
-        window.alert('1分未満の時間エントリは保存できません。');
-        return;
-      }
-
-      const hours = differenceInHours(endDateTime, startDateTime);
-      if (hours > 24) {
-        const confirmResult = window.confirm(
-          `${hours}時間の長時間記録になります。続行しますか？`
-        );
-        if (!confirmResult) {
-          return;
-        }
-      }
+      const durationMs = endDateTime.getTime() - startDateTime.getTime();
+      if (Number.isNaN(durationMs) || getValidationError(durationMs)) return;
 
       const timestamp = new Date().toISOString();
 
@@ -205,12 +210,20 @@ export const useTimeEntryForm = ({
     [formState, timeEntry, onSave, handleClose]
   );
 
+  const startAt = new Date(`${formState.startDate}T${formState.startTime}`);
+  const endAt = new Date(`${formState.endDate}T${formState.endTime}`);
+  const durationMs = endAt.getTime() - startAt.getTime();
+  const validationError = getValidationError(durationMs);
+  const isLongRecord =
+    !validationError && differenceInHours(endAt, startAt) > 24;
+
   const isFormValid = Boolean(
     formState.projectId &&
     formState.startDate &&
     formState.endDate &&
     formState.startTime &&
-    formState.endTime
+    formState.endTime &&
+    !validationError
   );
 
   const isMultiDay = !isSameDay(
@@ -229,6 +242,9 @@ export const useTimeEntryForm = ({
     isEditing,
     isMultiDay,
     isFormValid,
+    validationError,
+    durationMs: Number.isNaN(durationMs) ? 0 : durationMs,
+    isLongRecord,
     handleSetCurrentTime,
     handleSubmit,
     handleClose,

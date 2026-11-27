@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import App from '../App';
 import { ThemeProvider as CustomThemeProvider } from '../components/ui/ThemeProvider';
 import { LanguageProvider } from '../contexts/LanguageContext';
@@ -17,27 +17,12 @@ jest.mock('../components/ui/layout/Layout', () => ({
   Layout: ({
     children,
     activePage,
-    title,
-    showAddButton,
-    onAddButtonClick,
   }: {
     children: React.ReactNode;
     activePage: string;
-    title: string;
-    showAddButton: boolean;
-    onAddButtonClick: () => void;
   }) => (
     <div data-testid="layout">
       <div data-testid="active-page">{activePage}</div>
-      <div data-testid="page-title">{title}</div>
-      <div data-testid="show-add-button">
-        {showAddButton ? 'true' : 'false'}
-      </div>
-      {showAddButton && (
-        <button data-testid="add-button" onClick={onAddButtonClick}>
-          Add
-        </button>
-      )}
       {children}
     </div>
   ),
@@ -111,14 +96,17 @@ jest.mock('../hooks/useStorage', () => ({
   }),
 }));
 
+const mockTimer = {
+  isRunning: false,
+  activeProject: null as null | { id: string; name: string },
+  startTime: null as string | null,
+  start: jest.fn(),
+  stop: jest.fn(),
+  toggle: jest.fn(),
+};
+
 jest.mock('../hooks/useTimerController', () => ({
-  useTimerController: () => ({
-    isRunning: false,
-    activeProject: null,
-    startTime: null,
-    start: jest.fn(),
-    stop: jest.fn(),
-  }),
+  useTimerController: () => mockTimer,
 }));
 
 jest.mock('../hooks/useModal', () => ({
@@ -207,78 +195,25 @@ describe('App', () => {
       expect(screen.getByTestId('page-router')).toBeInTheDocument();
     });
   });
+});
 
-  describe('ページタイトル', () => {
-    it('timerページのタイトルが正しい', () => {
-      mockStorage['project_activity_log_active_page'] = 'timer';
-
-      renderApp();
-
-      // 日本語または英語のどちらかをチェック
-      const title = screen.getByTestId('page-title').textContent;
-      expect(title).toMatch(/(?:タイマー|Timer)/);
-    });
-
-    it('dashboardページのタイトルが正しい', () => {
-      mockStorage['project_activity_log_active_page'] = 'dashboard';
-
-      renderApp();
-
-      const title = screen.getByTestId('page-title').textContent;
-      expect(title).toMatch(/(?:ダッシュボード|Dashboard)/);
-    });
-
-    it('projectsページのタイトルが正しい', () => {
-      mockStorage['project_activity_log_active_page'] = 'projects';
-
-      renderApp();
-
-      const title = screen.getByTestId('page-title').textContent;
-      expect(title).toMatch(/(?:プロジェクト|Projects)/);
-    });
-
-    it('settingsページのタイトルが正しい', () => {
-      mockStorage['project_activity_log_active_page'] = 'settings';
-
-      renderApp();
-
-      const title = screen.getByTestId('page-title').textContent;
-      expect(title).toMatch(/(?:設定|Settings)/);
-    });
+describe('キーボードショートカット', () => {
+  afterEach(() => {
+    mockTimer.isRunning = false;
+    mockTimer.activeProject = null;
+    mockTimer.startTime = null;
+    mockTimer.stop.mockClear();
   });
 
-  describe('フローティングアクションボタン', () => {
-    it('projectsページではAddボタンが表示される', () => {
-      mockStorage['project_activity_log_active_page'] = 'projects';
+  it('計測中にEscapeを押してもタイマーは停止しない（メニュー等を閉じる操作と衝突するため）', () => {
+    mockTimer.isRunning = true;
+    mockTimer.activeProject = { id: 'project-1', name: 'Test Project' };
+    mockTimer.startTime = new Date().toISOString();
+    renderApp();
 
-      renderApp();
+    fireEvent.keyDown(document, { key: 'Escape' });
 
-      expect(screen.getByTestId('show-add-button')).toHaveTextContent('true');
-    });
-
-    it('timerページではAddボタンが表示される', () => {
-      mockStorage['project_activity_log_active_page'] = 'timer';
-
-      renderApp();
-
-      expect(screen.getByTestId('show-add-button')).toHaveTextContent('true');
-    });
-
-    it('dashboardページではAddボタンが表示されない', () => {
-      mockStorage['project_activity_log_active_page'] = 'dashboard';
-
-      renderApp();
-
-      expect(screen.getByTestId('show-add-button')).toHaveTextContent('false');
-    });
-
-    it('settingsページではAddボタンが表示されない', () => {
-      mockStorage['project_activity_log_active_page'] = 'settings';
-
-      renderApp();
-
-      expect(screen.getByTestId('show-add-button')).toHaveTextContent('false');
-    });
+    expect(mockTimer.stop).not.toHaveBeenCalled();
   });
 });
 

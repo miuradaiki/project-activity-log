@@ -72,6 +72,39 @@ describe('SettingsContext', () => {
     });
   });
 
+  describe('更新中の読み込み状態', () => {
+    it('基準時間の更新中に isLoading を true に戻さない（設定画面が再マウントされ入力のフォーカスが外れるため）', async () => {
+      const seen: boolean[] = [];
+      const { result } = renderHook(
+        () => {
+          const ctx = useSettingsContext();
+          seen.push(ctx.isLoading);
+          return ctx;
+        },
+        { wrapper }
+      );
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+      seen.length = 0;
+
+      // 保存に時間がかかる状況を再現し、途中の描画を観測する
+      const { updateSettings } = jest.requireMock('../../utils/settingsUtils');
+      let resolveSave: (v: unknown) => void = () => {};
+      updateSettings.mockImplementationOnce(
+        () => new Promise((resolve) => (resolveSave = resolve))
+      );
+      let pending: Promise<void> = Promise.resolve();
+      act(() => {
+        pending = result.current.updateBaseMonthlyHours(150);
+      });
+      await act(async () => {
+        resolveSave({ workHours: { baseMonthlyHours: 150 } });
+        await pending;
+      });
+
+      expect(seen).not.toContain(true);
+    });
+  });
+
   describe('useSettingsContext', () => {
     it('SettingsProvider外で使用してもデフォルト値が返される', () => {
       const { result } = renderHook(() => useSettingsContext());

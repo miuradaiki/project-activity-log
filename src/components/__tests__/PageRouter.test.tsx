@@ -4,12 +4,22 @@ import { PageRouter } from '../PageRouter';
 import { Project, TimeEntry } from '../../types';
 
 // Mock the child components
-jest.mock('../dashboard/Dashboard', () => ({
-  Dashboard: () => <div data-testid="dashboard">Dashboard</div>,
+jest.mock('../reports/ReportsView', () => ({
+  ReportsView: () => <div data-testid="dashboard">Dashboard</div>,
 }));
 
-jest.mock('../ui/project/ProjectsView', () => ({
+jest.mock('../projects/ProjectsView', () => ({
   ProjectsView: () => <div data-testid="projects-view">ProjectsView</div>,
+}));
+
+jest.mock('../today/TodayView', () => ({
+  TodayView: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="today-view">{children}</div>
+  ),
+}));
+
+jest.mock('../history/EntryHistory', () => ({
+  EntryHistory: () => <div data-testid="entry-history">EntryHistory</div>,
 }));
 
 jest.mock('../settings/SettingsView', () => ({
@@ -98,7 +108,7 @@ describe('PageRouter', () => {
       render(<PageRouter {...defaultProps} activePage="timer" />);
 
       // タイマーページ固有のコンテンツがあることを確認
-      expect(screen.getByText('timer.import.csv')).toBeInTheDocument();
+      expect(screen.getByTestId('today-view')).toBeInTheDocument();
     });
 
     it('dashboardページをレンダリングする', () => {

@@ -1,156 +1,131 @@
-import React from 'react';
-import {
-  Box,
-  Typography,
-  Divider,
-  TextField,
-  Button,
-  Card,
-  CardContent,
-  Grid,
-  InputAdornment,
-  Slider,
-  IconButton,
-  Tooltip,
-  useTheme,
-} from '@mui/material';
-import {
-  AccessTime as AccessTimeIcon,
-  Refresh as RefreshIcon,
-  Save as SaveIcon,
-  Info as InfoIcon,
-} from '@mui/icons-material';
+import React, { useEffect, useState } from 'react';
+import { Box, Button, ButtonBase, useTheme } from '@mui/material';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { APP_CONSTANTS } from '../../constants';
-import { formatHours } from '../../utils/formatters/timeFormatters';
+import { numberTypography } from '../../styles/modernTheme';
+import { SettingsGroup, SettingsRow } from './SettingsGroup';
+
+const STEP = 5;
+const { MIN_MONTHLY_HOURS: MIN, MAX_MONTHLY_HOURS: MAX } =
+  APP_CONSTANTS.PROJECT;
 
 interface WorkHoursSettingsProps {
   baseMonthlyHours: number;
-  onBaseMonthlyHoursChange: (value: number) => void;
-  onSave: () => void;
+  onCommit: (hours: number) => void;
   onReset: () => void;
 }
 
 export const WorkHoursSettings: React.FC<WorkHoursSettingsProps> = ({
   baseMonthlyHours,
-  onBaseMonthlyHoursChange,
-  onSave,
+  onCommit,
   onReset,
 }) => {
   const theme = useTheme();
   const { t } = useLanguage();
+  const commit = (hours: number) =>
+    onCommit(Math.min(MAX, Math.max(MIN, hours)));
+  // 入力中は下書きとして保持し、確定時にだけ保存する（途中の値で保存・巻き戻りしないように）
+  const [draft, setDraft] = useState(String(baseMonthlyHours));
+  useEffect(() => setDraft(String(baseMonthlyHours)), [baseMonthlyHours]);
+  const commitDraft = () => {
+    const v = Number(draft);
+    if (draft.trim() === '' || !Number.isFinite(v)) {
+      setDraft(String(baseMonthlyHours));
+      return;
+    }
+    const clamped = Math.min(MAX, Math.max(MIN, Math.round(v)));
+    setDraft(String(clamped));
+    if (clamped !== baseMonthlyHours) onCommit(clamped);
+  };
+  const exampleTarget = Math.round(baseMonthlyHours * 0.4 * 10) / 10;
 
-  return (
-    <Card
-      elevation={1}
+  const stepButton = (label: string, delta: number, disabled: boolean) => (
+    <ButtonBase
+      aria-label={label}
+      disabled={disabled}
+      onClick={() => commit(baseMonthlyHours + delta)}
       sx={{
-        transition: 'transform 0.2s, box-shadow 0.2s',
-        '&:hover': {
-          transform: 'translateY(-4px)',
-          boxShadow: theme.shadows[4],
-        },
+        width: 32,
+        height: '100%',
+        color: 'text.secondary',
+        fontSize: 16,
+        '&.Mui-disabled': { opacity: 0.35 },
       }}
     >
-      <CardContent>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-          <AccessTimeIcon color="primary" sx={{ mr: 1 }} />
-          <Typography variant="h6">{t('settings.monthly.hours')}</Typography>
-        </Box>
-        <Divider sx={{ mb: 3 }} />
+      {delta > 0 ? '+' : '−'}
+    </ButtonBase>
+  );
 
-        <Box sx={{ mb: 4 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-            <Typography id="monthly-hours-slider" gutterBottom>
-              {t('settings.monthly.hours')}
-            </Typography>
-            <Tooltip title={t('settings.monthly.hours.description')}>
-              <IconButton
-                size="small"
-                sx={{ ml: 1 }}
-                aria-label={t('aria.settings.info')}
-              >
-                <InfoIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          </Box>
-
-          <Grid container spacing={2} alignItems="center">
-            <Grid
-              size={{
-                xs: 12,
-                md: 8,
-              }}
-            >
-              <Slider
-                value={baseMonthlyHours}
-                onChange={(_, newValue) =>
-                  onBaseMonthlyHoursChange(newValue as number)
-                }
-                aria-labelledby="monthly-hours-slider"
-                valueLabelDisplay="auto"
-                step={5}
-                marks={[
-                  { value: 100, label: '100h' },
-                  { value: 140, label: '140h' },
-                  { value: 180, label: '180h' },
-                ]}
-                min={APP_CONSTANTS.PROJECT.MIN_MONTHLY_HOURS}
-                max={APP_CONSTANTS.PROJECT.MAX_MONTHLY_HOURS}
-              />
-            </Grid>
-            <Grid
-              size={{
-                xs: 12,
-                md: 4,
-              }}
-            >
-              <TextField
-                label={t('settings.monthly.hours.label')}
-                type="number"
-                value={baseMonthlyHours}
-                onChange={(e) => {
-                  const value = Number(e.target.value);
-                  if (
-                    value >= APP_CONSTANTS.PROJECT.MIN_MONTHLY_HOURS &&
-                    value <= APP_CONSTANTS.PROJECT.MAX_MONTHLY_HOURS
-                  ) {
-                    onBaseMonthlyHoursChange(value);
-                  }
-                }}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      {t('units.hours')}
-                    </InputAdornment>
-                  ),
-                }}
-                variant="outlined"
-                size="small"
-                fullWidth
-              />
-            </Grid>
-          </Grid>
-
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+  return (
+    <SettingsGroup title={t('settings.work.hours')}>
+      <SettingsRow
+        title={t('settings.monthly.hours')}
+        description={
+          <>
+            {t('settings.monthly.hours.help')}
+            <br />
             {t('settings.monthly.hours.example', {
-              hours: formatHours(baseMonthlyHours * 0.5),
+              base: baseMonthlyHours,
+              target: exampleTarget,
             })}
-          </Typography>
+          </>
+        }
+      >
+        <Button variant="text" size="small" onClick={onReset}>
+          {t('settings.reset')}
+        </Button>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            height: 34,
+            border: `1px solid ${theme.custom.tokens.border2}`,
+            borderRadius: 2.25,
+            overflow: 'hidden',
+          }}
+        >
+          {stepButton(t('settings.decrease'), -STEP, baseMonthlyHours <= MIN)}
+          <Box
+            component="input"
+            type="number"
+            aria-label={t('settings.monthly.hours')}
+            min={MIN}
+            max={MAX}
+            value={draft}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setDraft(e.target.value)
+            }
+            onBlur={commitDraft}
+            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+              if (e.key === 'Enter') commitDraft();
+            }}
+            sx={{
+              ...numberTypography(theme),
+              fontWeight: 300,
+              width: 64,
+              height: '100%',
+              textAlign: 'center',
+              fontSize: 20,
+              color: 'text.primary',
+              bgcolor: 'transparent',
+              border: 0,
+              borderLeft: 1,
+              borderRight: 1,
+              borderColor: 'divider',
+              outline: 'none',
+              MozAppearance: 'textfield',
+              '&::-webkit-inner-spin-button, &::-webkit-outer-spin-button': {
+                WebkitAppearance: 'none',
+                m: 0,
+              },
+            }}
+          />
+          {stepButton(t('settings.increase'), STEP, baseMonthlyHours >= MAX)}
         </Box>
-
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-          <Button
-            variant="outlined"
-            startIcon={<RefreshIcon />}
-            onClick={onReset}
-          >
-            {t('settings.reset')}
-          </Button>
-          <Button variant="contained" startIcon={<SaveIcon />} onClick={onSave}>
-            {t('settings.save')}
-          </Button>
+        <Box sx={{ fontSize: 12.5, color: 'text.secondary' }}>
+          {t('settings.per.month')}
         </Box>
-      </CardContent>
-    </Card>
+      </SettingsRow>
+    </SettingsGroup>
   );
 };

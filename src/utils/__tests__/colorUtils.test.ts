@@ -67,6 +67,27 @@ describe('colorUtils', () => {
         expect(manager.getColorById('p11')).toBe(PROJECT_COLORS[1]);
       });
 
+      test('プロジェクトに保存された色があれば、それを優先する', () => {
+        const projects = [
+          createProject('a', 'A'),
+          createMockProject({ id: 'b', name: 'B', color: PROJECT_COLORS[5] }),
+        ];
+
+        manager.initializeColors(projects);
+
+        expect(manager.getColorById('a')).toBe(PROJECT_COLORS[0]);
+        expect(manager.getColorById('b')).toBe(PROJECT_COLORS[5]);
+      });
+
+      test('pickUnusedColor は他のプロジェクトがまだ使っていない色を返す', () => {
+        const projects = [
+          createMockProject({ id: 'a', name: 'A', color: PROJECT_COLORS[0] }),
+          createProject('b', 'B'), // 自動で PROJECT_COLORS[1]
+        ];
+
+        expect(manager.pickUnusedColor(projects)).toBe(PROJECT_COLORS[2]);
+      });
+
       test('空のプロジェクトリストで初期化できる', () => {
         manager.initializeColors([]);
 
