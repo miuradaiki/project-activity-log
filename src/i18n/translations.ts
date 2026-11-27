@@ -77,7 +77,6 @@ export const translations = {
     'projects.tracking.label': '追跡のみ - 今月の累計時間',
 
     // ===== タイマー =====
-    'timer.title': ' ',
     'timer.start': '開始',
     'timer.stop': '停止',
     'timer.manual': '作業時間を手動入力',
@@ -90,10 +89,7 @@ export const translations = {
     'timer.end.time': '終了時間',
     'timer.description': ' ',
     'timer.history': '作業履歴',
-    'timer.history.timeline': 'タイムライン',
     'timer.import.csv': 'CSVインポート',
-    'timer.search': '検索...',
-    'timer.no.entries': 'タイマーを開始してください',
     'timer.notification.maxtime': '作業時間が8時間を超過しました',
     'timer.notification.maxtime.body':
       'タイマーを自動停止しました。必要に応じて新しいセッションを開始してください。',
@@ -174,7 +170,6 @@ export const translations = {
     'aria.calendar.next.month': '次の月へ',
     'aria.week.previous': '前の週へ',
     'aria.week.next': '次の週へ',
-    'aria.search.clear': '検索をクリア',
     'aria.time.set.start': '現在時刻を開始時刻に設定',
     'aria.time.set.end': '現在時刻を終了時刻に設定',
     'aria.settings.info': '設定の詳細情報',
@@ -289,6 +284,16 @@ export const translations = {
       '全プロジェクトの配分が合計 {percent}% になります（基準を {hours}h 超えます）',
     'projects.form.color': '色',
     'projects.form.color.n': '色 {n}',
+    'history.today': '今日',
+    'history.yesterday': '昨日',
+    'history.search.placeholder': 'プロジェクト・メモを検索',
+    'history.search.aria': '作業履歴を検索',
+    'history.filter.project': 'プロジェクトで絞り込む',
+    'history.filter.all': 'すべてのプロジェクト',
+    'history.empty': 'まだ作業記録がありません',
+    'history.no.match': '該当する作業記録はありません',
+    'history.more': 'さらに表示（残り {count} 件）',
+    'history.unknown.project': '不明なプロジェクト',
   },
   en: {
     // ===== Common =====
@@ -340,7 +345,6 @@ export const translations = {
     'projects.tracking.label': 'Tracking Only - Cumulative Hours This Month',
 
     // ===== Timer =====
-    'timer.title': ' ',
     'timer.start': 'Start',
     'timer.stop': 'Stop',
     'timer.manual': 'Manual Time Entry',
@@ -353,10 +357,7 @@ export const translations = {
     'timer.end.time': 'End Time',
     'timer.description': ' ',
     'timer.history': 'Work History',
-    'timer.history.timeline': 'Timeline',
     'timer.import.csv': 'Import CSV',
-    'timer.search': 'Search...',
-    'timer.no.entries': 'No work records found',
     'timer.notification.maxtime': 'Working time exceeded 8 hours',
     'timer.notification.maxtime.body':
       'Timer has been automatically stopped. Start a new session if needed.',
@@ -438,7 +439,6 @@ export const translations = {
     'aria.calendar.next.month': 'Next month',
     'aria.week.previous': 'Previous week',
     'aria.week.next': 'Next week',
-    'aria.search.clear': 'Clear search',
     'aria.time.set.start': 'Set current time as start time',
     'aria.time.set.end': 'Set current time as end time',
     'aria.settings.info': 'Settings information',
@@ -553,5 +553,15 @@ export const translations = {
       'Total allocation will be {percent}% ({hours}h over the base)',
     'projects.form.color': 'Color',
     'projects.form.color.n': 'Color {n}',
+    'history.today': 'Today',
+    'history.yesterday': 'Yesterday',
+    'history.search.placeholder': 'Search projects or notes',
+    'history.search.aria': 'Search work history',
+    'history.filter.project': 'Filter by project',
+    'history.filter.all': 'All projects',
+    'history.empty': 'No work records yet',
+    'history.no.match': 'No matching records',
+    'history.more': 'Show more ({count} left)',
+    'history.unknown.project': 'Unknown project',
   },
 };

@@ -9,7 +9,7 @@ import { ProjectsView } from './projects/ProjectsView';
 import { useSettingsContext } from '../contexts/SettingsContext';
 import { SettingsView } from './settings/SettingsView';
 import { TodayView } from './today/TodayView';
-import { TimeEntryList } from './timer/TimeEntryList';
+import { EntryHistory } from './history/EntryHistory';
 
 export interface PageRouterProps {
   activePage: string;
@@ -81,11 +81,11 @@ export const PageRouter: React.FC<PageRouterProps> = ({
           onManualEntry={() => manualEntryModal.open()}
           onCreateProject={() => projectFormModal.open()}
         >
-          <TimeEntryList
+          <EntryHistory
             timeEntries={timeEntries}
             projects={projects}
-            onDeleteTimeEntry={projectOps.deleteTimeEntry}
-            onEditTimeEntry={(entry) => manualEntryModal.open(entry)}
+            onDelete={projectOps.deleteTimeEntry}
+            onEdit={(entry) => manualEntryModal.open(entry)}
           />
         </TodayView>
       );

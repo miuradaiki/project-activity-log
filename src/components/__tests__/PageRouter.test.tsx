@@ -18,6 +18,10 @@ jest.mock('../today/TodayView', () => ({
   ),
 }));
 
+jest.mock('../history/EntryHistory', () => ({
+  EntryHistory: () => <div data-testid="entry-history">EntryHistory</div>,
+}));
+
 jest.mock('../settings/SettingsView', () => ({
   SettingsView: () => <div data-testid="settings-view">SettingsView</div>,
 }));
