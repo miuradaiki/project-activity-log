@@ -7,6 +7,7 @@ import {
 import { Project, TimeEntry } from '../../types';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useSettingsContext } from '../../contexts/SettingsContext';
+import { useNow } from '../../hooks/useNow';
 import {
   getMonthOverview,
   getRecentProjects,
@@ -53,8 +54,9 @@ export const TodayView: React.FC<TodayViewProps> = ({
   const { settings } = useSettingsContext();
   const baseHours = settings.workHours.baseMonthlyHours;
   const [pickerAnchor, setPickerAnchor] = useState<HTMLElement | null>(null);
-  const now = new Date();
-  const dayKey = now.toDateString();
+  // タイムラインの「現在」線・計測中の帯・日付の切り替わりを1分ごとに反映する
+  const nowMs = useNow(60_000);
+  const now = useMemo(() => new Date(nowMs), [nowMs]);
 
   const activeProjects = useMemo(
     () => projects.filter((p) => !p.isArchived),
@@ -65,15 +67,13 @@ export const TodayView: React.FC<TodayViewProps> = ({
     [projects, timeEntries, baseHours]
   );
   const todayHours = useMemo(
-    () => getTodayProjectHours(timeEntries, new Date()),
-    // 日付が変わったら再計算する
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [timeEntries, dayKey]
+    () => getTodayProjectHours(timeEntries, now),
+    [timeEntries, now]
   );
   const segments = useMemo(() => {
     const done = getTodaySegments(
       timeEntries,
-      new Date(),
+      now,
       TIMELINE_START,
       TIMELINE_END
     );
@@ -82,17 +82,16 @@ export const TodayView: React.FC<TodayViewProps> = ({
       id: 'running',
       projectId: activeProject.id,
       startTime,
-      endTime: new Date().toISOString(),
+      endTime: now.toISOString(),
       description: '',
       createdAt: startTime,
       updatedAt: startTime,
     };
     return [
       ...done,
-      ...getTodaySegments([running], new Date(), TIMELINE_START, TIMELINE_END),
+      ...getTodaySegments([running], now, TIMELINE_START, TIMELINE_END),
     ];
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [timeEntries, isRunning, activeProject, startTime, dayKey]);
+  }, [timeEntries, isRunning, activeProject, startTime, now]);
 
   const minutes = now.getHours() * 60 + now.getMinutes();
   const span = (TIMELINE_END - TIMELINE_START) * 60;

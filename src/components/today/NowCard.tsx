@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { useNow } from '../../hooks/useNow';
 import { Box, Button, Typography, useTheme } from '@mui/material';
 import { PlayArrowRounded as PlayIcon } from '@mui/icons-material';
 import { Project } from '../../types';
@@ -18,18 +19,6 @@ interface NowCardProps {
   onStop: () => void;
 }
 
-/** 表示専用の1秒ティッカー。自動停止はレイアウト側が担う */
-const useNow = (enabled: boolean) => {
-  const [now, setNow] = useState(() => Date.now());
-  useEffect(() => {
-    if (!enabled) return;
-    setNow(Date.now());
-    const id = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(id);
-  }, [enabled]);
-  return now;
-};
-
 const formatTime = (iso: string) => {
   const d = new Date(iso);
   return `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
@@ -46,7 +35,8 @@ export const NowCard: React.FC<NowCardProps> = ({
   const theme = useTheme();
   const { t } = useLanguage();
   const running = isRunning && !!activeProject && !!startTime;
-  const now = useNow(running);
+  // 表示専用の1秒ティッカー。自動停止はレイアウト側が担う
+  const now = useNow(1000, running);
 
   if (!running) {
     return (

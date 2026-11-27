@@ -62,6 +62,10 @@ const App: React.FC = () => {
     onTimerStop: () => timer.stop(),
   });
 
+  // 安定した参照にして、Layout の自動停止監視（毎秒のインターバル）を作り直さない
+  const { stop: stopTimer } = timer;
+  const handleStopTimer = useCallback(() => stopTimer(), [stopTimer]);
+
   const handleStartTimer = useCallback(
     (project: Project) => timer.toggle(project),
     [timer]
@@ -164,7 +168,7 @@ const App: React.FC = () => {
       activeProject={timer.activeProject}
       isTimerRunning={timer.isRunning}
       startTime={timer.startTime}
-      onStopTimer={() => timer.stop()}
+      onStopTimer={handleStopTimer}
     >
       <PageRouter
         activePage={activePage}

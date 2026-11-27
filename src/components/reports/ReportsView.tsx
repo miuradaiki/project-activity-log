@@ -3,6 +3,7 @@ import { Box, IconButton } from '@mui/material';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import { Project, TimeEntry } from '../../types';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useNow } from '../../hooks/useNow';
 import {
   getMonthOverview,
   getMonthProjectShares,
@@ -28,7 +29,10 @@ export const ReportsView: React.FC<ReportsViewProps> = ({
   baseMonthlyHours,
 }) => {
   const { t } = useLanguage();
-  const today = new Date();
+  // 開いたまま日付が変わっても「今日」「残り営業日」を追従させる
+  const nowMs = useNow(60_000);
+  const dayKey = new Date(nowMs).toDateString();
+  const today = useMemo(() => new Date(dayKey), [dayKey]);
   const [cursor, setCursor] = useState({
     y: today.getFullYear(),
     m: today.getMonth(),
@@ -36,19 +40,15 @@ export const ReportsView: React.FC<ReportsViewProps> = ({
   const isCurrentMonth =
     cursor.y === today.getFullYear() && cursor.m === today.getMonth();
   // 過去月は月末時点で集計する
-  const asOf = isCurrentMonth
-    ? today
-    : new Date(cursor.y, cursor.m + 1, 0, 23, 59);
-
-  const overview = useMemo(
-    () => getMonthOverview(projects, timeEntries, baseMonthlyHours, asOf),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [projects, timeEntries, baseMonthlyHours, cursor.y, cursor.m]
-  );
+  const overview = useMemo(() => {
+    const asOf = isCurrentMonth
+      ? today
+      : new Date(cursor.y, cursor.m + 1, 0, 23, 59);
+    return getMonthOverview(projects, timeEntries, baseMonthlyHours, asOf);
+  }, [projects, timeEntries, baseMonthlyHours, cursor, isCurrentMonth, today]);
   const weeks = useMemo(
     () => getWeekdayBreakdown(timeEntries, cursor.y, cursor.m, today),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [timeEntries, cursor.y, cursor.m]
+    [timeEntries, cursor, today]
   );
   const shares = useMemo(
     () => getMonthProjectShares(timeEntries, cursor.y, cursor.m),
