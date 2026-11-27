@@ -49,10 +49,8 @@ export const createSplitEntries = (
       projectId,
       startTime: currentStart.toISOString(),
       endTime: currentEnd.toISOString(),
-      description:
-        entries.length === 0
-          ? description
-          : `${description} (${entries.length + 1}日目)`,
+      // 接尾辞を付けると、書き出し→取り込みのたびにメモへ積み重なるためそのまま引き継ぐ
+      description,
       createdAt: timestamp,
       updatedAt: timestamp,
     };

@@ -224,7 +224,7 @@ describe('ManualTimeEntryForm', () => {
       const secondEntry = onSave.mock.calls[1][0];
 
       expect(firstEntry.description).toBeDefined();
-      expect(secondEntry.description).toContain('2日目');
+      expect(secondEntry.description).toBe(firstEntry.description);
       const expectedFirstStart = new Date('2025-01-01T22:00').toISOString();
       const expectedFirstEnd = new Date(
         '2025-01-01T23:59:59.999'
