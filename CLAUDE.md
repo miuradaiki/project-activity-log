@@ -267,7 +267,7 @@ When implementing UI components, follow the design guidelines defined in `docs/d
 - Use `theme.palette` for colors (no hardcoded values)
 - Use `theme.spacing` for margins/paddings (8px unit)
 - Support both light and dark modes
-- Use existing custom components (`GlassCard`, `StatusBadge`, etc.) from `src/components/ui/modern/StyledComponents.tsx`
+- Use the Graphite components (`GraphiteCard`, `ProgressMeter`, `StopButton`, etc.) from `src/components/ui/graphite/` (see section 0 of `docs/design-guidelines.md`)
 - Apply responsive design with MUI breakpoints (xs, md, lg)
 - Use Framer Motion for animations (keep them subtle and consistent)
 - Always add `aria-label` for accessibility

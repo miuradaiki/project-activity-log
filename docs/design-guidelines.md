@@ -2,6 +2,50 @@
 
 本ドキュメントは、Project Activity Log のUI実装における統一的なデザイン規約を定義する。
 
+## 0. Graphite デザインシステム（2026-11 刷新）
+
+本節は以降の節より優先する。グラデーション・グラス表現・`GlassCard` を前提とした記述は旧デザインのもので、新規実装では使わない。
+
+- 決定事項とモック: `plans/261126-1551-modern-ui-mockups/`
+- テーマ定義: `src/styles/modernTheme.ts`（ダーク / ライトの2スキーム）
+
+### 0.1 色
+
+| 役割       | ダーク    | ライト    | 使い方                                  |
+| ---------- | --------- | --------- | --------------------------------------- |
+| 背景       | `#09090B` | `#FBFBFC` | `background.default`                    |
+| カード     | `#111114` | `#FFFFFF` | `background.paper`                      |
+| 罫線       | 白 7%     | 黒 8%     | `divider`                               |
+| アクセント | `#8E8CFF` | `#5652E0` | `primary`。フォーカスと控えめな強調だけ |
+| 危険       | `#FF6B6B` | `#E5484D` | `error`。**停止と目標超過にのみ使う**   |
+
+- 主要 CTA は「文字色の塗り」（`Button variant="contained"`）。紫で塗らない
+- 影は使わない（ライトのカードのみ極薄の影）。階層は罫線と余白で作る
+- プロジェクト色は `projectColorManager`（`src/utils/colorUtils.ts`）から取得する
+
+### 0.2 書体
+
+- 本文: Inter + Noto Sans JP（`@fontsource` で同梱、オフライン動作）
+- 数字（タイマー・KPI）: `numberTypography(theme)` を使う（Manrope 200 / tabular-nums / 字間 -0.04em）
+
+### 0.3 共通コンポーネント（`src/components/ui/graphite/`）
+
+| コンポーネント     | 用途                                                             |
+| ------------------ | ---------------------------------------------------------------- |
+| `GraphiteCard`     | すべてのカード。`glow` はページの主役カードにだけ付ける          |
+| `ProgressMeter`    | 進捗バー。超過分は error 色ではみ出させる（100% で切り捨てない） |
+| `StopButton`       | 停止ボタン（アウトラインのピル＋赤い■）。停止はこの形に統一      |
+| `PlayToggleButton` | 行内の開始/停止トグル                                            |
+| `OverTag`          | 目標超過のタグ（`+6.7h 超過`）                                   |
+| `SegmentedControl` | フィルタ・並び替え・テーマなどの切り替え                         |
+| `StatValue`        | ラベル＋大きな数字＋単位                                         |
+
+### 0.4 画面構成
+
+- 固定サイドバー（216px）: 今日 / プロジェクト / レポート / 設定、今月の進捗、計測中チップ
+- 各ページは `PageHeader` を持ち、主要アクションはヘッダーに置く（FAB は使わない）
+- 進捗・目標の計算は `getProjectMonthProgress` / `getMonthOverview`（`src/utils/analytics/project-progress.ts`）に一本化し、基準時間は必ず設定値を使う
+
 ## 1. カラーシステム
 
 ### 1.1 セマンティックカラー
