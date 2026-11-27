@@ -246,7 +246,6 @@ const App: React.FC = () => {
           onClose={manualEntryModal.close}
           onSave={handleSaveTimeEntry}
           projects={projects}
-          timeEntries={timeEntries}
           timeEntry={manualEntryModal.data}
         />
 

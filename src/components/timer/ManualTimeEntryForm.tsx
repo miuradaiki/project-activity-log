@@ -24,14 +24,11 @@ interface ManualTimeEntryFormProps {
   onSave: (timeEntry: TimeEntry) => void;
   projects: Project[];
   timeEntry?: TimeEntry;
-  /** 重なりの確認に使う */
-  timeEntries?: TimeEntry[];
 }
 
 const ERROR_KEYS = {
   endBeforeStart: 'timer.manual.error.order',
   tooShort: 'timer.manual.error.short',
-  overlap: 'timer.manual.error.overlap',
 } as const;
 
 const Swatch: React.FC<{ projectId: string }> = ({ projectId }) => (
@@ -53,17 +50,10 @@ export const ManualTimeEntryForm: React.FC<ManualTimeEntryFormProps> = ({
   onSave,
   projects,
   timeEntry,
-  timeEntries,
 }) => {
   const theme = useTheme();
   const { t } = useLanguage();
-  const form = useTimeEntryForm({
-    open,
-    timeEntry,
-    timeEntries,
-    onSave,
-    onClose,
-  });
+  const form = useTimeEntryForm({ open, timeEntry, onSave, onClose });
   const { formState, validationError, isLongRecord, isMultiDay, isEditing } =
     form;
   const hours = Math.round((form.durationMs / 3600_000) * 10) / 10;
