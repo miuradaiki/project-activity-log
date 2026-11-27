@@ -1,5 +1,7 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { Box, CircularProgress } from '@mui/material';
+import { Alert, Box, CircularProgress, Snackbar } from '@mui/material';
+import { useLanguage } from './contexts/LanguageContext';
+import { useCsvImport } from './hooks/useCsvImport';
 import { Project, TimeEntry } from './types';
 
 import { ProjectForm } from './components/ProjectForm';
@@ -17,6 +19,7 @@ import { STORAGE_KEYS } from './constants/storageKeys';
 import { projectColorManager } from './utils/colorUtils';
 
 const App: React.FC = () => {
+  const { t } = useLanguage();
   // テーマとレイアウト管理
   const { isDarkMode, toggleThemeMode } = useThemeMode();
 
@@ -81,32 +84,12 @@ const App: React.FC = () => {
     [manualEntryModal, projectOps]
   );
 
-  // CSV インポート関数
-  const handleImportCSV = useCallback(async () => {
-    try {
-      const filePath = await window.electronAPI.showOpenFileDialog();
-      if (!filePath) return; // ユーザーがキャンセルした場合
-
-      const { safeImportWorkLog } = await import('./utils/safeImportUtils');
-      const result = await safeImportWorkLog(
-        filePath,
-        projects,
-        timeEntries,
-        (updatedProjects, updatedTimeEntries) => {
-          setProjects(updatedProjects);
-          setTimeEntries(updatedTimeEntries);
-        }
-      );
-
-      if (result.success) {
-        // インポート成功時の処理は不要
-      } else {
-        // インポート失敗時の処理は不要
-      }
-    } catch {
-      // エラーハンドリングは不要
-    }
-  }, [projects, timeEntries, setProjects, setTimeEntries]);
+  const csvImport = useCsvImport({
+    projects,
+    timeEntries,
+    setProjects,
+    setTimeEntries,
+  });
 
   // ナビゲーション処理
   const handleNavigate = useCallback((page: string) => {
@@ -190,7 +173,7 @@ const App: React.FC = () => {
         manualEntryModal={manualEntryModal}
         projectOps={projectOps}
         onStartTimer={handleStartTimer}
-        onImportCSV={handleImportCSV}
+        onImportCSV={csvImport.importCSV}
         isDarkMode={isDarkMode}
         onToggleTheme={toggleThemeMode}
       />
@@ -213,6 +196,26 @@ const App: React.FC = () => {
         projects={projects}
         timeEntry={manualEntryModal.data}
       />
+
+      <Snackbar
+        open={!!csvImport.result}
+        autoHideDuration={6000}
+        onClose={csvImport.dismiss}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={csvImport.dismiss}
+          severity={csvImport.result?.kind === 'error' ? 'error' : 'success'}
+          variant="filled"
+        >
+          {csvImport.result?.kind === 'success'
+            ? t('import.success', {
+                entries: csvImport.result.addedEntries,
+                projects: csvImport.result.addedProjects,
+              })
+            : t('import.error')}
+        </Alert>
+      </Snackbar>
 
       {/* キーボードショートカットダイアログ */}
       <KeyboardShortcutsDialog

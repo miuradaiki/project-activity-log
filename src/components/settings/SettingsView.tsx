@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Alert, Snackbar, Grid } from '@mui/material';
+import { Alert, Box, Snackbar, Typography } from '@mui/material';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { isTestDataEnabled } from '../../utils/env';
 import { useSettingsState } from './hooks/useSettingsState';
@@ -7,6 +7,7 @@ import { WorkHoursSettings } from './WorkHoursSettings';
 import { AppearanceSettings } from './AppearanceSettings';
 import { TestModeSettings } from './TestModeSettings';
 import { DataSettings } from './DataSettings';
+import { PageHeader } from '../ui/PageHeader';
 
 interface SettingsViewProps {
   onToggleTheme: () => void;
@@ -24,12 +25,11 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
   const {
     baseMonthlyHours,
-    setBaseMonthlyHours,
     notification,
     isLoading,
     isTestMode,
     testDataStats,
-    handleSaveBaseMonthlyHours,
+    handleCommitBaseMonthlyHours,
     handleLanguageChange,
     handleResetSettings,
     handleToggleTestMode,
@@ -46,43 +46,39 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   }
 
   return (
-    <Box sx={{ maxWidth: 800, mx: 'auto', p: 2 }}>
-      <Typography variant="h5" fontWeight="medium" sx={{ mb: 3 }}>
-        {t('settings.title')}
-      </Typography>
-      <Grid container spacing={3}>
-        <Grid size={12}>
-          <WorkHoursSettings
-            baseMonthlyHours={baseMonthlyHours}
-            onBaseMonthlyHoursChange={setBaseMonthlyHours}
-            onSave={handleSaveBaseMonthlyHours}
-            onReset={handleResetSettings}
-          />
-        </Grid>
-
-        <Grid size={12}>
-          <AppearanceSettings
-            isDarkMode={isDarkMode}
-            onToggleTheme={onToggleTheme}
-            onLanguageChange={handleLanguageChange}
-          />
-        </Grid>
-
-        <Grid size={12}>
-          <DataSettings onImportCSV={onImportCSV} />
-        </Grid>
-
+    <Box>
+      <PageHeader
+        title={t('settings.title')}
+        subtitle={t('settings.instant')}
+      />
+      <Box
+        sx={{
+          maxWidth: 720,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 3.25,
+        }}
+      >
+        <WorkHoursSettings
+          baseMonthlyHours={baseMonthlyHours}
+          onCommit={handleCommitBaseMonthlyHours}
+          onReset={handleResetSettings}
+        />
+        <AppearanceSettings
+          isDarkMode={isDarkMode}
+          onToggleTheme={onToggleTheme}
+          onLanguageChange={handleLanguageChange}
+        />
+        <DataSettings onImportCSV={onImportCSV} />
         {testDataFeatureEnabled && (
-          <Grid size={12}>
-            <TestModeSettings
-              isTestMode={isTestMode}
-              testDataStats={testDataStats}
-              onToggleTestMode={handleToggleTestMode}
-              onRegenerateTestData={handleRegenerateTestData}
-            />
-          </Grid>
+          <TestModeSettings
+            isTestMode={isTestMode}
+            testDataStats={testDataStats}
+            onToggleTestMode={handleToggleTestMode}
+            onRegenerateTestData={handleRegenerateTestData}
+          />
         )}
-      </Grid>
+      </Box>
       <Snackbar
         open={notification.open}
         autoHideDuration={4000}
@@ -93,7 +89,6 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           onClose={handleCloseNotification}
           severity={notification.severity}
           variant="filled"
-          elevation={6}
         >
           {notification.message}
         </Alert>

@@ -125,8 +125,7 @@ export const translations = {
     'settings.reset.success': '設定をデフォルトに戻しました',
     'settings.reset.error': 'リセットに失敗しました',
     'settings.language.changed': '言語設定を変更しました',
-    'settings.monthly.hours.example':
-      'に基づく月間目標時間（基準: {hours}時間/月）',
+    'settings.monthly.hours.example': '例: {base}h × 40% = {target}h',
     'settings.appearance': '外観設定',
     'settings.darkmode': 'ダークモード',
     'settings.darkmode.description': '画面の配色を切り替えます',
@@ -260,6 +259,21 @@ export const translations = {
     'reports.by.project': 'プロジェクト別',
     'reports.tracking.suffix': '（追跡のみ）',
     'reports.no.data': 'この月の記録はありません',
+    'import.success':
+      '{entries}件の記録を取り込みました（新規プロジェクト {projects}件）',
+    'import.error': '取り込みに失敗しました。ファイルの形式を確認してください',
+    'settings.work.hours': '稼働時間',
+    'settings.monthly.hours.help':
+      'プロジェクトの目標時間は「基準時間 × 稼働率」で決まります。',
+    'settings.per.month': 'h / 月',
+    'settings.decrease': '減らす',
+    'settings.increase': '増やす',
+    'settings.appearance.language': '外観と言語',
+    'settings.theme': 'テーマ',
+    'settings.theme.hint': 'Alt + L でも切り替えられます',
+    'settings.theme.light': 'ライト',
+    'settings.theme.dark': 'ダーク',
+    'settings.instant': '変更はすぐに保存されます',
   },
   en: {
     // ===== Common =====
@@ -360,8 +374,7 @@ export const translations = {
     'settings.reset.success': 'Settings reset to default',
     'settings.reset.error': 'Failed to reset settings',
     'settings.language.changed': 'Language changed',
-    'settings.monthly.hours.example':
-      ' based monthly target (baseline: {hours} hours/month)',
+    'settings.monthly.hours.example': 'e.g. {base}h × 40% = {target}h',
     'settings.appearance': 'Appearance',
     'settings.darkmode': 'Dark Mode',
     'settings.darkmode.description': 'Switch the color scheme of the screen',
@@ -495,5 +508,19 @@ export const translations = {
     'reports.by.project': 'By project',
     'reports.tracking.suffix': '(tracking)',
     'reports.no.data': 'No entries this month',
+    'import.success': 'Imported {entries} entries ({projects} new projects)',
+    'import.error': 'Import failed. Check the file format.',
+    'settings.work.hours': 'Work hours',
+    'settings.monthly.hours.help':
+      'Project targets are base hours × allocation.',
+    'settings.per.month': 'h / month',
+    'settings.decrease': 'Decrease',
+    'settings.increase': 'Increase',
+    'settings.appearance.language': 'Appearance & language',
+    'settings.theme': 'Theme',
+    'settings.theme.hint': 'Toggle with Alt + L',
+    'settings.theme.light': 'Light',
+    'settings.theme.dark': 'Dark',
+    'settings.instant': 'Changes are saved automatically',
   },
 };

@@ -16,8 +16,8 @@ interface UseSettingsStateReturn {
   isLoading: boolean;
   isTestMode: boolean;
   testDataStats: { projectCount: number; timeEntryCount: number };
-  handleSaveBaseMonthlyHours: () => Promise<void>;
-  handleLanguageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleCommitBaseMonthlyHours: (hours: number) => Promise<void>;
+  handleLanguageChange: (language: 'ja' | 'en') => void;
   handleResetSettings: () => Promise<void>;
   handleToggleTestMode: () => void;
   handleRegenerateTestData: () => Promise<void>;
@@ -60,18 +60,24 @@ export const useSettingsState = (): UseSettingsStateReturn => {
     setNotification((prev) => ({ ...prev, open: false }));
   }, []);
 
-  const handleSaveBaseMonthlyHours = useCallback(async () => {
-    try {
-      await updateBaseMonthlyHours(baseMonthlyHours);
-      showNotification(t('settings.monthly.hours.saved'), 'success');
-    } catch {
-      showNotification(t('settings.save.error'), 'error');
-    }
-  }, [baseMonthlyHours, updateBaseMonthlyHours, showNotification, t]);
+  // 値を変えた時点で保存する（保存ボタンを押し忘れて反映されない問題を防ぐ）
+  const handleCommitBaseMonthlyHours = useCallback(
+    async (hours: number) => {
+      const previous = baseMonthlyHours;
+      setBaseMonthlyHours(hours);
+      try {
+        await updateBaseMonthlyHours(hours);
+      } catch {
+        setBaseMonthlyHours(previous);
+        showNotification(t('settings.save.error'), 'error');
+      }
+    },
+    [baseMonthlyHours, updateBaseMonthlyHours, showNotification, t]
+  );
 
   const handleLanguageChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setLanguage(event.target.value as 'ja' | 'en');
+    (language: 'ja' | 'en') => {
+      setLanguage(language);
       showNotification(t('settings.language.changed'), 'success');
     },
     [setLanguage, showNotification, t]
@@ -127,7 +133,7 @@ export const useSettingsState = (): UseSettingsStateReturn => {
     isLoading,
     isTestMode,
     testDataStats,
-    handleSaveBaseMonthlyHours,
+    handleCommitBaseMonthlyHours,
     handleLanguageChange,
     handleResetSettings,
     handleToggleTestMode,
