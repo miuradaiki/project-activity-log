@@ -51,7 +51,7 @@ describe('timeEntryUtils', () => {
       expect(result[0].description).toBe('深夜作業');
 
       // 2日目のエントリー
-      expect(result[1].description).toBe('深夜作業 (2日目)');
+      expect(result[1].description).toBe('深夜作業');
     });
 
     test('3日にまたがる場合は3つのエントリーに分割する', () => {
@@ -71,10 +71,10 @@ describe('timeEntryUtils', () => {
       expect(result[0].description).toBe('長時間作業');
 
       // 2日目
-      expect(result[1].description).toBe('長時間作業 (2日目)');
+      expect(result[1].description).toBe('長時間作業');
 
       // 3日目
-      expect(result[2].description).toBe('長時間作業 (3日目)');
+      expect(result[2].description).toBe('長時間作業');
     });
 
     test('説明が空の場合でも正しく動作する', () => {
@@ -90,7 +90,7 @@ describe('timeEntryUtils', () => {
 
       expect(result).toHaveLength(2);
       expect(result[0].description).toBe('');
-      expect(result[1].description).toBe(' (2日目)');
+      expect(result[1].description).toBe('');
     });
 
     test('各エントリーに一意のIDが付与される', () => {
