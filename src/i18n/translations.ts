@@ -77,7 +77,7 @@ export const translations = {
     'timer.import.csv': 'CSVインポート',
     'timer.notification.maxtime': '作業時間が8時間を超過しました',
     'timer.notification.maxtime.body':
-      'タイマーを自動停止しました。必要に応じて新しいセッションを開始してください。',
+      'タイマーを自動停止し、記録を開始から8時間で区切りました。必要に応じて新しく計測を始めてください。',
     'timer.export.success': 'CSVを書き出しました',
     'timer.export.error': 'エクスポートに失敗しました',
 
@@ -316,7 +316,7 @@ export const translations = {
     'timer.import.csv': 'Import CSV',
     'timer.notification.maxtime': 'Working time exceeded 8 hours',
     'timer.notification.maxtime.body':
-      'Timer has been automatically stopped. Start a new session if needed.',
+      'Timer was stopped automatically and the entry was capped at 8 hours. Start a new session if needed.',
     'timer.export.success': 'Exported CSV',
     'timer.export.error': 'Failed to export time entries',
 

@@ -161,14 +161,46 @@ describe('useTimerController', () => {
         jest.advanceTimersByTime(2 * 60 * 1000);
       });
 
+      let returned: unknown;
       await act(async () => {
-        await result.current.stop();
+        returned = await result.current.stop();
       });
 
       expect(onTimeEntriesCreated).toHaveBeenCalled();
       const entries = onTimeEntriesCreated.mock.calls[0][0];
       expect(entries.length).toBeGreaterThan(0);
       expect(entries[0].projectId).toBe(mockProject.id);
+      // プロジェクト削除で、停止分の記録も取り消し対象にするため返す
+      expect(returned).toEqual(entries);
+    });
+
+    it('8時間を超えてから停止すると（スリープ明けの自動停止など）、記録は開始から8時間で区切る', async () => {
+      jest.setSystemTime(new Date('2026-11-27T01:00:00.000Z'));
+      const onTimeEntriesCreated = jest.fn();
+      const { result } = renderHook(() =>
+        useTimerController(mockProjects, onTimeEntriesCreated)
+      );
+
+      await act(async () => {
+        await result.current.start(mockProject);
+      });
+      // スリープ中はインターバルが動かないため、時計だけを12時間進める
+      jest.setSystemTime(new Date('2026-11-27T13:00:00.000Z'));
+
+      await act(async () => {
+        await result.current.stop();
+      });
+
+      const entries = onTimeEntriesCreated.mock.calls[0][0];
+      const total = entries.reduce(
+        (sum: number, e: { startTime: string; endTime: string }) =>
+          sum + new Date(e.endTime).getTime() - new Date(e.startTime).getTime(),
+        0
+      );
+      expect(total).toBe(8 * 60 * 60 * 1000);
+      expect(entries[entries.length - 1].endTime).toBe(
+        '2026-11-27T09:00:00.000Z'
+      );
     });
 
     it('1分未満の場合、TimeEntryは作成されず、alert ではなく onDiscarded で知らせる', async () => {
