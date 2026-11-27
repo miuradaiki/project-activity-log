@@ -45,7 +45,7 @@ export default [
         StorageEvent: 'readonly',
         requestAnimationFrame: 'readonly',
         cancelAnimationFrame: 'readonly',
-        
+
         // Node.js globals
         process: 'readonly',
         __dirname: 'readonly',
@@ -53,7 +53,7 @@ export default [
         require: 'readonly',
         global: 'readonly',
         NodeJS: 'readonly',
-        
+
         // Jest globals
         jest: 'readonly',
         describe: 'readonly',
@@ -74,11 +74,14 @@ export default [
     rules: {
       'no-console': 'warn',
       'no-unused-vars': 'off',
-      '@typescript-eslint/no-unused-vars': ['error', { 
-        'argsIgnorePattern': '^_', 
-        'varsIgnorePattern': '^_',
-        'ignoreRestSiblings': true
-      }],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        },
+      ],
       '@typescript-eslint/no-explicit-any': 'warn',
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
@@ -99,6 +102,7 @@ export default [
       'src/utils/storage/index.js',
       'vite.config.ts',
       'jest.config.js',
+      '*.cjs',
       'coverage',
     ],
   },
