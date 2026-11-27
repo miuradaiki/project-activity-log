@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { useSettingsContext } from '../../../contexts/SettingsContext';
 import { useLanguage } from '../../../contexts/LanguageContext';
-import { useStorage } from '../../../hooks/useStorage';
+import { useStorageContext } from '../../../contexts/StorageContext';
 import { useToast } from '../../../contexts/ToastContext';
 
 interface UseSettingsStateReturn {
@@ -30,7 +30,7 @@ export const useSettingsState = (): UseSettingsStateReturn => {
     isTestMode,
     toggleTestMode,
     testDataStats,
-  } = useStorage();
+  } = useStorageContext();
 
   const [baseMonthlyHours, setBaseMonthlyHours] = useState<number>(
     settings?.workHours?.baseMonthlyHours || 140
